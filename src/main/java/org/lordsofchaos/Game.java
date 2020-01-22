@@ -1,4 +1,4 @@
-package org.lordsofchaos;
+package main.java.org.lordsofchaos;
 
 public class Game
 {
