@@ -14,7 +14,7 @@ public class GameController {
 
     //The 2 dimensional array to represent the map
     MatrixObject[][] Map;
-
+    
     //can't finish this method at this time because we need more info from graphics
     public MatrixObject[][] generateMap() {
 
