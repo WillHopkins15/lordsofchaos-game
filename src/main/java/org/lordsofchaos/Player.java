@@ -5,41 +5,50 @@ public class Player {
      protected String Name;
      protected PlayerType playerType;
      protected int currentMoney;
+     protected int Health;
 
-     public Player(String Name, PlayerType PT, int currentMoney) {
-        SetName(Name);
-        SetPlayerType(playerType);
-        SetCurrentMoney(currentMoney);
+     public Player(String Name, PlayerType PT, int CurrentMoney, int Health) {
+        setName(Name);
+        setPlayerType(playerType);
+        setCurrentMoney(currentMoney);
+        setHealth(Health);
      }
 
-     public void SetName(String Name) {
+     public void setName(String Name) {
          this.Name = Name;
      }
 
-     public String GetName() {
+     public String getName() {
          return Name;
      }
 
-     public void SetPlayerType(PlayerType playerType) {
+     public void setPlayerType(PlayerType playerType) {
          this.playerType = playerType;
      }
 
-     public PlayerType GetPlayerType() {
+     public PlayerType getPlayerType() {
          return playerType;
      }
 
-     public void SetCurrentMoney (int currentMoney) {
+     public void setCurrentMoney (int currentMoney) {
          this.currentMoney =  currentMoney;
      }
 
-     public int GetCurrentMoney() {
+     public int getCurrentMoney() {
          return currentMoney;
      }
 
-     public void AddMoney(int money) {
+     public void addMoney(int money) {
          currentMoney = currentMoney + money;
      }
 
+     public void setHealth(int Health) {
+         this.Health = Health;
+     }
+
+     public int getHealth() {
+         return Health;
+     }
 
      //not sure about method name can be changed later
      //method may become redundant later

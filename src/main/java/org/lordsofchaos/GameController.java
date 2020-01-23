@@ -17,10 +17,10 @@ public class GameController {
 
     //can't finish this method at this time because we need more info from graphics
     public MatrixObject[][] generateMap() {
-
+        return null;
     }
 
-     public void ShootTroop(Tower tower, Troop troop) {
+     public void shootTroop(Tower tower, Troop troop) {
         //will have to call sound and graphics for shooting at troop
         int temp;
         temp = troop.GetCurrentHealth() - tower.GetDamage();
@@ -35,22 +35,31 @@ public class GameController {
     //cast as matrix object
     //don't need to pass co-ord
 
-    public void ObjectPlaced(Tower tower){
+    /*public void objectPlaced(Tower tower){
         // anything that need to be done sound and graphics wise add later
         Map[coord.GetX()][coord.GetY()] = tower;
 
-    }
+    }*/
 
-    public void ObjectPlaced(Troop troop) {
+    public void objectPlaced(Troop troop) {
         //talk to tim  about adding an add troop function to the path class 
     }
 
-    public void ObjectRemoved(Troop troop, Coordinates coord) {
+    public void objectRemoved(Troop troop, Coordinates coord) {
         //talk to tim about adding remove troop function to the path class
     }
 
-    public void DamageBase(Troop troop){
-        // need to make a new class called base 
+    public void damageBase(Player player, Troop troop){
+        int temp;
+        temp  = player.getHealth() - troop.GetDamage();
+
+        if (temp <= 0) {
+            player.setHealth(0);
+            //end of game and relavant graphics and sound need to be done.
+        } else {
+            player.setHealth(temp);
+        }
+
     }
     
     public void plusWave() {
