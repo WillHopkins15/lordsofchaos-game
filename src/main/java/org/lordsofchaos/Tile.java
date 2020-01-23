@@ -1,4 +1,4 @@
-package main.java.org.lordsofchaos;
+package org.lordsofchaos;
 
 public class Tile extends MatrixObject
 {

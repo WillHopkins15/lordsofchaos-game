@@ -1,4 +1,4 @@
-package main.java.org.lordsofchaos;
+package org.lordsofchaos;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class GameController {
 
     //The 2 dimensional array to represent the map
     MatrixObject[][] Map;
-    
+
     //can't finish this method at this time because we need more info from graphics
     public MatrixObject[][] generateMap() {
 
@@ -32,13 +32,16 @@ public class GameController {
     }
 
     //ask about the tower and matrix object issue;
-    public void ObjectPlaced(MatrixObject tower, Coordinates coord){
+    //cast as matrix object
+    //don't need to pass co-ord
+
+    public void ObjectPlaced(Tower tower){
         // anything that need to be done sound and graphics wise add later
         Map[coord.GetX()][coord.GetY()] = tower;
 
     }
 
-    public void ObjectPlaced(Troop troop, Coordinates coord) {
+    public void ObjectPlaced(Troop troop) {
         //talk to tim  about adding an add troop function to the path class 
     }
 
