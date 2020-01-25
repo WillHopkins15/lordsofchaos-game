@@ -1,7 +1,11 @@
-package org.lordsofchaos;
+package org.lordsofchaos.gameobjects.troops;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lordsofchaos.gameobjects.DamageType;
+import org.lordsofchaos.gameobjects.InteractiveObject;
+import org.lordsofchaos.matrixobjects.Path;
 
 public class Troop extends InteractiveObject
 {

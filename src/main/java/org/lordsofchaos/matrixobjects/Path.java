@@ -1,7 +1,9 @@
-package org.lordsofchaos;
+package org.lordsofchaos.matrixobjects;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lordsofchaos.gameobjects.troops.Troop;
 
 public class Path extends MatrixObject
 {

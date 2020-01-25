@@ -1,4 +1,6 @@
-package org.lordsofchaos;
+package org.lordsofchaos.gameobjects;
+
+import org.lordsofchaos.Coordinates;
 
 public abstract class GameObject
 {

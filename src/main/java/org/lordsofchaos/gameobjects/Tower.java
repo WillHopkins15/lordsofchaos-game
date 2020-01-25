@@ -1,7 +1,11 @@
-package org.lordsofchaos;
+package org.lordsofchaos.gameobjects;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lordsofchaos.Coordinates;
+import org.lordsofchaos.gameobjects.troops.Troop;
+import org.lordsofchaos.matrixobjects.Path;
 
 public class Tower extends InteractiveObject
 {

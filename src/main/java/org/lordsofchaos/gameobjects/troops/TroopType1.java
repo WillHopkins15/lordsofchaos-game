@@ -1,6 +1,9 @@
-package org.lordsofchaos;
+package org.lordsofchaos.gameobjects.troops;
 
 import java.util.List;
+
+import org.lordsofchaos.gameobjects.DamageType;
+import org.lordsofchaos.matrixobjects.Path;
 
 public class TroopType1 extends Troop
 {

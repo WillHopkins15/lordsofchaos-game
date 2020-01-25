@@ -2,6 +2,12 @@ package org.lordsofchaos;
 
 import java.util.List;
 
+import org.lordsofchaos.gameobjects.Tower;
+import org.lordsofchaos.gameobjects.troops.Troop;
+import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.matrixobjects.Tile;
+
 public class GameController {
 
     //Height and Width of the map
@@ -55,7 +61,7 @@ public class GameController {
         temp = troop.getCurrentHealth() - tower.getDamage();
         troop.setCurrentHealth(temp);
 
-        if (troop.currentHealth <= 0) {
+        if (troop.getCurrentHealth() <= 0) {
             //sound and graphic to remove the troop;
         }
     }

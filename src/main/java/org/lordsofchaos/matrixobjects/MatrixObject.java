@@ -1,4 +1,6 @@
-package org.lordsofchaos;
+package org.lordsofchaos.matrixobjects;
+
+import org.lordsofchaos.Coordinates;
 
 public abstract class MatrixObject {
     // this is not a real-world position, so when constructing a matrixObject, only pass in

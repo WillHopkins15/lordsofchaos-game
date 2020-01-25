@@ -1,4 +1,4 @@
-package org.lordsofchaos;
+package org.lordsofchaos.gameobjects;
 
 public enum DamageType
 {

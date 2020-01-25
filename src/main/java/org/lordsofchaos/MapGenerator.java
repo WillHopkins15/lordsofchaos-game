@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.matrixobjects.Tile;
+
 public class MapGenerator
 {
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(Arrays.asList
