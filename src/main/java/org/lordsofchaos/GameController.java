@@ -4,23 +4,48 @@ import java.util.List;
 
 public class GameController {
 
-    //Height and Width of the map
-    int Height;
-    int Width;
+    //Height and Width of the map, using 10 for debug values
+    int Height = 10;
+    int Width = 10;
     int Wave;
 
      //A list containing different lists that are have the co-ordinates of a paths
-    List<List<Coordinates>> Paths;
+    List<List<Path>> Paths;
 
     //The 2 dimensional array to represent the map
     MatrixObject[][] Map;
-
-    //can't finish this method at this time because we need more info from graphics
-    public MatrixObject[][] generateMap() {
-        return null;
+    
+    public void Initialise()
+    {
+        Paths = MapGenerator.generatePaths();
+        Map= MapGenerator.generateMap(Width, Height, Paths);
+        debugVisualiseMap();
     }
-
-     public void shootTroop(Tower tower, Troop troop) {
+    
+    private void debugVisualiseMap()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            System.out.println();
+            for (int y = 0; y < Height; y++)
+            {
+                if (Map[y][x].getClass() == Tile.class)
+                {
+                    System.out.print("@");
+                }
+                else if (Map[y][x].getClass() == Path.class)
+                {
+                    System.out.print("P");
+                }
+                else
+                {
+                    System.out.print("!");
+                }
+            }   
+        }
+    }
+    
+    public void shootTroop(Tower tower, Troop troop) {
         //will have to call sound and graphics for shooting at troop
         int temp;
         temp = troop.GetCurrentHealth() - tower.GetDamage();
@@ -41,13 +66,21 @@ public class GameController {
 
     }*/
 
-    public void objectPlaced(Troop troop) {
-        //talk to tim  about adding an add troop function to the path class 
+    // Placement
+    public void objectPlaced(Troop troop, int matrixX, int matrixY) {
     }
+    
+    public void objectPlaced(Tower tower, int matrixX, int matrixY) {
+    }
+    //
 
-    public void objectRemoved(Troop troop, Coordinates coord) {
-        //talk to tim about adding remove troop function to the path class
+    // Removal
+    public void objectRemoved(Troop troop, int matrixX, int matrixY) {
     }
+    
+    public void objectRemoved(Tower tower, int matrixX, int matrixY) {
+    }
+    //
 
     public void damageBase(Player player, Troop troop){
         int temp;
