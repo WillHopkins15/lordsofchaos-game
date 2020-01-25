@@ -3,7 +3,7 @@ package org.lordsofchaos.gameobjects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lordsofchaos.Coordinates;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.Path;
 
@@ -16,10 +16,10 @@ public class Tower extends InteractiveObject
     protected Troop target;
     protected List<Path> inRange;
     
-    public Tower(String spriteName, Coordinates coordinates,int cost, int damage, 
+    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, 
             TowerType towerType, int range, DamageType damageType)
     {
-        super(spriteName, coordinates, cost, damage);
+        super(spriteName, rwc, cost, damage);
         setTowerType(towerType);
         setRange(range);
         setDamageType(damageType);

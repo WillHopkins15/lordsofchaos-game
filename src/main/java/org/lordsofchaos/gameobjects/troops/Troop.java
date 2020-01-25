@@ -3,6 +3,7 @@ package org.lordsofchaos.gameobjects.troops;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
@@ -18,7 +19,8 @@ public class Troop extends InteractiveObject
     public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
     {
-        super(spriteName, path.get(0).getMatrixPosition(), cost, damage);
+        super(spriteName, new RealWorldCoordinates(path.get(0).getMatrixPosition())
+        		, cost, damage);
         setMovementSpeed(movementSpeed);
         setCurrentHealth(maxHealth);
         setMaxHealth(maxHealth);

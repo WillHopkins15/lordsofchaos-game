@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.lordsofchaos.coordinatesystems.Coordinates;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
@@ -12,19 +14,19 @@ public class MapGenerator
 {
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(Arrays.asList
             (
-                    new Coordinates(0,0),
-                    new Coordinates(1,0),
-                    new Coordinates(2,0),
-                    new Coordinates(3,0),
-                    new Coordinates(3,1),
-                    new Coordinates(3,2),
-                    new Coordinates(4,2),
-                    new Coordinates(4,3),
-                    new Coordinates(5,3),
-                    new Coordinates(5,4),
-                    new Coordinates(6,4),
-                    new Coordinates(7,4),
-                    new Coordinates(8,4)
+                    new MatrixCoordinates(0,0),
+                    new MatrixCoordinates(1,0),
+                    new MatrixCoordinates(2,0),
+                    new MatrixCoordinates(3,0),
+                    new MatrixCoordinates(3,1),
+                    new MatrixCoordinates(3,2),
+                    new MatrixCoordinates(4,2),
+                    new MatrixCoordinates(4,3),
+                    new MatrixCoordinates(5,3),
+                    new MatrixCoordinates(5,4),
+                    new MatrixCoordinates(6,4),
+                    new MatrixCoordinates(7,4),
+                    new MatrixCoordinates(8,4)
                     ));
     
     public static List<List<Path>> generatePaths()

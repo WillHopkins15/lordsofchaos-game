@@ -2,6 +2,8 @@ package org.lordsofchaos;
 
 import java.util.List;
 
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.Tower;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
@@ -10,6 +12,7 @@ import org.lordsofchaos.matrixobjects.Tile;
 
 public class GameController {
 
+	private static int scaleFactor = 100;
     //Height and Width of the map
     private int height;
     private int width;
@@ -22,13 +25,18 @@ public class GameController {
     //The 2 dimensional array to represent the map
     private MatrixObject[][] map;
     
+    public static int getScaleFactor()
+    {
+    	return scaleFactor;
+    }
+    
     public void initialise()
     {
     	height = 10;
     	width = 10;
     	wave = 0;
         paths = MapGenerator.generatePaths();
-        map= MapGenerator.generateMap(width, height, paths);
+        map = MapGenerator.generateMap(width, height, paths);
         debugVisualiseMap();
     }
     
@@ -77,18 +85,22 @@ public class GameController {
     }*/
 
     // Placement
-    public void objectPlaced(Troop troop, int matrixX, int matrixY) {
+    public void objectPlaced(Troop troop, RealWorldCoordinates rwc) {
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     }
     
-    public void objectPlaced(Tower tower, int matrixX, int matrixY) {
+    public void objectPlaced(Tower tower, RealWorldCoordinates rwc) {
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     }
     //
 
     // Removal
-    public void objectRemoved(Troop troop, int matrixX, int matrixY) {
+    public void objectRemoved(Troop troop, RealWorldCoordinates rwc) {
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     }
     
-    public void objectRemoved(Tower tower, int matrixX, int matrixY) {
+    public void objectRemoved(Tower tower, RealWorldCoordinates rwc) {
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     }
     //
 

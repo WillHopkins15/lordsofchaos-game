@@ -1,11 +1,11 @@
 package org.lordsofchaos.matrixobjects;
 
-import org.lordsofchaos.Coordinates;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 
 public abstract class MatrixObject {
     // this is not a real-world position, so when constructing a matrixObject, only pass in
     // matrixPositions
-    protected Coordinates matrixPosition;
+    protected MatrixCoordinates matrixPosition;
     
     public MatrixObject(int y, int x)
     {
@@ -14,10 +14,10 @@ public abstract class MatrixObject {
     
     public void setMatrixPosition(int y, int x)
     {
-        matrixPosition = new Coordinates(y, x);
+        matrixPosition = new MatrixCoordinates(y, x);
     }
     
-    public Coordinates getMatrixPosition()
+    public MatrixCoordinates getMatrixPosition()
     {
         return matrixPosition;
     }
