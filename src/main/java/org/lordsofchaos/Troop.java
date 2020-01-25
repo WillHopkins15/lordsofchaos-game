@@ -11,10 +11,10 @@ public class Troop extends InteractiveObject
     protected DamageType armourType;
     protected List<Path> path;
     
-    public Troop(String spriteName, Coordinates coordinates, int cost, int damage,
+    public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
     {
-        super(spriteName, coordinates, cost, damage);
+        super(spriteName, path.get(0).getMatrixPosition(), cost, damage);
         setMovementSpeed(movementSpeed);
         setCurrentHealth(maxHealth);
         setMaxHealth(maxHealth);

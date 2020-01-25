@@ -7,7 +7,8 @@ public class GameController {
     //Height and Width of the map
     private int height;
     private int width;
-    private int wave;
+    @SuppressWarnings("unused")
+	private int wave;
 
      //A list containing different lists that are have the co-ordinates of a paths
     private List<List<Path>> paths;

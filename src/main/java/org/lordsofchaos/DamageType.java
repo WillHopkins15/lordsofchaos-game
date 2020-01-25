@@ -2,5 +2,5 @@ package org.lordsofchaos;
 
 public enum DamageType
 {
-	Fire, Ice, Heavy, Light
+	Fire, Ice, Heavy, Light, None
 }
