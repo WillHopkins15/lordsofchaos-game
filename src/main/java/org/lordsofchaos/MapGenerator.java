@@ -45,7 +45,7 @@ public class MapGenerator
             for (int element = 0; element < currentList.size(); element++)
             {
                 Coordinates coords = currentList.get(element);
-                Path pathElement = new Path(coords.GetY(), coords.GetX(), null);
+                Path pathElement = new Path(coords.getY(), coords.getX(), null);
                 path.add(pathElement);
             }
         }
@@ -73,7 +73,7 @@ public class MapGenerator
             {
                 Path pathTile = currentPath.get(element);
                 Coordinates coords = pathTile.getMatrixPosition();
-                map[coords.GetY()][coords.GetX()] = pathTile;
+                map[coords.getY()][coords.getX()] = pathTile;
             }
         }
         return map;

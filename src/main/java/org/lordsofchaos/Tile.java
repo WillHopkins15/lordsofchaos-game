@@ -7,16 +7,16 @@ public class Tile extends MatrixObject
     public Tile(int y, int x, Tower tower)
     {
         super(y, x);
-        SetTower(tower);
+        setTower(tower);
     }
     
     // Getters and setters
-    public void SetTower(Tower tower)
+    public void setTower(Tower tower)
     {
         this.tower = tower;
     }
     
-    public Tower GetTower()
+    public Tower getTower()
     {
         return tower;
     }

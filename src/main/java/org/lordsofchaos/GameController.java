@@ -4,36 +4,39 @@ import java.util.List;
 
 public class GameController {
 
-    //Height and Width of the map, using 10 for debug values
-    int Height = 10;
-    int Width = 10;
-    int Wave;
+    //Height and Width of the map
+    private int height;
+    private int width;
+    private int wave;
 
      //A list containing different lists that are have the co-ordinates of a paths
-    List<List<Path>> Paths;
+    private List<List<Path>> paths;
 
     //The 2 dimensional array to represent the map
-    MatrixObject[][] Map;
+    private MatrixObject[][] map;
     
-    public void Initialise()
+    public void initialise()
     {
-        Paths = MapGenerator.generatePaths();
-        Map= MapGenerator.generateMap(Width, Height, Paths);
+    	height = 10;
+    	width = 10;
+    	wave = 0;
+        paths = MapGenerator.generatePaths();
+        map= MapGenerator.generateMap(width, height, paths);
         debugVisualiseMap();
     }
     
     private void debugVisualiseMap()
     {
-        for (int x = 0; x < Width; x++)
+        for (int x = 0; x < width; x++)
         {
             System.out.println();
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                if (Map[y][x].getClass() == Tile.class)
+                if (map[y][x].getClass() == Tile.class)
                 {
                     System.out.print("@");
                 }
-                else if (Map[y][x].getClass() == Path.class)
+                else if (map[y][x].getClass() == Path.class)
                 {
                     System.out.print("P");
                 }
@@ -48,8 +51,8 @@ public class GameController {
     public void shootTroop(Tower tower, Troop troop) {
         //will have to call sound and graphics for shooting at troop
         int temp;
-        temp = troop.GetCurrentHealth() - tower.GetDamage();
-        troop.SetCurrentHealth(temp);
+        temp = troop.getCurrentHealth() - tower.getDamage();
+        troop.setCurrentHealth(temp);
 
         if (troop.currentHealth <= 0) {
             //sound and graphic to remove the troop;
@@ -84,7 +87,7 @@ public class GameController {
 
     public void damageBase(Player player, Troop troop){
         int temp;
-        temp  = player.getHealth() - troop.GetDamage();
+        temp  = player.getHealth() - troop.getDamage();
 
         if (temp <= 0) {
             player.setHealth(0);
@@ -96,7 +99,7 @@ public class GameController {
     }
     
     public void plusWave() {
-        Wave = Wave + 1;
+        wave += 1;
 
     }
 

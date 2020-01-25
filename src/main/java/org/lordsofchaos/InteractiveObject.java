@@ -9,28 +9,28 @@ public abstract class InteractiveObject extends GameObject
             int cost, int damage)
     {
         super(spriteName, coordinates);
-        SetCost(cost);
-        SetDamage(damage);
+        setCost(cost);
+        setDamage(damage);
 
     }
     
     // Getters and Setters
-    public void SetCost(int cost)
+    public void setCost(int cost)
     {
         this.cost = cost;
     }
     
-    public int GetCost()
+    public int getCost()
     {
         return cost;
     }
     
-    public void SetDamage(int damage)
+    public void setDamage(int damage)
     {
         this.damage = damage;
     }
     
-    public int GetDamage()
+    public int getDamage()
     {
         return damage;
     }

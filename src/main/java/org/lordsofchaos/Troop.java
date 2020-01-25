@@ -15,49 +15,49 @@ public class Troop extends InteractiveObject
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
     {
         super(spriteName, coordinates, cost, damage);
-        SetMovementSpeed(movementSpeed);
-        SetCurrentHealth(maxHealth);
-        SetMaxHealth(maxHealth);
-        SetPath(path);
+        setMovementSpeed(movementSpeed);
+        setCurrentHealth(maxHealth);
+        setMaxHealth(maxHealth);
+        setPath(path);
     }
     
     // Getters and setters
-    public void SetMovementSpeed(float movementSpeed)
+    public void setMovementSpeed(float movementSpeed)
     {
         this.movementSpeed = movementSpeed;
     }
     
-    public float GetMovementSpeed()
+    public float getMovementSpeed()
     {
         return movementSpeed;
     }
     
-    public void SetMaxHealth(int health)
+    public void setMaxHealth(int health)
     {
         maxHealth = health;
     }
     
-    public int GetMaxHealth()
+    public int getMaxHealth()
     {
         return maxHealth;
     }
     
-    public void SetCurrentHealth(int health)
+    public void setCurrentHealth(int health)
     {
         currentHealth = health;
     }
     
-    public int GetCurrentHealth()
+    public int getCurrentHealth()
     {
         return currentHealth;
     }
     
-    public void SetPath(List<Path> path)
+    public void setPath(List<Path> path)
     {
         this.path = path;
     }
     
-    public List<Path> GetPath()
+    public List<Path> getPath()
     {
         if (path == null)
         {
@@ -67,12 +67,12 @@ public class Troop extends InteractiveObject
     }
     //
     
-    public void Move()
+    public void move()
     {
         // move along set path
     }
     
-    public void Attack()
+    public void attack()
     {
         
     }

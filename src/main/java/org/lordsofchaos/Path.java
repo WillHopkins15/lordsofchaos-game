@@ -10,11 +10,11 @@ public class Path extends MatrixObject
     public Path(int y, int x, List<Troop> troops)
     {
         super(y, x);
-        SetTroops(troops);
+        setTroops(troops);
     }
     
     // Getters and Setters
-    public List<Troop> GetTroops()
+    public List<Troop> getTroops()
     {
         if (troops == null)
         {
@@ -23,9 +23,22 @@ public class Path extends MatrixObject
         return troops;
     }
     
-    public void SetTroops(List<Troop> troops)
+    public void setTroops(List<Troop> troops)
     {
         this.troops = troops;
     }
     //
+    
+    public void addTroop(Troop troop)
+    {
+    	getTroops().add(troop);
+    }
+    
+    public void removeTroop(Troop troop)
+    {
+    	for (int i = 0; i < getTroops().size(); i++)
+    	{
+    		
+    	}
+    }
 }

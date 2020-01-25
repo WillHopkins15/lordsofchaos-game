@@ -8,27 +8,27 @@ public class Coordinates
     // Coordinates are always given y then x, so there in no confusion with the matrix
     public Coordinates (int y, int x)
     {
-        SetY(y);
-        SetX(x);
+        setY(y);
+        setX(x);
     }
     
     // Getters and Setters
-    public void SetX(int x)
+    public void setX(int x)
     {
         this.x = x;
     }
     
-    public void SetY(int y)
+    public void setY(int y)
     {
         this.y = y;
     }
     
-    public int GetX()
+    public int getX()
     {
         return x;
     }
     
-    public int GetY()
+    public int getY()
     {
         return y;
     }

@@ -7,38 +7,38 @@ public abstract class GameObject
     
     public GameObject(String spriteName, Coordinates coordinates)
     {
-        SetSpriteName(spriteName);
-        SetCoordinates(coordinates);
+        setSpriteName(spriteName);
+        setCoordinates(coordinates);
     }
 
     // Getters and Setters
-    public void SetSpriteName(String spriteName)
+    public void setSpriteName(String spriteName)
     {
         this.spriteName = spriteName;
     }
     
-    public String GetSpriteName()
+    public String getSpriteName()
     {
         return spriteName;
     }
     
-    public void SetCoordinates(Coordinates coordinates)
+    public void setCoordinates(Coordinates coordinates)
     {
         this.coordinates = coordinates;
     }
     
-    public Coordinates GetCoordinates()
+    public Coordinates getCoordinates()
     {
         return coordinates;
     }
     //
     
-    public void Initialise()
+    public void initialise()
     {
         
     }
     
-    public void Remove()
+    public void remove()
     {
         
     }

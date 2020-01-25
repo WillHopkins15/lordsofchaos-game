@@ -16,51 +16,51 @@ public class Tower extends InteractiveObject
             TowerType towerType, int range, DamageType damageType)
     {
         super(spriteName, coordinates, cost, damage);
-        SetTowerType(towerType);
-        SetRange(range);
-        SetDamageType(damageType);
+        setTowerType(towerType);
+        setRange(range);
+        setDamageType(damageType);
     }
     
     // Getters and Setters
-    public void SetTowerType(TowerType towerType)
+    public void setTowerType(TowerType towerType)
     {
         this.towerType = towerType;
     }
     
-    public TowerType GetTowerType()
+    public TowerType getTowerType()
     {
         return towerType;
     }
     
-    public void SetRange(int range)
+    public void setRange(int range)
     {
         this.range = range;
-        FindPathInRange();
+        findPathInRange();
     }
     
-    public int GetRange()
+    public int getRange()
     {
         return range;
     }
     
-    public void SetDamageType(DamageType damageType)
+    public void setDamageType(DamageType damageType)
     {
         this.damageType = damageType;
     }
     
-    public DamageType GetDamageType()
+    public DamageType getDamageType()
     {
         return damageType;
     }
     //
     
-    private void FindPathInRange()
+    private void findPathInRange()
     {
         // use range to find all in-range path objects in matrix
         inRange = new ArrayList<Path>();
     }
     
-    private Troop FindNearestTroop()
+    private Troop findNearestTroop()
     {
         if (inRange != null && !inRange.isEmpty())
         {
@@ -69,9 +69,9 @@ public class Tower extends InteractiveObject
         return null;
     }
     
-    public void Shoot()
+    public void shoot()
     {
-        target = FindNearestTroop();
+        target = findNearestTroop();
     }
 
 }
