@@ -1,6 +1,6 @@
 package org.lordsofchaos.matrixobjects;
 
-import org.lordsofchaos.gameobjects.Tower;
+import org.lordsofchaos.gameobjects.towers.Tower;
 
 public class Tile extends MatrixObject
 {

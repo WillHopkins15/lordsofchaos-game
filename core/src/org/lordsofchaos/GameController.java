@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.Tower;
+import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
