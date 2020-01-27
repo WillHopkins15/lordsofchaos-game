@@ -3,6 +3,7 @@ package org.lordsofchaos.gameobjects.towers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
@@ -66,6 +67,7 @@ public class Tower extends InteractiveObject
     public void shoot()
     {
         target = findNearestTroop();
+        GameController.shootTroop(this, target);
     }
 
 }
