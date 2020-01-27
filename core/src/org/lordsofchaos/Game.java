@@ -1,4 +1,4 @@
-package com.lordsofchaos.towerdefense;
+package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
