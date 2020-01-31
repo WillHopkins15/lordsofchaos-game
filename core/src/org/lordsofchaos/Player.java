@@ -6,6 +6,7 @@ public class Player {
      protected PlayerType playerType;
      protected int currentMoney;
      protected int Health;
+     protected RealWorldCoordinates coordinates;
 
      public Player(String Name, PlayerType PT, int CurrentMoney, int Health) {
         setName(Name);
@@ -48,6 +49,14 @@ public class Player {
 
      public int getHealth() {
          return Health;
+     }
+
+     public void setCoordinates(RealWorldCoordinates coordinates) {
+         this.coordinates = coordinates;
+     }
+
+     public RealWorldCoordinates getCoordinates() {
+         return coordinates;
      }
 
      //not sure about method name can be changed later

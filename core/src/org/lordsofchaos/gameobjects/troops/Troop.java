@@ -76,10 +76,14 @@ public class Troop extends InteractiveObject
     public void move()
     {
         // move along set path
+
     }
     
-    public void attack()
+    public void attack(Player defendor) 
     {
+        if (getRealWorldCoordinates() == defendor.getCoordinates()) {
+            defender.setHealth(defender.getHealth() - damage);
+        }
         
     }
 
