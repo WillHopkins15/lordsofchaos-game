@@ -3,10 +3,14 @@ package org.lordsofchaos.gameobjects.troops;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.security.sasl.RealmCallback;
+
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.Player;
 
 public class Troop extends InteractiveObject
 {
@@ -14,7 +18,7 @@ public class Troop extends InteractiveObject
     protected int currentHealth;
     protected int maxHealth;
     protected DamageType armourType;
-    protected List<Path> path;
+    protected List<java.nio.file.Path> path;
     
     public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
@@ -76,12 +80,51 @@ public class Troop extends InteractiveObject
     public void move()
     {
         // move along set path
+        MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
+        int index = path.indexOf(currentco);
+        if (index != (path.size()-1)) {
+            MatrixCoordinates nexttile = new MatrixCoordinates();
+            nexttile = path.get(index+1);
+            String direction;
+
+            if ((currentco.getY() - nexttile.getY()) == 0) {
+                //x direction 
+                if ((currentco.getX() - nexttile.getX()) == 1) {
+                    direction = "west";
+                } else {
+                    direction = "east";
+                }
+            } else {
+                if ((currentco.getY() - nexttile.getY()) == 1) {
+                    direction = "north";
+                } else {
+                    direction = "south";
+                }
+            }
+
+            switch (direction) {
+                case "north":
+                    realWorldCoordinates.setY(realWorldCoordinates.getY()-0.1);
+                    break;
+                case "east":
+                    realWorldCoordinates.setX(realWorldCoordinates.getX()+0.1);
+                    break;
+                case "south":
+                    realWorldCoordinates.setY(realWorldCoordinates.getY()+0.1);
+                    break;
+                case "west":
+                    realWorldCoordinates.setX(realWorldCoordinates.getX()-0.1);
+                    break;
+
+            }
+
+        }
 
     }
     
-    public void attack(Player defendor) 
+    public void attack(Player defender) 
     {
-        if (getRealWorldCoordinates() == defendor.getCoordinates()) {
+        if (getRealWorldCoordinates().compare(defender.getCoordinates())) {
             defender.setHealth(defender.getHealth() - damage);
         }
         
