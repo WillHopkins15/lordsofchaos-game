@@ -118,6 +118,16 @@ public class Troop extends InteractiveObject
 
             }
 
+            MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
+
+            if ((currentco.equals(updatedco)) == false) {
+                (path.get(index)).removeTroop(this);
+                (path.get(index+1)).addTroop(this);
+            }
+           
+
+        } else {
+            (path.get(index)).removeTroop(this);
         }
 
     }
