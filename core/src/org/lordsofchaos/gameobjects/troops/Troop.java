@@ -10,7 +10,7 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.Player;
+import org.lordsofchaos.player.Player;
 
 public class Troop extends InteractiveObject
 {
