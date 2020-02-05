@@ -7,17 +7,15 @@ import org.lordsofchaos.player.Defender;
 public class GameStart{
     
     protected int wave = 1;
+    //names will later need to be given
+    protected final static String ATTACKERNAME = "blank";
+    protected final static String DEFENDERNAME = "blank";
 
+    public static Attacker attacker = new Attacker(ATTACKERNAME);
+    public static Defender defender = new Defender(DEFENDERNAME);
 
     
     public void start() throws InterruptedException{
-
-        //names will later need to be given
-        String attackername = "blank";
-        String defendername = "blank";
-
-        Attacker attacker = new Attacker(attackername);
-        Defender defender = new Defender(defendername);
 
         
         while (defender.getHealth() != 0) {
@@ -53,9 +51,5 @@ public class GameStart{
     public void plusWave() {
         wave += 1;
     }
-
-
-
-
 
 }

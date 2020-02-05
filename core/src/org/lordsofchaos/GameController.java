@@ -144,18 +144,7 @@ public class GameController {
     	return true;
     }
 
-    public void damageBase(Defender defender, Troop troop){
-        int temp;
-        temp  = defender.getHealth() - troop.getDamage();
 
-        if (temp <= 0) {
-            defender.setHealth(0);
-            //end of game and relavant graphics and sound need to be done.
-        } else {
-            defender.setHealth(temp);
-        }
-
-    }
 
 
 
