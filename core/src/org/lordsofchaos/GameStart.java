@@ -1,7 +1,7 @@
 package org.lordsofchaos;
 
-import java.util.Timer;
-import java.util.TaskTimer;
+import org.lordsofchaos.player.Attacker;
+import org.lordsofchaos.player.Defender;
 
 
 public class GameStart{
@@ -12,21 +12,22 @@ public class GameStart{
     
     public void start() throws InterruptedException{
 
-        String attackername;
-        String defendername;
+        //names will later need to be given
+        String attackername = "blank";
+        String defendername = "blank";
 
-        Attacker attacker = new Attacker(attackername); 
+        Attacker attacker = new Attacker(attackername);
         Defender defender = new Defender(defendername);
 
         
         while (defender.getHealth() != 0) {
 
-            GameController.initalise();
+            //GameController.initialise();
 
             //countdown for attacker to put troops down
             countdown();
 
-            //countdown for defence to put twoers down
+            //countdown for defence to put towers down
             countdown();
 
             plusWave();

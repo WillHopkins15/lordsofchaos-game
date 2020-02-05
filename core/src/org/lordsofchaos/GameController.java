@@ -11,6 +11,8 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
+import org.lordsofchaos.player.Defender;
+
 
 public class GameController {
 
@@ -142,15 +144,15 @@ public class GameController {
     	return true;
     }
 
-    public void damageBase(Player player, Troop troop){
+    public void damageBase(Defender defender, Troop troop){
         int temp;
-        temp  = player.getHealth() - troop.getDamage();
+        temp  = defender.getHealth() - troop.getDamage();
 
         if (temp <= 0) {
-            player.setHealth(0);
+            defender.setHealth(0);
             //end of game and relavant graphics and sound need to be done.
         } else {
-            player.setHealth(temp);
+            defender.setHealth(temp);
         }
 
     }

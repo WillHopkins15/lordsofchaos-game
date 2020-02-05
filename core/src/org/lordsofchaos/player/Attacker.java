@@ -1,4 +1,4 @@
-package org.lordsofchoas.player;
+package org.lordsofchaos.player;
 
 public class Attacker extends Player{
 

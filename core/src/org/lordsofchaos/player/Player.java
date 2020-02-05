@@ -26,12 +26,12 @@ public class Player {
          return currentMoney;
      }
 
-     public void setMoneyBoost(int moneyboost) {
-         this.moneyboost = moneyboost;
+     public void setMoneyBoost(int moneyBoost) {
+         this.moneyBoost = moneyBoost;
      }
 
      public int getMoneyBoost() {
-         return moneyboost;
+         return moneyBoost;
      }
 
      //not sure about method name can be changed later
