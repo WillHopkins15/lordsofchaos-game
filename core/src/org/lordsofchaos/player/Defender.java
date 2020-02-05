@@ -6,10 +6,13 @@ public class Defender extends Player{
     protected int Health;
     protected RealWorldCoordinates coordinates;
 
-    public Defender(String Name, int CurrentMoney, int Health, RealWorldCoordinates coordinates, int moneyboost) {
-        super(Name, PT, CurrentMoney);
+    public Defender(String Name) {
+        super(Name);
+        setCurrentMoney(50);
         setHealth(100);
-        setCoordinates(coordinates);
+        //change tbis when the actual coordinate for the game is decided
+        RealWorldCoordinates coord = new RealWorldCoordinates(8,4);  
+        setCoordinates(coord);
         setMoneyBoost(50);
         
         }

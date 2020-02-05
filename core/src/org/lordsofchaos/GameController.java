@@ -19,7 +19,7 @@ public class GameController {
     private int height;
     private int width;
     @SuppressWarnings("unused")
-	private int wave;
+	private int wave = 1;
 
     // 
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
@@ -152,11 +152,6 @@ public class GameController {
         } else {
             player.setHealth(temp);
         }
-
-    }
-    
-    public void plusWave() {
-        wave += 1;
 
     }
 

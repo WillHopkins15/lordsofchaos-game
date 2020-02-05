@@ -6,9 +6,8 @@ public class Player {
      protected int currentMoney;
      protected int moneyBoost;
 
-     public Player(String Name, int CurrentMoney) {
+     public Player(String Name) {
         setName(Name);
-        setCurrentMoney(currentMoney);
      }
 
      public void setName(String Name) {
