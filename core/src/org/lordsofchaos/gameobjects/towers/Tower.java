@@ -1,15 +1,17 @@
-package org.lordsofchaos.gameobjects;
+package org.lordsofchaos.gameobjects.towers;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.DamageType;
+import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.Path;
 
 public class Tower extends InteractiveObject
 {
-    protected TowerType towerType;
     protected int range;
     protected DamageType damageType;
     
@@ -17,25 +19,14 @@ public class Tower extends InteractiveObject
     protected List<Path> inRange;
     
     public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, 
-            TowerType towerType, int range, DamageType damageType)
+             int range, DamageType damageType)
     {
         super(spriteName, rwc, cost, damage);
-        setTowerType(towerType);
         setRange(range);
         setDamageType(damageType);
     }
     
     // Getters and Setters
-    public void setTowerType(TowerType towerType)
-    {
-        this.towerType = towerType;
-    }
-    
-    public TowerType getTowerType()
-    {
-        return towerType;
-    }
-    
     public void setRange(int range)
     {
         this.range = range;
@@ -76,6 +67,7 @@ public class Tower extends InteractiveObject
     public void shoot()
     {
         target = findNearestTroop();
+        GameController.shootTroop(this, target);
     }
 
 }

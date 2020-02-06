@@ -38,9 +38,9 @@ public class Path extends MatrixObject
     
     public void removeTroop(Troop troop)
     {
-    	for (int i = 0; i < getTroops().size(); i++)
-    	{
-    		
-    	}
+        
+        if (getTroops().contains(troop) == true) {
+            getTroops().remove(troop);
+        }
     }
 }

@@ -1,14 +1,18 @@
 package org.lordsofchaos;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
-import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.Tower;
+import org.lordsofchaos.gameobjects.towers.Tower;
+import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
+import org.lordsofchaos.player.Defender;
+
 
 public class GameController {
 
@@ -17,17 +21,25 @@ public class GameController {
     private int height;
     private int width;
     @SuppressWarnings("unused")
-	private int wave;
+	private int wave = 1;
 
-     //A list containing different lists that are have the co-ordinates of a paths
-    private List<List<Path>> paths;
+    // 
+    private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
+    
+    //A list containing different lists that are have the co-ordinates of a paths
+    private static List<List<Path>> paths = new ArrayList<List<Path>>();
 
     //The 2 dimensional array to represent the map
-    private MatrixObject[][] map;
+    private static MatrixObject[][] map;
     
     public static int getScaleFactor()
     {
     	return scaleFactor;
+    }
+    
+    public static List<List<Path>> getPaths()
+    {
+    	return paths;
     }
     
     public void initialise()
@@ -38,6 +50,16 @@ public class GameController {
         paths = MapGenerator.generatePaths();
         map = MapGenerator.generateMap(width, height, paths);
         debugVisualiseMap();
+    }
+    
+    public void sendData()
+    {
+    	// send towerBuilds and unitBuildPlan over netwoek
+    	int[][] unitBuildPlan = EventManager.getUnitBuildPlan();
+    	
+    	// then clear data ready for next turn
+    	EventManager.resetBuildPlan();
+    	towerBuilds.clear();
     }
     
     private void debugVisualiseMap()
@@ -63,7 +85,7 @@ public class GameController {
         }
     }
     
-    public void shootTroop(Tower tower, Troop troop) {
+    public static void shootTroop(Tower tower, Troop troop) {
         //will have to call sound and graphics for shooting at troop
         int temp;
         temp = troop.getCurrentHealth() - tower.getDamage();
@@ -74,53 +96,55 @@ public class GameController {
         }
     }
 
-    //ask about the tower and matrix object issue;
-    //cast as matrix object
-    //don't need to pass co-ord
+    // called when user attempts to place a tower
+    // - could be an illegal place, has yet to be verified
+    public static void towerPlaced(TowerBuild tbp)
+    {
+    	if (!verifyTowerPlacement(tbp))
+    	{
+    		return;
+    	}
+    	// convert realWorldCoords to matrix
+    	MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
+    	
+    	Tower tower = createTower(tbp);
 
-    /*public void objectPlaced(Tower tower){
-        // anything that need to be done sound and graphics wise add later
-        Map[coord.GetX()][coord.GetY()] = tower;
-
-    }*/
-
-    // Placement
-    public void objectPlaced(Troop troop, RealWorldCoordinates rwc) {
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
+    	Tile tile = (Tile)map[mc.getY()][mc.getX()];
+    	tile.setTower(tower);
+    	
+    	towerBuilds.add(tbp);
     }
     
-    public void objectPlaced(Tower tower, RealWorldCoordinates rwc) {
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
-    }
-    //
-
-    // Removal
-    public void objectRemoved(Troop troop, RealWorldCoordinates rwc) {
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
-    }
-    
-    public void objectRemoved(Tower tower, RealWorldCoordinates rwc) {
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
-    }
-    //
-
-    public void damageBase(Player player, Troop troop){
-        int temp;
-        temp  = player.getHealth() - troop.getDamage();
-
-        if (temp <= 0) {
-            player.setHealth(0);
-            //end of game and relavant graphics and sound need to be done.
-        } else {
-            player.setHealth(temp);
-        }
-
+    private static Tower createTower(TowerBuild tbp)
+    {
+    	Tower tower = null;
+    	if (tbp.getTowerType() == 0)
+    	{
+    		tower = new TowerType1(tbp.getRealWorldCoordinates());
+    	}
+    	// other if's to be added when new towers are added
+    	return tower;
     }
     
-    public void plusWave() {
-        wave += 1;
-
+    private static boolean verifyTowerPlacement(TowerBuild tbp) 
+    {
+    	// convert realWorldCoords to matrix
+    	MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
+    	// check if this matrix position is legal
+    	MatrixObject mo = map[mc.getY()][mc.getX()];
+    	if (mo.getClass() == Path.class)
+    	{
+    		return false; // cannot place towers on path
+    	}
+    	else if ((mo.getClass() == Tile.class)
+    			&& (((Tile) mo).getTower()) != null)
+    	{
+    		return false; // else it is a tile, but a tower exists here already
+    	}
+    	return true;
     }
+
+
 
 
 
