@@ -6,9 +6,8 @@ public class Player {
      protected int currentMoney;
      protected int moneyBoost;
 
-     public Player(String Name, int CurrentMoney) {
+     public Player(String Name) {
         setName(Name);
-        setCurrentMoney(currentMoney);
      }
 
      public void setName(String Name) {
@@ -27,12 +26,12 @@ public class Player {
          return currentMoney;
      }
 
-     public void setMoneyBoost(int moneyboost) {
-         this.moneyboost = moneyboost;
+     public void setMoneyBoost(int moneyBoost) {
+         this.moneyBoost = moneyBoost;
      }
 
      public int getMoneyBoost() {
-         return moneyboost;
+         return moneyBoost;
      }
 
      //not sure about method name can be changed later

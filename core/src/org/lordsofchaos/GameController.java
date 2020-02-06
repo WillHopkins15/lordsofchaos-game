@@ -11,6 +11,8 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
+import org.lordsofchaos.player.Defender;
+
 
 public class GameController {
 
@@ -19,7 +21,7 @@ public class GameController {
     private int height;
     private int width;
     @SuppressWarnings("unused")
-	private int wave;
+	private int wave = 1;
 
     // 
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
@@ -142,23 +144,7 @@ public class GameController {
     	return true;
     }
 
-    public void damageBase(Player player, Troop troop){
-        int temp;
-        temp  = player.getHealth() - troop.getDamage();
 
-        if (temp <= 0) {
-            player.setHealth(0);
-            //end of game and relavant graphics and sound need to be done.
-        } else {
-            player.setHealth(temp);
-        }
-
-    }
-    
-    public void plusWave() {
-        wave += 1;
-
-    }
 
 
 
