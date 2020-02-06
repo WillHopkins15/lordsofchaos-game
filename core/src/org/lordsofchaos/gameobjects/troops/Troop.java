@@ -18,7 +18,7 @@ public class Troop extends InteractiveObject
     protected int currentHealth;
     protected int maxHealth;
     protected DamageType armourType;
-    protected List<java.nio.file.Path> path;
+    protected List<Path> path;
     
     public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)

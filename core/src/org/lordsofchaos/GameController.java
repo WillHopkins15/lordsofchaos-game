@@ -52,7 +52,7 @@ public class GameController {
     
     public void sendData()
     {
-    	// send towerBuilds and unitBuildPlan over netwoek
+    	// send towerBuilds and unitBuildPlan over network
     	int[][] unitBuildPlan = EventManager.getUnitBuildPlan();
     	
     	// then clear data ready for next turn
