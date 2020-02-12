@@ -23,7 +23,7 @@ public class GameController {
     @SuppressWarnings("unused")
 	private int wave = 1;
 
-    // 
+    // during defender build phase, when player places a tower, add a build plan here
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
     
     //A list containing different lists that are have the co-ordinates of a paths
@@ -55,7 +55,8 @@ public class GameController {
     public void sendData()
     {
     	// send towerBuilds and unitBuildPlan over network
-    	int[][] unitBuildPlan = EventManager.getUnitBuildPlan();
+    	BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), 
+    			towerBuilds);
     	
     	// then clear data ready for next turn
     	EventManager.resetBuildPlan();
