@@ -9,10 +9,10 @@ public class Path extends MatrixObject
 {
     private List<Troop> troops;
     
-    public Path(int y, int x, List<Troop> troops)
+    public Path(int y, int x)
     {
         super(y, x);
-        setTroops(troops);
+        //setTroops(troops);
     }
     
     // Getters and Setters
