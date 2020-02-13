@@ -25,5 +25,11 @@ public abstract class Coordinates
     {
         return y;
     }
-    //
+    
+    public boolean equals(Coordinates other) {
+        if ((getX() == other.getX()) && (getY() == other.getY())) {
+            return true;
+        }
+        return false;
+    }
 }

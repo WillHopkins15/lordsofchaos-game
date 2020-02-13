@@ -51,7 +51,7 @@ public class MapGenerator
             for (int element = 0; element < currentList.size(); element++)
             {
                 Coordinates coords = currentList.get(element);
-                Path pathElement = new Path(coords.getY(), coords.getX(), null);
+                Path pathElement = new Path(coords.getY(), coords.getX());
                 path.add(pathElement);
             }
         }

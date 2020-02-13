@@ -14,8 +14,7 @@ public class TroopType1 extends Troop
 	private static int cost = 10;
 	private static int damage = 10;
 	
-	public TroopType1(List<Path> path)
-	{
+	public TroopType1(List<Path> path) {
 		super(spriteName, cost, damage, 
 				movementSpeed, maxHealth, 
 				armourType, path);
