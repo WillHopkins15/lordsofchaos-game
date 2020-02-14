@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -101,7 +102,7 @@ public class GameController {
     // - could be an illegal place, has yet to be verified
     public static void towerPlaced(TowerBuild tbp)
     {
-    	if (!verifyTowerPlacement(tbp))
+    	if (!verifyTowerPlacement(tbp.getRealWorldCoordinates()))
     	{
     		return;
     	}
@@ -127,10 +128,10 @@ public class GameController {
     	return tower;
     }
     
-    private static boolean verifyTowerPlacement(TowerBuild tbp) 
+    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc) 
     {
     	// convert realWorldCoords to matrix
-    	MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     	// check if this matrix position is legal
     	MatrixObject mo = map[mc.getY()][mc.getX()];
     	if (mo.getClass() == Path.class)
