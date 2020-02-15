@@ -27,6 +27,7 @@ public class Troop extends InteractiveObject
     protected boolean moved;
     protected boolean targeted;
     protected boolean atEnd;
+
     
     public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
