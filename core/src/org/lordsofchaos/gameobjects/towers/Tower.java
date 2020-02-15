@@ -14,7 +14,6 @@ public class Tower extends InteractiveObject
 {
     protected int range;
     protected DamageType damageType;
-    
     protected Troop target;
     protected List<Path> inRange;
     

@@ -6,6 +6,7 @@ import java.util.List;
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -120,7 +121,7 @@ public class GameController {
     private static Tower createTower(TowerBuild tbp)
     {
     	Tower tower = null;
-    	if (tbp.getTowerType() == 0)
+    	if (tbp.getTowerType() == TowerType.type1)
     	{
     		tower = new TowerType1(tbp.getRealWorldCoordinates());
     	}
