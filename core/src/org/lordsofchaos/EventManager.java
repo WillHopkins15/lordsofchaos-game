@@ -1,18 +1,21 @@
 package org.lordsofchaos;
 
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.TowerType;
+
+import java.lang.reflect.Type;
 
 public class EventManager
 {
 	// TowerBuild tells you what sort of tower has been placed and where,
 	// GameController then uses this to create instances of towers
 	// GameController contains a list of TowerBuilds which will be sent over the network
-	public class TowerBuild
+	public static class TowerBuild
 	{
 		private RealWorldCoordinates rwc;
-		private int towerType;
+		private TowerType towerType;
 		
-		public TowerBuild(int towerType, RealWorldCoordinates rwc)
+		public TowerBuild(TowerType towerType, RealWorldCoordinates rwc)
 		{
 			this.towerType = towerType;
 			this.rwc = rwc;
@@ -23,7 +26,7 @@ public class EventManager
 			return rwc;
 		}
 
-		public int getTowerType()
+		public TowerType getTowerType()
 		{
 			return towerType;
 		}
@@ -37,8 +40,9 @@ public class EventManager
 		return unitBuildPlan;
 	}
 	
-	public static void towerPlaced(TowerBuild tbp)
+	public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc)
 	{
+		TowerBuild tbp = new TowerBuild(towerType, rwc);
 		GameController.towerPlaced(tbp);
 	}
 	
