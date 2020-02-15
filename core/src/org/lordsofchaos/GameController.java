@@ -36,6 +36,11 @@ public class GameController {
 
     //The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
+
+    public static List<Troop> getTroops()
+    {
+        return troops;
+    }
     
     public static int getScaleFactor()
     {
