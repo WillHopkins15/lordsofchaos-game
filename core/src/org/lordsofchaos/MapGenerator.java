@@ -84,4 +84,9 @@ public class MapGenerator
         }
         return map;
     }
+
+    public static ArrayList<Coordinates> getPath1() {
+        return path1;
+    }
+
 }

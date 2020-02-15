@@ -39,7 +39,7 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java-library"
-
+    apply plugin: "idea"
 
     dependencies {
         implementation project(":core")
@@ -52,11 +52,13 @@ project(":desktop") {
 
 project(":core") {
     apply plugin: "java-library"
-
+    apply plugin: "idea"
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'
     }
 }

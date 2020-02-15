@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.gameobjects.GameObject;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -16,14 +18,16 @@ import org.lordsofchaos.player.Defender;
 
 public class GameController {
 
-	private static int scaleFactor = 100;
+    private static int scaleFactor = 100;
     //Height and Width of the map
     private int height;
     private int width;
     @SuppressWarnings("unused")
-	private int wave = 1;
+	protected static int wave = 1;
+    protected static List<Troop> troops = new ArrayList<Troop>();
+    protected static List<Tower> towers = new ArrayList<Tower>();
 
-    // 
+    // during defender build phase, when player places a tower, add a build plan here
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
     
     //A list containing different lists that are have the co-ordinates of a paths
@@ -41,6 +45,7 @@ public class GameController {
     {
     	return paths;
     }
+
     
     public void initialise()
     {
@@ -54,8 +59,9 @@ public class GameController {
     
     public void sendData()
     {
-    	// send towerBuilds and unitBuildPlan over netwoek
-    	int[][] unitBuildPlan = EventManager.getUnitBuildPlan();
+    	// send towerBuilds and unitBuildPlan over network
+    	BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), 
+    			towerBuilds);
     	
     	// then clear data ready for next turn
     	EventManager.resetBuildPlan();
@@ -84,6 +90,10 @@ public class GameController {
             }   
         }
     }
+
+    public static MatrixObject getMatrixObject(int y, int x) {
+        return map[y][x];
+    }
     
     public static void shootTroop(Tower tower, Troop troop) {
         //will have to call sound and graphics for shooting at troop
@@ -100,7 +110,7 @@ public class GameController {
     // - could be an illegal place, has yet to be verified
     public static void towerPlaced(TowerBuild tbp)
     {
-    	if (!verifyTowerPlacement(tbp))
+    	if (!verifyTowerPlacement(tbp.getRealWorldCoordinates()))
     	{
     		return;
     	}
@@ -126,10 +136,10 @@ public class GameController {
     	return tower;
     }
     
-    private static boolean verifyTowerPlacement(TowerBuild tbp) 
+    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc) 
     {
     	// convert realWorldCoords to matrix
-    	MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
     	// check if this matrix position is legal
     	MatrixObject mo = map[mc.getY()][mc.getX()];
     	if (mo.getClass() == Path.class)

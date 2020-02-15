@@ -9,6 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+
+import org.lordsofchaos.Game;
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.GameStart;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -24,8 +27,12 @@ public class Troop extends InteractiveObject
     protected int currentHealth;
     protected int maxHealth;
     protected DamageType armourType;
-    protected List<java.nio.file.Path> path;
+    protected List<Path> path;
     protected Sprite sprite;
+    protected boolean moved;
+    protected boolean targeted;
+    protected boolean atEnd;
+
     
     public Troop(String spriteName, int cost, int damage,
             float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
@@ -36,8 +43,10 @@ public class Troop extends InteractiveObject
         setCurrentHealth(maxHealth);
         setMaxHealth(maxHealth);
         setPath(path);
+        setAtEnd(false);
         Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
+
     }
     
     // Getters and setters
@@ -88,8 +97,34 @@ public class Troop extends InteractiveObject
         return sprite;
     }
     
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+
+    public boolean getMoved() {
+        return moved;
+    }
+
+    public boolean getTargeted() {
+        return targeted;
+    }
+
+    public void setTargeted(boolean targeted) {
+        this.targeted = targeted;
+    }
+
+    public boolean getAtEnd() {
+        return atEnd;
+    }
+
+    public void setAtEnd(boolean atEnd) {
+        this.atEnd = atEnd;
+    }
+
     public void move()
     {
+        setMoved(false);
         // move along set path
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
         int index = path.indexOf(currentco);
@@ -130,16 +165,19 @@ public class Troop extends InteractiveObject
             }
 
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
-
+            //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index+1)).addTroop(this);
+                setMoved(true);
+
             }
            
 
         } else {
             (getPath().get(index)).removeTroop(this);
             damageBase();
+            setAtEnd(true);
         }
 
     }
