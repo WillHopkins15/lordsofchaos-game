@@ -52,8 +52,7 @@ public class GameController {
     	return paths;
     }
 
-    
-    public void initialise()
+    public static void initialise()
     {
     	height = 10;
     	width = 10;
@@ -63,7 +62,7 @@ public class GameController {
         debugVisualiseMap();
     }
     
-    public void sendData()
+    public static void sendData()
     {
     	// send towerBuilds and unitBuildPlan over network
     	BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), 
@@ -74,7 +73,7 @@ public class GameController {
     	towerBuilds.clear();
     }
     
-    private void debugVisualiseMap()
+    private static void debugVisualiseMap()
     {
         for (int x = 0; x < width; x++)
         {
@@ -159,9 +158,4 @@ public class GameController {
     	}
     	return true;
     }
-
-
-
-
-
 }
