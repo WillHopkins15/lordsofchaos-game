@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
+
 public class Game extends ApplicationAdapter {
 
 	SpriteBatch batch;
@@ -57,19 +58,15 @@ public class Game extends ApplicationAdapter {
 		renderer.render();
 
 		Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
-		Vector2 v22 = cartesianToIsometric(-y, x);
+
 		renderer.getBatch().begin();
 		renderer.getBatch().draw(troop.getSprite(), v2.x, v2.y, 48, 48);
-		//renderer.getBatch().draw(troop2.getSprite(), v22.x, v22.y, 48, 48);
 		renderer.getBatch().end();
 
-		x = x + 20f * Gdx.graphics.getDeltaTime();
 		RealWorldCoordinates rwc = troop.getRealWorldCoordinates();
-		rwc.setX(rwc.getX() + 1);
-		//rwc.setY(rwc.getY() + 2);
-		troop.setRealWorldCoordinates(rwc);
-		//y = y + -20f * Gdx.graphics.getDeltaTime();
+		//rwc.setY(rwc.getY() + 1);
 
+		troop.setRealWorldCoordinates(rwc);
 
 	}
 
@@ -97,13 +94,8 @@ public class Game extends ApplicationAdapter {
 	}
 
 	public Vector2 realWorldCooridinateToIsometric(RealWorldCoordinates rwc) {
-		
 		Vector2 diff = cartesianToIsometric(1280 - 128, 1280 - 64);
-
 		Vector2 v2 = cartesianToIsometric(rwc.getX() - diff.x, rwc.getY() - diff.y);
-
-		//v2.x = v2.x + 40;
-		//v2.y = v2.y + 48;
 		return v2;
 	}
 }
