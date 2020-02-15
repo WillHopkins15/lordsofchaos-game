@@ -21,4 +21,6 @@ public abstract class MatrixObject {
     {
         return matrixPosition;
     }
+
+
 }

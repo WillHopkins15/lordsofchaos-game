@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
@@ -18,12 +19,14 @@ import org.lordsofchaos.player.Defender;
 
 public class GameController {
 
-	private static int scaleFactor = 100;
+    private static int scaleFactor = 100;
     //Height and Width of the map
     private int height;
     private int width;
     @SuppressWarnings("unused")
-	private int wave = 1;
+	protected static int wave = 1;
+    protected static List<Troop> troops = new ArrayList<Troop>();
+    protected static List<Tower> towers = new ArrayList<Tower>();
 
     // during defender build phase, when player places a tower, add a build plan here
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
@@ -43,6 +46,7 @@ public class GameController {
     {
     	return paths;
     }
+
     
     public void initialise()
     {
@@ -86,6 +90,10 @@ public class GameController {
                 }
             }   
         }
+    }
+
+    public static MatrixObject getMatrixObject(int y, int x) {
+        return map[y][x];
     }
     
     public static void shootTroop(Tower tower, Troop troop) {
