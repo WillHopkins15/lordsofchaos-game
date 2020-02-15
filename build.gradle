@@ -1,3 +1,6 @@
+import org.gradle.plugins.ide.eclipse.model.AccessRule
+
+
 buildscript {
     
 
@@ -9,8 +12,8 @@ buildscript {
         jcenter()
         google()
     }
-    dependencies {
-        
+
+    dependencies {    
 
     }
 }
@@ -51,8 +54,10 @@ project(":desktop") {
 }
 
 project(":core") {
+
     apply plugin: "java-library"
     apply plugin: "idea"
+    apply plugin: "eclipse"
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -61,4 +66,17 @@ project(":core") {
         compileOnly 'org.projectlombok:lombok:1.18.10'
         annotationProcessor 'org.projectlombok:lombok:1.18.10'
     }
+
+    eclipse {
+        classpath {
+            file {
+                whenMerged {
+                    def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
+                    jre.accessRules.add(new AccessRule('0', 'javafx/**'))
+                    jre.accessRules.add(new AccessRule('0', 'com/sun/javafx/**'))
+                }
+            }
+        }
+    }
+
 }
