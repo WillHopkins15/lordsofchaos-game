@@ -6,11 +6,22 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * Thread for listening to new UDP connections on the specified port number. New connections
+ * are added to a list in the {@link GameServer} class.
+ *
+ * @author Will Hopkins
+ */
 public class ConnectionListener extends Thread
 {
     private DatagramSocket socket;
     private static byte[] buffer = new byte[256];
     
+    /**
+     * Creates a UDP DatagramSocket on the specified port, if the port is available.
+     *
+     * @param port Port number to open on
+     */
     @SneakyThrows
     public ConnectionListener(int port) {
         socket = new DatagramSocket(port);

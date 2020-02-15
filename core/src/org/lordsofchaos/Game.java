@@ -41,13 +41,8 @@ public class Game extends ApplicationAdapter
     
     private static void setupClient() {
         GameClient gc = new GameClient();
-        gc.makeConnection();
-        Scanner scan = new Scanner(System.in);
-        String msg = "";
-        while (!msg.equals("end")) {
-            System.out.print("Message: ");
-            msg = scan.nextLine();
-            gc.sendEcho(msg);
+        if (gc.makeConnection()) {
+            gc.runGame();
         }
         gc.close();
     }
