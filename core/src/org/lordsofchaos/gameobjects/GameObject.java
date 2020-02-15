@@ -5,12 +5,12 @@ import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 public abstract class GameObject
 {
     protected String spriteName;
-    protected RealWorldCoordinates coordinates;
+    protected RealWorldCoordinates realWorldCoordinates;
     
     public GameObject(String spriteName, RealWorldCoordinates rwc)
     {
         setSpriteName(spriteName);
-        setCoordinates(rwc);
+        setRealWorldCoordinates(rwc);
     }
 
     // Getters and Setters
@@ -24,14 +24,14 @@ public abstract class GameObject
         return spriteName;
     }
     
-    public void setCoordinates(RealWorldCoordinates rwc)
+    public void setRealWorldCoordinates(RealWorldCoordinates rwc)
     {
-        this.coordinates = rwc;
+        realWorldCoordinates = rwc;
     }
     
-    public RealWorldCoordinates getCoordinates()
+    public RealWorldCoordinates getRealWorldCoordinates()
     {
-        return coordinates;
+        return realWorldCoordinates;
     }
     //
     
