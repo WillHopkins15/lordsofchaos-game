@@ -14,19 +14,32 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
+import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 
 
 public class GameController {
 
+    enum WaveState{
+        DefenderBuild, AttackerBuild, Play
+    }
+
+    private static WaveState waveState;
+
     private static int scaleFactor = 100;
     //Height and Width of the map
-    private int height;
-    private int width;
+    private static int height;
+    private static int width;
     @SuppressWarnings("unused")
 	protected static int wave = 1;
     protected static List<Troop> troops = new ArrayList<Troop>();
     protected static List<Tower> towers = new ArrayList<Tower>();
+
+    protected final static String ATTACKERNAME = "blank";
+    protected final static String DEFENDERNAME = "blank";
+
+    public static Attacker attacker = new Attacker(ATTACKERNAME);
+    public static Defender defender = new Defender(DEFENDERNAME);
 
     // during defender build phase, when player places a tower, add a build plan here
     private static List<TowerBuild> towerBuilds = new ArrayList<TowerBuild>();
@@ -54,6 +67,7 @@ public class GameController {
 
     public static void initialise()
     {
+        waveState = WaveState.DefenderBuild;
     	height = 10;
     	width = 10;
     	wave = 0;
@@ -71,6 +85,58 @@ public class GameController {
     	// then clear data ready for next turn
     	EventManager.resetBuildPlan();
     	towerBuilds.clear();
+    }
+
+    // called by renderer every frame/ whatever
+    public static void update(float deltaTime)
+    {
+        if (waveState == WaveState.DefenderBuild)
+        {
+
+            // if time elapsed, change state to attackerBuild
+            // waveState = WaveState.AttackerBuild;
+        }
+        else if (waveState == WaveState.AttackerBuild)
+        {
+
+            // if time elapsed, plus wave and change state to play
+        }
+        else {
+            shootTroops();
+            moveTroops();
+            spawnTroop();
+            //plusWave();
+            attacker.addMoney();
+            defender.addMoney();
+            // add money
+            // spawn in troops
+        }
+
+    }
+
+    private static void spawnTroop()
+    {
+
+    }
+
+    public static void moveTroops() {
+        int size = GameController.troops.size();
+
+        for (int i = 0; i < size; i++) {
+            (GameController.troops.get(i)).move();
+
+            if (GameController.troops.get(i).getAtEnd()) {
+                GameController.troops.remove((GameController.troops.get(i)));
+            }
+        }
+    }
+
+    public static void shootTroops()  {
+        if (!GameController.towers.isEmpty()) {
+            for (int j = 0; j < GameController.towers.size(); j++){
+                GameController.towers.get(j).shoot();
+            }
+        }
     }
     
     private static void debugVisualiseMap()
