@@ -11,7 +11,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-
+import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
@@ -27,6 +27,18 @@ public class Game extends ApplicationAdapter {
 
 	int width =  1280;
 	final int height = 720;
+
+	public static void main(String[] args) {
+        setupClient();
+    }
+    
+    private static void setupClient() {
+        GameClient gc = new GameClient();
+        if (gc.makeConnection()) {
+            gc.runGame();
+        }
+        gc.close();
+    }
 	
 	@Override
 	public void create () {
