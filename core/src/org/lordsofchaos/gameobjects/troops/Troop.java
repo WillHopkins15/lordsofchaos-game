@@ -5,6 +5,10 @@ import java.util.List;
 
 import javax.security.sasl.RealmCallback;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
 
 import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
@@ -24,6 +28,7 @@ public class Troop extends InteractiveObject
     protected int maxHealth;
     protected DamageType armourType;
     protected List<Path> path;
+    protected Sprite sprite;
     protected boolean moved;
     protected boolean targeted;
     protected boolean atEnd;
@@ -39,6 +44,8 @@ public class Troop extends InteractiveObject
         setMaxHealth(maxHealth);
         setPath(path);
         setAtEnd(false);
+        Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
+        this.sprite = new Sprite(texture);
 
     }
     
@@ -75,17 +82,21 @@ public class Troop extends InteractiveObject
     
     public void setPath(List<Path> path)
     {
-        this.path = path;
+        //this.path = path;
     }
     
-    public List<Path> getPath()
-    {
-        if (path == null)
-        {
-            path = new ArrayList<Path>();
-        }
-        return path;
+    public List<Path> getPath() {
+        //if (path == null) {
+            return new ArrayList<Path>();
+        //}
+        // return path;
     }
+    //
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+    
 
     public void setMoved(boolean moved) {
         this.moved = moved;
