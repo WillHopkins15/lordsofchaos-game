@@ -14,8 +14,8 @@ import java.net.InetAddress;
  */
 public class ConnectionListener extends Thread
 {
-    private static byte[] buffer = new byte[256];
     private DatagramSocket socket;
+    private static byte[] buffer = new byte[256];
     
     /**
      * Creates a UDP DatagramSocket on the specified port, if the port is available.

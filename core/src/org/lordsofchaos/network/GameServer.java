@@ -21,10 +21,23 @@ import java.util.List;
  */
 public class GameServer
 {
-    public static final int SERV_PORT = 5148;
+    protected static final int SERV_PORT = 3333;
     protected static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
     
     public GameServer() {
+    }
+    
+    @SneakyThrows
+    public void run() {
+        String servAddress = InetAddress.getLocalHost().getHostName();
+        HostManager.addHost(servAddress);
+        new ConnectionListener(SERV_PORT).start();
+        System.out.printf("Server started on hostname %s\n", servAddress);
+        
+        while (true) {
+            pairPlayers();
+            Thread.sleep(1000);
+        }
     }
     
     private static void pairPlayers() {
@@ -78,18 +91,5 @@ public class GameServer
     
     public static void main(String[] args) {
         new GameServer().run();
-    }
-    
-    @SneakyThrows
-    public void run() {
-        String servAddress = InetAddress.getLocalHost().getHostName();
-        HostManager.addHost(servAddress);
-        new ConnectionListener(SERV_PORT).start();
-        System.out.printf("Server started on %s\n", servAddress);
-        
-        while (true) {
-            pairPlayers();
-            Thread.sleep(1000);
-        }
     }
 }

@@ -32,13 +32,6 @@ public class GameClient
         socket = new DatagramSocket();
     }
     
-    @SneakyThrows
-    private static Object getObjectFromPacket(byte[] bytes) {
-        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-        ObjectInputStream oin = new ObjectInputStream(bin);
-        return oin.readObject();
-    }
-    
     /**
      * Filters through the knownhosts file to find an online server. Fails if
      * no servers are online. When a connection is made to a server, the method
@@ -52,7 +45,7 @@ public class GameClient
         socket.setSoTimeout(5000);
         for (String item : HostManager.getHosts()) {
             address = InetAddress.getByName(item);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, GameServer.SERV_PORT);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 3333);
             socket.send(packet);
             try {
                 socket.receive(packet);
@@ -63,7 +56,7 @@ public class GameClient
             
             System.out.println("Server found!");
             System.out.println("Looking for opponent...");
-            socket.setSoTimeout(0); //Stop socket from timing out
+            socket.setSoTimeout(0);
             socket.receive(packet);
             
             getObjectFromPacket(packet.getData());
@@ -73,6 +66,13 @@ public class GameClient
         }
         System.out.println("No Servers Online.");
         return false;
+    }
+    
+    @SneakyThrows
+    private static Object getObjectFromPacket(byte[] bytes) {
+        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+        ObjectInputStream oin = new ObjectInputStream(bin);
+        return oin.readObject();
     }
     
     @SneakyThrows
