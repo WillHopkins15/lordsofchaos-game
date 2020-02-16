@@ -4,7 +4,10 @@ import java.util.Arrays;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,8 +18,9 @@ import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
-
-public class Game extends ApplicationAdapter {
+import com.badlogic.gdx.Input.Buttons;
+import org.lordsofchaos.graphics.*;
+public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
 	OrthographicCamera camera;
@@ -24,7 +28,8 @@ public class Game extends ApplicationAdapter {
 	TiledMap map;
 	Troop troop;
 	Troop troop2;
-
+	protected static Button towerButton;
+	protected static boolean buildMode = false;
 	int width =  1280;
 	final int height = 720;
 
@@ -39,7 +44,9 @@ public class Game extends ApplicationAdapter {
         }
         gc.close();
     }
-	
+	public static void createButtons(){
+		towerButton = new Button("UI/button.png",30,30);
+	}
 	@Override
 	public void create () {
 
@@ -54,9 +61,9 @@ public class Game extends ApplicationAdapter {
 		System.out.println(troop.getRealWorldCoordinates().getY());
 		camera.position.set(width, 0, 10);
 		camera.update();
-
+		createButtons();
 		renderer.setView(camera);
-
+		Gdx.input.setInputProcessor(this);
 	}
 
 	float x = 0;
@@ -70,11 +77,24 @@ public class Game extends ApplicationAdapter {
 		renderer.render();
 
 		Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
+		batch.begin();
+		towerButton.getSprite().draw(batch);
+		Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
+		Sprite tmpSpriteTower = new Sprite(tmpTower);
+		if(buildMode){
 
+			tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,Gdx.graphics.getHeight() - Gdx.input.getY());
+			batch.setColor(0,200,0,0.5f);
+			batch.draw(tmpSpriteTower,Gdx.input.getX()  - 24,Gdx.graphics.getHeight() - Gdx.input.getY() - 16,48,94);
+		}
+		batch.end();
 		renderer.getBatch().begin();
 		renderer.getBatch().draw(troop.getSprite(), v2.x, v2.y, 48, 48);
-		renderer.getBatch().end();
 
+		RealWorldCoordinates rwcT = new RealWorldCoordinates(30,30);
+		//renderer.getBatch().draw(towerButton.getTexture(),realWorldCooridinateToIsometric(rwcT).x,realWorldCooridinateToIsometric(rwcT).y,200,100)
+		renderer.getBatch().end();
+		tmpTower.dispose();
 		RealWorldCoordinates rwc = troop.getRealWorldCoordinates();
 		//rwc.setY(rwc.getY() + 1);
 
@@ -109,5 +129,78 @@ public class Game extends ApplicationAdapter {
 		Vector2 diff = cartesianToIsometric(1280 - 128, 1280 - 64);
 		Vector2 v2 = cartesianToIsometric(rwc.getX() - diff.x, rwc.getY() - diff.y);
 		return v2;
+	}
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+		int x = screenX;
+		int y = Gdx.graphics.getHeight() - screenY;
+		System.out.println("Clicked at x = " + x + " y = " + y);
+		if(button == Buttons.LEFT) {
+			if(buildMode){
+
+			}
+
+			if(towerButton.checkClick(x,y) ) {
+				System.out.println("Clicked towerButton");
+				if (!buildMode)
+					buildMode = true;
+			}
+		}
+		if(button == Buttons.RIGHT){
+			if(buildMode)
+				buildMode = false;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		int x = screenX;
+		int y = Gdx.graphics.getHeight() - screenY;
+		/*if(button == Buttons.LEFT) {
+			if(startButton.checkClick(x, y)) {
+				currentScreen = Screen.MAIN_MENU;
+				startButton.setPressedStatus(false);
+			}
+		}*/
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
