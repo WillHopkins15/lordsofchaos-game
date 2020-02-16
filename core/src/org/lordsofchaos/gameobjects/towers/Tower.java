@@ -18,6 +18,8 @@ import org.lordsofchaos.MapGenerator;
 
 public class Tower extends InteractiveObject
 {
+	protected float shootTimer = 0;
+	protected float shootTimerLimit = 3;
     protected int range;
     protected DamageType damageType;
     protected Troop target;
@@ -117,10 +119,20 @@ public class Tower extends InteractiveObject
         return null;
     }
     
-    public void shoot()
+    public void resetTimer()
     {
-        target = findNearestTroop();
-        GameController.shootTroop(this, target);
+    	shootTimer = 0;
+    }
+    
+    public void shoot(float deltaTime)
+    {
+    	shootTimer += deltaTime;
+    	if (shootTimer > shootTimerLimit)
+    	{
+    		target = findNearestTroop();
+    		GameController.shootTroop(this, target);
+    		resetTimer();
+    	}
     }
 
 }
