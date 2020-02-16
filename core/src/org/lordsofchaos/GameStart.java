@@ -74,7 +74,7 @@ public class GameStart{
         int size = GameController.troops.size();
 
         for (int i = 0; i < size; i++) {
-            (GameController.troops.get(i)).move();
+            (GameController.troops.get(i)).move(0f);
 
             if (GameController.troops.get(i).getAtEnd()) {
                 GameController.troops.remove((GameController.troops.get(i)));

@@ -266,7 +266,7 @@ public class GameController {
         int size = GameController.troops.size();
 
         for (int i = 0; i < size; i++) {
-            (GameController.troops.get(i)).move();
+            (GameController.troops.get(i)).move(deltaTime);
 
             if (GameController.troops.get(i).getAtEnd()) {
                 GameController.troops.remove((GameController.troops.get(i)));

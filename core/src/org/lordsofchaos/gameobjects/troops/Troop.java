@@ -23,6 +23,8 @@ import org.lordsofchaos.player.*;
 
 public class Troop extends InteractiveObject
 {
+    protected float moveTimer;
+    protected float moveTimeLimit = 0.1f;
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -122,8 +124,20 @@ public class Troop extends InteractiveObject
         this.atEnd = atEnd;
     }
 
-    public void move()
+    private void resetTimer()
     {
+        moveTimer = 0;
+    }
+
+    public void move(float deltaTime)
+    {
+        moveTimer+= deltaTime;
+        if (moveTimer < moveTimeLimit)
+        {
+            return;
+        }
+        resetTimer();
+
         setMoved(false);
         // move along set path
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
