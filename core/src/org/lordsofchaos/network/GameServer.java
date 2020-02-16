@@ -27,19 +27,6 @@ public class GameServer
     public GameServer() {
     }
     
-    @SneakyThrows
-    public void run() {
-        String servAddress = InetAddress.getLocalHost().getHostName();
-        HostManager.addHost(servAddress);
-        new ConnectionListener(SERV_PORT).start();
-        System.out.printf("Server started on hostname %s\n", servAddress);
-        
-        while (true) {
-            pairPlayers();
-            Thread.sleep(1000);
-        }
-    }
-    
     private static void pairPlayers() {
         if (getNumConnections() > 1) {
             Pair<InetAddress, Integer> player1 = connections.get(0);
@@ -91,5 +78,18 @@ public class GameServer
     
     public static void main(String[] args) {
         new GameServer().run();
+    }
+    
+    @SneakyThrows
+    public void run() {
+        String servAddress = InetAddress.getLocalHost().getHostName();
+        HostManager.addHost(servAddress);
+        new ConnectionListener(SERV_PORT).start();
+        System.out.printf("Server started on %s\n", servAddress);
+        
+        while (true) {
+            pairPlayers();
+            Thread.sleep(1000);
+        }
     }
 }
