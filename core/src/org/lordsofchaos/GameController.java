@@ -111,7 +111,7 @@ public class GameController {
         paths = MapGenerator.generatePaths();
         map = MapGenerator.generateMap(width, height, paths);
         EventManager.initialise(6, getPaths().size());
-        debugVisualiseMap();
+        //debugVisualiseMap();
     }
     
     public static void sendData()
