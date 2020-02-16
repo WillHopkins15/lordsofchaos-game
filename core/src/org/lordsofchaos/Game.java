@@ -1,6 +1,7 @@
 package org.lordsofchaos;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -27,9 +28,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	IsometricTiledMapRenderer renderer;
 	TiledMap map;
 	Troop troop;
+<<<<<<< Updated upstream
 	Troop troop2;
 	protected static Button towerButton;
 	protected static boolean buildMode = false;
+=======
+
+>>>>>>> Stashed changes
 	int width =  1280;
 	final int height = 720;
 
@@ -54,11 +59,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		map = new TmxMapLoader().load("maps/Isometric.tmx");
 		renderer = new IsometricTiledMapRenderer(map);
 		camera = new OrthographicCamera(width * 2, height * 2);
-		Path p = new Path(0, 0);
-		troop = new TroopType1(Arrays.asList(p));
-		troop2 = new TroopType2(Arrays.asList(p));
-		System.out.println(troop.getRealWorldCoordinates().getX());
-		System.out.println(troop.getRealWorldCoordinates().getY());
 		camera.position.set(width, 0, 10);
 		camera.update();
 		createButtons();
@@ -76,6 +76,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 		renderer.render();
 
+<<<<<<< Updated upstream
 		Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
 		batch.begin();
 		towerButton.getSprite().draw(batch);
@@ -99,7 +100,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		//rwc.setY(rwc.getY() + 1);
 
 		troop.setRealWorldCoordinates(rwc);
+=======
+		List<Troop> troops = GameController.getTroops();
 
+		renderer.getBatch().begin();
+		
+		for (int i = 0; i < troops.size(); i++) {
+			Vector2 coordinates = this.realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
+			renderer.getBatch().draw(troop.getSprite(), coordinates.x, coordinates.y, 48, 48);
+		}
+>>>>>>> Stashed changes
+
+		renderer.getBatch().end();
 	}
 
 	@Override
@@ -122,7 +134,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		Vector2 isometric = new Vector2();
         isometric.x = x - y;
         isometric.y = (x + y) * 0.5f;
-        return isometric;  
+        return isometric;
 	}
 
 	public Vector2 realWorldCooridinateToIsometric(RealWorldCoordinates rwc) {
