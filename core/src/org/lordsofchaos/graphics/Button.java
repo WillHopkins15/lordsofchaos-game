@@ -38,6 +38,8 @@ public class Button {
 	public void setPressedStatus(boolean x) {
 		pressedStatus = x;
 	}
+	public float getX(){return buttonX1;}
+	public float getY(){return buttonY1;}
 	public void dispose() {
 		texture.dispose();
 	}
