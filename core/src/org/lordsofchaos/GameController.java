@@ -105,13 +105,13 @@ public class GameController {
     	unitSpawnTimer = 0;
     	addMoneyTimer = 0;
         waveState = WaveState.DefenderBuild;
-    	height = 10;
-    	width = 10;
+    	height = 20;
+    	width = 20;
     	wave = 0;
         paths = MapGenerator.generatePaths();
         map = MapGenerator.generateMap(width, height, paths);
         EventManager.initialise(6, getPaths().size());
-        //debugVisualiseMap();
+        debugVisualiseMap();
     }
     
     public static void sendData()
@@ -122,7 +122,7 @@ public class GameController {
     	
     	// then clear data ready for next turn
     	
-    	// server needs to send BuildPhaseData to EventManager liek this:
+    	// server needs to send BuildPhaseData to EventManager like this:
     	//EventManager.recieveBuildPhaseData(bpd);
     }
     
@@ -284,18 +284,18 @@ public class GameController {
     
     private static void debugVisualiseMap()
     {
-        for (int x = 0; x < width; x++)
+        for (int y = height-1; y > -1; y--)
         {
             System.out.println();
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
                 if (map[y][x].getClass() == Tile.class)
                 {
-                    System.out.print("@");
+                    System.out.print("- ");
                 }
                 else if (map[y][x].getClass() == Path.class)
                 {
-                    System.out.print("P");
+                    System.out.print("@ ");
                 }
                 else
                 {
