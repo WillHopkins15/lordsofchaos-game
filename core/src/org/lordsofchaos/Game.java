@@ -1,6 +1,7 @@
 package org.lordsofchaos;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -31,7 +32,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	IsometricTiledMapRenderer renderer;
 	TiledMap map;
 	Troop troop;
-	Troop troop2;
 	private static int player;
 	private static Button towerButton;
 	private static boolean buildMode = false;
@@ -67,18 +67,23 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 	public void isometricPov(){
 		renderer.render();
-		Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
+		List<Troop> troops = GameController.getTroops();
+		//Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
 		renderer.getBatch().begin();
 		//renderer.getBatch().draw(troop.getSprite(), v2.x, v2.y, 48, 48);
 
-		RealWorldCoordinates rwcT = new RealWorldCoordinates(30, 30);
+		//RealWorldCoordinates rwcT = new RealWorldCoordinates(30, 30);
 		//renderer.getBatch().draw(towerButton.getTexture(),realWorldCooridinateToIsometric(rwcT).x,realWorldCooridinateToIsometric(rwcT).y,200,100)
-		renderer.getBatch().end();
-		RealWorldCoordinates rwc = troop.getRealWorldCoordinates();
+
+		//RealWorldCoordinates rwc = troop.getRealWorldCoordinates();
 		//rwc.setY(rwc.getY() + 1);
 
-		troop.setRealWorldCoordinates(rwc);
-
+		//troop.setRealWorldCoordinates(rwc);
+		for (int i = 0; i < troops.size(); i++) {
+			Vector2 coordinates = this.realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
+			renderer.getBatch().draw(troop.getSprite(), coordinates.x, coordinates.y, 48, 48);
+		}
+		renderer.getBatch().end();
 	}
 	public  void defenderPOV(){
 		isometricPov();
@@ -157,11 +162,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		map = new TmxMapLoader().load("maps/Isometric.tmx");
 		renderer = new IsometricTiledMapRenderer(map);
 		camera = new OrthographicCamera(width * 2, height * 2);
-		Path p = new Path(0, 0);
-		troop = new TroopType1(Arrays.asList(p));
-		troop2 = new TroopType2(Arrays.asList(p));
-		System.out.println(troop.getRealWorldCoordinates().getX());
-		System.out.println(troop.getRealWorldCoordinates().getY());
 		camera.position.set(width, 0, 10);
 		camera.update();
 		createButtons();
@@ -197,6 +197,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			if(player == 1)
 				attackerPOV();
 		}
+
 	}
 
 	@Override
@@ -224,7 +225,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		Vector2 isometric = new Vector2();
         isometric.x = x - y;
         isometric.y = (x + y) * 0.5f;
-        return isometric;  
+        return isometric;
 	}
 
 	public Vector2 realWorldCooridinateToIsometric(RealWorldCoordinates rwc) {
