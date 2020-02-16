@@ -1,18 +1,27 @@
 package org.lordsofchaos;
 
+import java.util.List;
+import java.util.ArrayList;
+
+
+import org.lordsofchaos.gameobjects.troops.Troop;
+import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
+import org.lordsofchaos.GameController;
+
 
 
 public class GameStart{
-    
-    protected int wave = 1;
+
     //names will later need to be given
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
 
     public static Attacker attacker = new Attacker(ATTACKERNAME);
     public static Defender defender = new Defender(DEFENDERNAME);
+
+
 
     
     public void start() throws InterruptedException{
@@ -28,10 +37,19 @@ public class GameStart{
             //countdown for defence to put towers down
             countdown();
 
+
+
+
+            while (!GameController.troops.isEmpty()) {
+
+                moveTroops();
+                shootTroops();
+
+            }
+
             plusWave();
             attacker.addMoney();
             defender.addMoney();
-
 
         }
 
@@ -49,7 +67,28 @@ public class GameStart{
     }
 
     public void plusWave() {
-        wave += 1;
+        GameController.wave += 1;
     }
+
+    public void moveTroops() {
+        int size = GameController.troops.size();
+
+        for (int i = 0; i < size; i++) {
+            (GameController.troops.get(i)).move();
+
+            if (GameController.troops.get(i).getAtEnd()) {
+                GameController.troops.remove((GameController.troops.get(i)));
+            }
+        }
+    }
+
+    public void shootTroops()  {
+        if (!GameController.towers.isEmpty()) {
+            for (int j = 0; j < GameController.towers.size(); j++){
+                GameController.towers.get(j).shoot();
+            }
+        }
+    }
+
 
 }

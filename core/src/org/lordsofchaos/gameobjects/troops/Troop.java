@@ -9,6 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+
+import org.lordsofchaos.Game;
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.GameStart;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -18,67 +21,63 @@ import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.player.*;
 
 
-public class Troop extends InteractiveObject
-{
+public class Troop extends InteractiveObject {
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
     protected DamageType armourType;
-    protected List<java.nio.file.Path> path;
+    protected List < Path > path;
     protected Sprite sprite;
-    
+    protected boolean moved;
+    protected boolean targeted;
+    protected boolean atEnd;
+
+
     public Troop(String spriteName, int cost, int damage,
-            float movementSpeed, int maxHealth, DamageType armourType, List<Path> path)
-    {
-        super(spriteName, new RealWorldCoordinates(path.get(0).getMatrixPosition())
-        		, cost, damage);
+        float movementSpeed, int maxHealth, DamageType armourType, List < Path > path) {
+        super(spriteName, new RealWorldCoordinates(path.get(0).getMatrixPosition()), cost, damage);
         setMovementSpeed(movementSpeed);
         setCurrentHealth(maxHealth);
         setMaxHealth(maxHealth);
         setPath(path);
+        setAtEnd(false);
         Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
+
     }
-    
+
     // Getters and setters
-    public void setMovementSpeed(float movementSpeed)
-    {
+    public void setMovementSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
     }
-    
-    public float getMovementSpeed()
-    {
+
+    public float getMovementSpeed() {
         return movementSpeed;
     }
-    
-    public void setMaxHealth(int health)
-    {
+
+    public void setMaxHealth(int health) {
         maxHealth = health;
     }
-    
-    public int getMaxHealth()
-    {
+
+    public int getMaxHealth() {
         return maxHealth;
     }
-    
-    public void setCurrentHealth(int health)
-    {
+
+    public void setCurrentHealth(int health) {
         currentHealth = health;
     }
-    
-    public int getCurrentHealth()
-    {
+
+    public int getCurrentHealth() {
         return currentHealth;
     }
-    
-    public void setPath(List<Path> path)
-    {
+
+    public void setPath(List < Path > path) {
         //this.path = path;
     }
-    
-    public List<Path> getPath() {
+
+    public List < Path > getPath() {
         //if (path == null) {
-            return new ArrayList<Path>();
+        return new ArrayList < Path > ();
         //}
         // return path;
     }
@@ -87,15 +86,39 @@ public class Troop extends InteractiveObject
     public Sprite getSprite() {
         return sprite;
     }
-    
-    public void move()
-    {
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+
+    public boolean getMoved() {
+        return moved;
+    }
+
+    public boolean getTargeted() {
+        return targeted;
+    }
+
+    public void setTargeted(boolean targeted) {
+        this.targeted = targeted;
+    }
+
+    public boolean getAtEnd() {
+        return atEnd;
+    }
+
+    public void setAtEnd(boolean atEnd) {
+        this.atEnd = atEnd;
+    }
+
+    public void move() {
+        setMoved(false);
         // move along set path
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
         int index = path.indexOf(currentco);
-        if (index != (path.size()-1)) {
+        if (index != (path.size() - 1)) {
             MatrixCoordinates nexttile;
-            nexttile = (getPath().get(index+1)).getMatrixPosition();
+            nexttile = (getPath().get(index + 1)).getMatrixPosition();
             String direction;
 
             if ((currentco.getY() - nexttile.getY()) == 0) {
@@ -115,40 +138,43 @@ public class Troop extends InteractiveObject
 
             switch (direction) {
                 case "north":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY()-1);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
                     break;
                 case "east":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX()+1);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() + 1);
                     break;
                 case "south":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY()+1);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() + 1);
                     break;
                 case "west":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX()-1);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
                     break;
 
             }
 
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
-
+            //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
                 (getPath().get(index)).removeTroop(this);
-                (getPath().get(index+1)).addTroop(this);
+                (getPath().get(index + 1)).addTroop(this);
+                setMoved(true);
+
             }
-           
+
 
         } else {
             (getPath().get(index)).removeTroop(this);
             damageBase();
+            setAtEnd(true);
         }
 
     }
-    
 
 
-    public void damageBase(){
+
+    public void damageBase() {
         int temp;
-        temp  = GameStart.defender.getHealth() - getDamage();
+        temp = GameStart.defender.getHealth() - getDamage();
 
         if (temp <= 0) {
             GameStart.defender.setHealth(0);
