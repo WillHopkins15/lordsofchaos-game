@@ -45,7 +45,7 @@ public class GameClient
         socket.setSoTimeout(5000);
         for (String item : HostManager.getHosts()) {
             address = InetAddress.getByName(item);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 3333);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, GameServer.SERV_PORT);
             socket.send(packet);
             try {
                 socket.receive(packet);

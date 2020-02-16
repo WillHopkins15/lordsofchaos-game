@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class GameServer
 {
-    protected static final int SERV_PORT = 3333;
+    public static final int SERV_PORT = 5148;
     protected static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
     
     public GameServer() {

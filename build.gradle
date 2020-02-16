@@ -1,8 +1,6 @@
 import org.gradle.plugins.ide.eclipse.model.AccessRule
 
-
 buildscript {
-    
 
     repositories {
         mavenLocal()
@@ -13,8 +11,8 @@ buildscript {
         google()
     }
 
-    dependencies {    
-
+    dependencies {
+        classpath 'org.openjfx:javafx-plugin:0.0.8'
     }
 }
 
@@ -58,6 +56,7 @@ project(":core") {
     apply plugin: "java-library"
     apply plugin: "idea"
     apply plugin: "eclipse"
+    apply plugin: 'org.openjfx.javafxplugin'
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -79,4 +78,7 @@ project(":core") {
         }
     }
 
+    javafx {
+        modules = [ 'javafx.base' ]
+    }
 }
