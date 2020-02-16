@@ -12,7 +12,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.openjfx:javafx-plugin:0.0.8'
+        if (JavaVersion.current() == JavaVersion.VERSION_11) {
+            classpath 'org.openjfx:javafx-plugin:0.0.8'
+        }
     }
 }
 
@@ -56,7 +58,9 @@ project(":core") {
     apply plugin: "java-library"
     apply plugin: "idea"
     apply plugin: "eclipse"
-    apply plugin: 'org.openjfx.javafxplugin'
+    if (JavaVersion.current() == JavaVersion.VERSION_11) {
+        apply plugin: 'org.openjfx.javafxplugin'
+    }
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -78,7 +82,9 @@ project(":core") {
         }
     }
 
-    javafx {
-        modules = ['javafx.base']
+    if (JavaVersion.current() == JavaVersion.VERSION_11) {
+        javafx {
+            modules = ['javafx.base']
+        }
     }
 }
