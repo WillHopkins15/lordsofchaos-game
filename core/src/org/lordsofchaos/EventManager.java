@@ -58,7 +58,16 @@ public class EventManager {
 		resetEventManager();
 	}
 
-	public static int[][] getUnitBuildPlan() {
+	public static void towerRemoved(TowerBuild tbp)
+	{
+		if (towerBuilds.contains(tbp))
+		{
+			towerBuilds.remove(tbp);
+		}
+	}
+	
+	public static int[][] getUnitBuildPlan()
+	{
 		return unitBuildPlan;
 	}
 
@@ -68,7 +77,8 @@ public class EventManager {
 
 	public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
 		TowerBuild tbp = new TowerBuild(towerType, rwc);
-		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(rwc)) {
+		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(towerType, rwc))
+		{
 			towerBuilds.add(tbp);
 		}
 	}
