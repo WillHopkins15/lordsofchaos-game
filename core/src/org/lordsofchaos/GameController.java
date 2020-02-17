@@ -250,12 +250,22 @@ public class GameController {
     public static void moveTroops(float deltaTime) {
         int size = GameController.troops.size();
 
+        // any troops that reach the end will be stored here and removed at the end
+        List<Troop> troopsToRemove = new ArrayList<Troop>();
+
+        // move troops
         for (int i = 0; i < size; i++) {
             (GameController.troops.get(i)).move(deltaTime);
 
             if (GameController.troops.get(i).getAtEnd()) {
-                GameController.troops.remove((GameController.troops.get(i)));
+                troopsToRemove.add((GameController.troops.get(i)));
             }
+        }
+
+        // remove any troops that have reached the end
+        for (int i = 0; i < troopsToRemove.size(); i++)
+        {
+            GameController.troops.remove(troopsToRemove.get(i));
         }
     }
 
