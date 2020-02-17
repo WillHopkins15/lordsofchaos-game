@@ -66,7 +66,7 @@ public class GameController {
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
 
-    public static int getBuildPhaseTimer()
+    public static float getBuildPhaseTimer()
     {
         return buildTimer;
     }
