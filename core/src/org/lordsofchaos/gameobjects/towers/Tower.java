@@ -1,23 +1,20 @@
 package org.lordsofchaos.gameobjects.towers;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import javafx.util.Pair;
-import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
-import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.gameobjects.troops.Troop;
-import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.MapGenerator;
-import org.lordsofchaos.player.Defender;
 
 public class Tower extends InteractiveObject
 {
@@ -27,13 +24,15 @@ public class Tower extends InteractiveObject
     protected DamageType damageType;
     protected Troop target;
     protected List<Path> inRange;
+    protected Sprite sprite;
     
     public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, 
-             int range, DamageType damageType)
-    {
+             int range, DamageType damageType){
         super(spriteName, rwc, cost, damage);
         setRange(range);
         setDamageType(damageType);
+        Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
+        this.sprite = new Sprite(texture);
     }
     
     // Getters and Setters
@@ -48,6 +47,10 @@ public class Tower extends InteractiveObject
         return range;
     }
     
+    public Sprite getSprite() {
+        return sprite;
+    }
+
     public void setDamageType(DamageType damageType)
     {
         this.damageType = damageType;

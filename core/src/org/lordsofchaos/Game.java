@@ -15,16 +15,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.Input.Keys;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
+import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
@@ -37,7 +35,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	IsometricTiledMapRenderer renderer;
 	TiledMap map;
 	Troop troop;
-	private static float verticalOffset = 8;
+	private static float verticalSpriteOffset = 8;
+	private static float horizontalSpriteOffset = 8;
 	private static int player;
 	private static Button towerButton;
 	private static boolean buildMode = false;
@@ -86,14 +85,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y - verticalOffset, 48, 48);
+			renderer.getBatch().draw(troops.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 48);
 		}
 
-		/*List<Troop> towers = GameController.get();
-		for (int i = 0; i < troops.size(); i++) {
-			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y - verticalOffset, 48, 48);
-		}*/
+		List<Tower> towers = GameController.getTowers();
+		for (int i = 0; i < towers.size(); i++) {
+			Vector2 coordinates = realWorldCooridinateToIsometric(towers.get(i).getRealWorldCoordinates());
+			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 94);
+		}
 
 		if (player == 0) {
 			// DEFENDER
@@ -109,7 +108,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				}
 
 				Vector2 coords = realWorldCooridinateToIsometric(rwc);
-				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - verticalOffset, 48, 94);
+				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - verticalSpriteOffset, 48, 94);
 				renderer.getBatch().setColor(Color.WHITE);
 			}
 
