@@ -16,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.network.GameClient;
+import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
@@ -33,7 +34,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	TiledMap map;
 	Troop troop;
 	private static float verticalSpriteOffset = 8;
-	private static float horizontalSpriteOffset = 8;
+	private static float horizontalSpriteOffset = 24;
 	private static int player;
 	private static Button towerButton;
 	private static boolean buildMode = false;
@@ -97,6 +98,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 					coordinates.y - verticalSpriteOffset, 48, 48);
 		}
 
+		List<TowerBuild> towerBuilds = EventManager.getTowerBuilds();
+		for (int i = 0; i < towerBuilds.size(); i++) {
+			Vector2 coordinates = realWorldCooridinateToIsometric(towerBuilds.get(i).getRealWorldCoordinates());
+
+			renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
+			renderer.getBatch().draw(towerBuilds.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 94);
+			renderer.getBatch().setColor(Color.WHITE);
+		}
+
 		List<Tower> towers = GameController.getTowers();
 		for (int i = 0; i < towers.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(towers.get(i).getRealWorldCoordinates());
@@ -118,7 +129,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				}
 
 				Vector2 coords = realWorldCooridinateToIsometric(rwc);
-				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - verticalSpriteOffset, 48, 94);
+				renderer.getBatch().draw(tmpSpriteTower2, coords.x - horizontalSpriteOffset, coords.y - verticalSpriteOffset, 48, 94);
 				renderer.getBatch().setColor(Color.WHITE);
 			}
 
@@ -238,7 +249,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				// Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
 			} else {
 				MatrixCoordinates mc = new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY()));
-				
+
 			}
 		}
 
