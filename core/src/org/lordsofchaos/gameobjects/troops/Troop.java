@@ -134,7 +134,18 @@ public class Troop extends InteractiveObject
 
         Path foundPath = (Path)GameController.getMatrixObject(currentco.getY(),currentco.getX());
 
-        int index = path.indexOf(foundPath);
+        int index = -1;
+
+        for (int i = 0; i < path.size(); i++)
+        {
+            if (path.get(i).getMatrixPosition().getY() == foundPath.getMatrixPosition().getY()
+            && path.get(i).getMatrixPosition().getX() == foundPath.getMatrixPosition().getX())
+            {
+                index = i;
+                break;
+            }
+        }
+
         if (index != (path.size() - 1)) {
             MatrixCoordinates nexttile;
             nexttile = (getPath().get(index + 1)).getMatrixPosition();
