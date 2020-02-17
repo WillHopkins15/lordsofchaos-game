@@ -34,6 +34,7 @@ public class Troop extends InteractiveObject
     protected boolean moved;
     protected boolean targeted;
     protected boolean atEnd;
+    private String previousdir = "nothing";
 
 
     public Troop(String spriteName, int cost, int damage,
@@ -130,6 +131,7 @@ public class Troop extends InteractiveObject
 
         setMoved(false);
         // move along set path
+
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
 
         Path foundPath = (Path)GameController.getMatrixObject(currentco.getY(),currentco.getX());
@@ -166,6 +168,26 @@ public class Troop extends InteractiveObject
                 }
             }
 
+            if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
+                switch (previousdir) {
+                    case "north":
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
+                        break;
+                    case "east":
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() + 1);
+                        break;
+                    case "south":
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() + 1);
+                        break;
+                    case "west":
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
+                        break;
+
+                }
+
+            }
+
+
             switch (direction) {
                 case "north":
                     realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
@@ -182,9 +204,16 @@ public class Troop extends InteractiveObject
 
             }
 
+
+
+
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
+                System.out.println("previous direction: " + previousdir);
+                System.out.println("current direction: " + direction);
+                System.out.println(previousdir.equals(direction));
+                previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
                 setMoved(true);
