@@ -41,7 +41,7 @@ public class GameController {
     private static float addMoneyTimeLimit = 1;
     //
 
-    private static int scaleFactor = 100;
+    private static int scaleFactor = 64;
     //Height and Width of the map
     private static int height;
     private static int width;
