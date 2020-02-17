@@ -134,6 +134,29 @@ public class GameController {
         addMoneyTimer = 0;
     }
 
+    public static void endPhase () {
+        if (waveState == WaveState.DefenderBuild) {
+            waveState = WaveState.AttackerBuild;
+
+            // create all towers
+            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+                createTower(EventManager.getTowerBuilds().get(i));
+            }
+
+            System.out.println("Attacker build phase begins");
+            resetBuildTimer();
+        } else if (waveState == WaveState.AttackerBuild) {
+            waveState = WaveState.Play;
+            System.out.println("Play begins");
+            wave++;
+            resetBuildTimer();
+        }
+        else
+        {
+            // not implementing for now
+        }
+    }
+
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
         if (waveState == WaveState.DefenderBuild) {
@@ -141,24 +164,13 @@ public class GameController {
             // if time elapsed, change state to attackerBuild
             // waveState = WaveState.AttackerBuild;
             if (buildTimer > buildTimeLimit) {
-                waveState = WaveState.AttackerBuild;
-
-                // create all towers
-                for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                    createTower(EventManager.getTowerBuilds().get(i));
-                }
-
-                System.out.println("Attacker build phase begins");
-                resetBuildTimer();
+                endPhase();
             }
         } else if (waveState == WaveState.AttackerBuild) {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                waveState = WaveState.Play;
-                System.out.println("Play begins");
-                wave++;
-                resetBuildTimer();
+                endPhase();
             }
         } else {
             // if defender health reaches zero, game over
