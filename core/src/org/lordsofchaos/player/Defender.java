@@ -34,6 +34,7 @@ public class Defender extends Player {
         //change this when the actual coordinate for the game is decided
 
         RealWorldCoordinates coord = new RealWorldCoordinates(8, 4);
+
         setCoordinates(coord);
         setMoneyBoost(50);
 

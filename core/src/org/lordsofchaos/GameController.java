@@ -28,7 +28,7 @@ public class GameController {
 
     // timing
     private static float buildTimer = 0;
-    private static float buildTimeLimit = 30;
+    private static float buildTimeLimit = 5;
 
     private static float unitSpawnTimer = 0;
     private static float unitSpawnTimeLimit = 1;
@@ -38,7 +38,7 @@ public class GameController {
     //
 
     private static int scaleFactor = 64;
-    //Height and Width of the map
+    // Height and Width of the map
     private static int height;
     private static int width;
     @SuppressWarnings("unused")
@@ -65,10 +65,17 @@ public class GameController {
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
 
+    public static float getBuildPhaseTimer() {
+        return buildTimer;
+    }
+
+    public static WaveState getWaveState() {
+        return waveState;
+    }
+
     public static List<Tower> getTowers() {
         return towers;
     }
-
 
     public static MatrixObject[][] getMap() {
         return map;
@@ -107,18 +114,15 @@ public class GameController {
         EventManager.initialise(6, getPaths().size());
         debugVisualiseMap();
     }
-    
-    public static void sendData()
-    {
-    	// send towerBuilds and unitBuildPlan over network
-    	BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), 
-    			EventManager.getTowerBuilds());
-    	
-    	// then clear data ready for next turn
+
+    public static void sendData() {
+        // send towerBuilds and unitBuildPlan over network
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
+
+        // then clear data ready for next turn
     }
 
-    public static void recieveNetworkData(BuildPhaseData bpd)
-    {
+    public static void recieveNetworkData(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
     }
 
@@ -134,6 +138,40 @@ public class GameController {
         addMoneyTimer = 0;
     }
 
+    public static void endPhase() {
+        if (waveState == WaveState.DefenderBuild) {
+            waveState = WaveState.AttackerBuild;
+
+            // create all towers
+            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+                createTower(EventManager.getTowerBuilds().get(i));
+            }
+
+            System.out.println("Attacker build phase begins");
+            resetBuildTimer();
+        } else if (waveState == WaveState.AttackerBuild) {
+            waveState = WaveState.Play;
+            System.out.println("Play begins");
+            wave++;
+            resetBuildTimer();
+        } else {
+            waveState = WaveState.DefenderBuild;
+
+            // reset all tower cooldowns
+            if (!GameController.towers.isEmpty()) {
+                for (int j = 0; j < GameController.towers.size(); j++) {
+                    GameController.towers.get(j).resetTimer();
+                }
+            }
+
+            // make sure to reset all tower build plans and unit build plans
+            EventManager.resetEventManager();
+
+            resetAddMoneyTimer();
+            resetUnitSpawnTimer();
+        }
+    }
+
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
         if (waveState == WaveState.DefenderBuild) {
@@ -141,24 +179,13 @@ public class GameController {
             // if time elapsed, change state to attackerBuild
             // waveState = WaveState.AttackerBuild;
             if (buildTimer > buildTimeLimit) {
-                waveState = WaveState.AttackerBuild;
-
-                // create all towers
-                for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                    createTower(EventManager.getTowerBuilds().get(i));
-                }
-
-                System.out.println("Attacker build phase begins");
-                resetBuildTimer();
+                endPhase();
             }
         } else if (waveState == WaveState.AttackerBuild) {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                waveState = WaveState.Play;
-                System.out.println("Play begins");
-                wave++;
-                resetBuildTimer();
+                endPhase();
             }
         } else {
             // if defender health reaches zero, game over
@@ -167,20 +194,7 @@ public class GameController {
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
-                waveState = WaveState.DefenderBuild;
-
-                // reset all tower cooldowns
-                if (!GameController.towers.isEmpty()) {
-                    for (int j = 0; j < GameController.towers.size(); j++) {
-                        GameController.towers.get(j).resetTimer();
-                    }
-                }
-
-                // make sure to reset all tower build plans and unit build plans
-                EventManager.resetEventManager();
-
-                resetAddMoneyTimer();
-                resetUnitSpawnTimer();
+                endPhase();
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
@@ -267,11 +281,9 @@ public class GameController {
             }
         }
     }
-    
-    private static void troopDies(Troop troop)
-    {
-    	if (troops.contains(troop))
-        {
+
+    private static void troopDies(Troop troop) {
+        if (troops.contains(troop)) {
             troops.remove(troop);
         }
     }
@@ -300,7 +312,7 @@ public class GameController {
         Tile tile = (Tile) map[mc.getY()][mc.getX()];
 
         if (tbp.getTowerType() == TowerType.type1) {
-            tower = new TowerType1(tbp.getRealWorldCoordinates());
+            tower = new TowerType1(tbp.getRealWorldCoordinates(), tbp.getSprite());
         }
         // other if's to be added when new towers are added
 
@@ -308,39 +320,52 @@ public class GameController {
         tile.setTower(tower);
         return tower;
     }
-    
-    private static boolean inBounds(MatrixCoordinates mc)
-    {
-    	if (mc.getX() < 0 || mc.getY() < 0
-    			|| mc.getX() >= width || mc.getY() >= height)
-    	{
-    		return false;
-    	}
-    	return true;
-    }
-    
-    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc)
-    {
-    	// convert realWorldCoords to matrix
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
 
-    	// check if given mc is actually within the bounds of the matrix
-    	if (!inBounds(mc))
-    	{
-    		return false;
-    	}
-    	
-    	// check if this matrix position is legal
-    	MatrixObject mo = map[mc.getY()][mc.getX()];
-    	if (mo.getClass() == Path.class)
-    	{
-    		return false; // cannot place towers on path
-    	}
-    	else if ((mo.getClass() == Tile.class)
-    			&& (((Tile) mo).getTower()) != null)
-    	{
-    		return false; // else it is a tile, but a tower exists here already
-    	}
-    	return true;
+    public static boolean inBounds(MatrixCoordinates mc) {
+        if (mc.getX() < 0 || mc.getY() < 0 || mc.getX() >= width || mc.getY() >= height) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean inBounds(int y, int x) {
+        if (x < 0 || y < 0 || x >= width || y >= height) {
+            return false;
+        }
+        return true;
+    }
+
+    // want to find the cost of a tower before it has been placed
+    private static int getTowerTypeCost(TowerType towerType) {
+        if (towerType == TowerType.type1) {
+            return 50;
+        } else {
+            return 0;
+        }
+    }
+
+    public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
+        // convert realWorldCoords to matrix
+        MatrixCoordinates mc = new MatrixCoordinates(rwc);
+
+        // check if given mc is actually within the bounds of the matrix
+        if (!inBounds(mc)) {
+            return false;
+        }
+
+        if (clientPlayerType != null) {
+            if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney()) {
+                return false;
+            }
+        }
+
+        // check if this matrix position is legal
+        MatrixObject mo = map[mc.getY()][mc.getX()];
+        if (mo.getClass() == Path.class) {
+            return false; // cannot place towers on path
+        } else if ((mo.getClass() == Tile.class) && (((Tile) mo).getTower()) != null) {
+            return false; // else it is a tile, but a tower exists here already
+        }
+        return true;
     }
 }

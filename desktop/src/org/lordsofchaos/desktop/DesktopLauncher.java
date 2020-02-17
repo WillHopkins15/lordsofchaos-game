@@ -14,7 +14,6 @@ public class DesktopLauncher {
 		System.out.println("TEST");
 		GameController.initialise();
 
-
 		new LwjglApplication(new Game(), config);
 
 	}

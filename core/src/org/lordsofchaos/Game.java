@@ -15,17 +15,17 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.network.GameClient;
+import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.graphics.*;
-
-
+import org.lordsofchaos.player.*;
 public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
@@ -34,7 +34,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	TiledMap map;
 	Troop troop;
 	private static float verticalSpriteOffset = 8;
-	private static float horizontalSpriteOffset = 8;
+	private static float horizontalSpriteOffset = 24;
 	private static int player;
 	private static Button towerButton;
 	private static boolean buildMode = false;
@@ -44,7 +44,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button defenderButton;
 	private static Button attackerButton;
 	private static Button endTurnButton;
-	//move to player
+	//move to player if possible
 	private static Texture healthBarTexture;
 	private static Texture healthTexture;
 	private static Sprite healthBarSprite;
@@ -97,30 +97,42 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troops.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 48);
+			renderer.getBatch().draw(troops.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 48);
+		}
+
+		List<TowerBuild> towerBuilds = EventManager.getTowerBuilds();
+		for (int i = 0; i < towerBuilds.size(); i++) {
+			Vector2 coordinates = realWorldCooridinateToIsometric(towerBuilds.get(i).getRealWorldCoordinates());
+
+			renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
+			renderer.getBatch().draw(towerBuilds.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 94);
+			renderer.getBatch().setColor(Color.WHITE);
 		}
 
 		List<Tower> towers = GameController.getTowers();
 		for (int i = 0; i < towers.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(towers.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 94);
+			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 94);
 		}
 
 		if (player == 0) {
 			// DEFENDER
 			if (buildMode) {
-				Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
+				Texture tmpTower = new Texture(Gdx.files.internal("towers/TowerType1.png"));
 				Sprite tmpSpriteTower2 = new Sprite(tmpTower);
 				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
-				if (GameController.verifyTowerPlacement(rwc)) {
+				if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
 					renderer.getBatch().setColor(0, 200, 0, 0.5f);
 				} else {
 					renderer.getBatch().setColor(200, 0, 0, 0.5f);
 				}
 
 				Vector2 coords = realWorldCooridinateToIsometric(rwc);
-				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - verticalSpriteOffset, 48, 94);
+				renderer.getBatch().draw(tmpSpriteTower2, coords.x - horizontalSpriteOffset, coords.y - verticalSpriteOffset, 48, 94);
 				renderer.getBatch().setColor(Color.WHITE);
 			}
 
@@ -131,31 +143,42 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().end();
 	}
 
+
 	public void healthPercentage(){
 			float result = currentHp / 100.0f;
-			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW* result, healthSprite.getHeight());
+			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
 	}
+	public void showHealth(){
+		healthPercentage();
+		healthBarSprite.draw(batch);
+		healthSprite.draw(batch);
+		String nr = currentHp + "";
+		hpCounter.getData().setScale(1.5f);
+		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
 
+	}
+	public void showCoins(Player player){
+		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
+		String tmpCoinCounter = player.getCurrentMoney() + "";
+		coinCounter.getData().setScale(2.0f);
+		coinCounter.draw(batch,tmpCoinCounter,Gdx.graphics.getWidth() - 120,Gdx.graphics.getHeight() - 50);
+
+		coinSprite.draw(batch);
+	}
 	public void defenderPOV() {
 		isometricPov();
 		batch.begin();
 
 		towerButton.getSprite().draw(batch);
-		/*tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY());
-		batch.setColor(0, 200, 0, 0.5f);
-		batch.draw(tmpSpriteTower, Gdx.input.getX() - 24, Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
-		*/
-		healthPercentage();
-		healthBarSprite.draw(batch);
-		healthSprite.draw(batch);
-		String nr = currentHp +"";
-		hpCounter.getData().setScale(1.5f);
-		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
-		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
-		String tmpCoinCounter = GameController.defender.getCurrentMoney() + "";
-		coinCounter.getData().setScale(2.0f);
-		coinCounter.draw(batch,tmpCoinCounter,Gdx.graphics.getWidth() - 120,Gdx.graphics.getHeight() - 50);
-		coinSprite.draw(batch);
+		/*
+		 * tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,
+		 * Gdx.graphics.getHeight() - Gdx.input.getY()); batch.setColor(0, 200, 0,
+		 * 0.5f); batch.draw(tmpSpriteTower, Gdx.input.getX() - 24,
+		 * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
+		 */
+		showHealth();
+
+		showCoins(GameController.defender);
 		endTurnButton.getSprite().draw(batch);
 		batch.end();
 
@@ -171,19 +194,27 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 		unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10,
 				unitButton.getY() + 25);
+		endTurnButton.getSprite().draw(batch);
+		showHealth();
+		showCoins(GameController.attacker);
 		batch.end();
 		isometricPov();
 	}
 
 	public void attackerTouchDown(int x, int y, int pointer, int button) {
-		if (button == Buttons.LEFT) {
-			if (unitButton.checkClick(x, y)) {
-				EventManager.buildPlanChange(0, 0, 1);
+		if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
+			if (button == Buttons.LEFT) {
+				if (unitButton.checkClick(x, y)) {
+					EventManager.buildPlanChange(0, 0, 1);
+				}
+				else if(endTurnButton.checkClick(x,y)){
+					GameController.endPhase();
+				}
 			}
-		}
-		if (button == Buttons.RIGHT) {
-			if (unitButton.checkClick(x, y)) {
-				EventManager.buildPlanChange(0, 0, -1);
+			if (button == Buttons.RIGHT) {
+				if (unitButton.checkClick(x, y)) {
+					EventManager.buildPlanChange(0, 0, -1);
+				}
 			}
 		}
 	}
@@ -199,51 +230,51 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 
 	public void defenderTouchDown(int x, int y, int pointer, int button) {
-		if (button == Buttons.LEFT) {
-			if (currentScreen == Screen.MAIN_MENU) {
+		if(GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+			if (button == Buttons.LEFT) {
+				if (currentScreen == Screen.MAIN_MENU) {
 
-				if (startButton.checkClick(x, y))
-					currentScreen = Screen.GAME;
-				else if (quitButton.checkClick(x, y)) {
-					quitButton.dispose();
-					startButton.dispose();
-					Gdx.app.exit();
+					if (startButton.checkClick(x, y))
+						currentScreen = Screen.GAME;
+					else if (quitButton.checkClick(x, y)) {
+						quitButton.dispose();
+						startButton.dispose();
+						Gdx.app.exit();
+					}
+				}
+				if (buildMode) {
+					// Place tower
+					RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
+					if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
+						EventManager.towerPlaced(TowerType.type1, rwc);
+						buildMode = false;
+					}
+
+				}
+				if (towerButton.checkClick(x, y)) {
+					System.out.println("Clicked towerButton");
+					if (!buildMode) {
+						buildMode = true;
+						// Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
+						// Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
+						// tmpCursor.dispose();
+					}
+				} else if (endTurnButton.checkClick(x, y) && !buildMode) {
+					 GameController.endPhase();
 				}
 			}
-			if (buildMode) {
-				// Place tower
-				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-				if (GameController.verifyTowerPlacement(rwc)) {
-					EventManager.towerPlaced(TowerType.type1, rwc);
+			if (button == Buttons.RIGHT) {
+				if (buildMode) {
 					buildMode = false;
-				}
-
-			}
-			if (towerButton.checkClick(x, y)) {
-				System.out.println("Clicked towerButton");
-				if (!buildMode) {
-					buildMode = true;
-					//Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
-					//Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
-					//tmpCursor.dispose();
-				}
-			}
-			else if(endTurnButton.checkClick(x,y) && !buildMode){
-				//end turn
-			}
-		}
-		if(button == Buttons.RIGHT){
-			if(buildMode) {
-				buildMode = false;
-				//Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
-			}
-			else if(!buildMode){
-					RealWorldCoordinates tmpCoordinates = snap(Gdx.input.getX(),Gdx.input.getY());
+					// Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+				} else {
+					RealWorldCoordinates tmpCoordinates = snap(Gdx.input.getX(), Gdx.input.getY());
 					//removeTower(tmpCoordinates.getX,tmpCoordinates.getY)
+
+				}
+
 			}
 		}
-
-
 	}
 
 	@Override
@@ -263,16 +294,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		camera.update();
 		createButtons();
 		renderer.setView(camera);
-		//move to player
+		// move to player
 		healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
 		healthBarSprite = new Sprite(healthBarTexture);
 		healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
 		healthSprite = new Sprite(healthTexture);
 
 		healthSprite.setScale(5);
-		healthSprite.setPosition(225,Gdx.graphics.getHeight()- 64);
+		healthSprite.setPosition(225, Gdx.graphics.getHeight() - 64);
 		healthBarSprite.setScale(5);
-		healthBarSprite.setPosition(170,Gdx.graphics.getHeight() - 70);
+		healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
 		coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
 		coinSprite = new Sprite(coinTexture);
 		coinSprite.setScale(1.5f);
@@ -393,13 +424,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
 		int x = screenX;
 		int y = Gdx.graphics.getHeight() - screenY;
 		System.out.println("Clicked at x = " + x + " y = " + y);
 		if (button == Buttons.LEFT) {
 			if (currentScreen == Screen.MAIN_MENU) {
-
 				if (startButton.checkClick(x, y))
 					currentScreen = Screen.CHOOSE_FACTION;
 				else if (quitButton.checkClick(x, y)) {
