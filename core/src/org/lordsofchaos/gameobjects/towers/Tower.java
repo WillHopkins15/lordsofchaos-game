@@ -62,26 +62,32 @@ public class Tower extends InteractiveObject {
 
         // List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
+        //System.out.println("matrixco is: " + matrixco.getY() + "," + matrixco.getX());
         MatrixCoordinates tempco;
         MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
 
-        // creating the numerical bounds for the tiles that would be in range
+        //creating the numerical bounds for the tiles that would be in range
+
         int y = (matrixco.getY() - getRange());
         int ylimit = (y + 1 + (range * 2));
-
+        //System.out.println("lower bound is:" + y + "upper bound is:" + ylimit);
         int x = (matrixco.getX() - getRange());
         int xlimit = (x + 1 + (range * 2));
+        //System.out.println("lower bound is:" + x + "upper bound is:" + xlimit);
 
         int count = 0;
 
         for (int a = y; a < ylimit; a++) {
-            for (int b = x; b < xlimit; b++) {
-                if (GameController.getMatrixObject(a, b) instanceof Path) {
+            for (int b = x; b <  xlimit; b++) {
+                if (GameController.getMatrixObject(a,b) instanceof Path){
+                    //System.out.println("the path coords: " + a + "," + b);
                     count++;
                 }
             }
         }
+
         if (count != 0) {
+            count= 0;
 
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
