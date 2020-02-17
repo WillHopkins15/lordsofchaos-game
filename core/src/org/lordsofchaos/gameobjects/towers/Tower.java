@@ -94,15 +94,6 @@ public class Tower extends InteractiveObject
         }
 
         if (count != 0) {
-            count= 0;
-
-            for (int a = y; a < ylimit; a++) {
-                for (int b = x; b < xlimit; b++) {
-                    if (GameController.getMatrixObject(a, b) instanceof Path) {
-                        count++;
-                    }
-                }
-            }
 
             Pair temp[] = new Pair[count];
 
