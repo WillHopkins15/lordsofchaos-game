@@ -15,8 +15,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Input.Keys;
 import org.lordsofchaos.network.GameClient;
@@ -25,6 +27,7 @@ import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.graphics.*;
+
 public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
@@ -41,120 +44,153 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button defenderButton;
 	private static Button attackerButton;
 	private BitmapFont unitNumber;
-	int width =  1280;
+	int width = 1280;
 	final int height = 720;
 	private Screen currentScreen;
 	private float elapsedTime;
 
+
 	public static void main(String[] args) {
-        setupClient();
-    }
-    
-    private static void setupClient() {
-        GameClient gc = new GameClient();
-        if (gc.makeConnection()) {
-            gc.runGame();
-        }
-        gc.close();
-    }
-	public static void createButtons(){
-		towerButton = new Button("UI/towerButton.png",30,30);
-		startButton = new Button("UI/startButton.png", Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2,Gdx.graphics.getHeight() / 2);
-		quitButton = new Button("UI/quitButton.png", Gdx.graphics.getWidth() / 2 - startButton.getSprite().getWidth() / 2,Gdx.graphics.getHeight() / 2 - startButton.getSprite().getHeight() *2);
-		unitButton = new Button("UI/ufoButton.png", 50,50);
-		defenderButton = new Button("UI/defenderButton.png",100,Gdx.graphics.getHeight() / 2);
-		attackerButton = new Button("UI/attackerButton.png", Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100,Gdx.graphics.getHeight() / 2);
+		setupClient();
 	}
-	public void isometricPov(){
-		renderer.render();
-		List<Troop> troops = GameController.getTroops();
-		//Vector2 v2 = realWorldCooridinateToIsometric(troop.getRealWorldCoordinates());
-		renderer.getBatch().begin();
-		//renderer.getBatch().draw(troop.getSprite(), v2.x, v2.y, 48, 48);
 
-		//RealWorldCoordinates rwcT = new RealWorldCoordinates(30, 30);
-		//renderer.getBatch().draw(towerButton.getTexture(),realWorldCooridinateToIsometric(rwcT).x,realWorldCooridinateToIsometric(rwcT).y,200,100)
-
-		//RealWorldCoordinates rwc = troop.getRealWorldCoordinates();
-		//rwc.setY(rwc.getY() + 1);
-
-		//troop.setRealWorldCoordinates(rwc);
-		for (int i = 0; i < troops.size(); i++) {
-			Vector2 coordinates = this.realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troop.getSprite(), coordinates.x, coordinates.y, 48, 48);
+	private static void setupClient() {
+		GameClient gc = new GameClient();
+		if (gc.makeConnection()) {
+			gc.runGame();
 		}
+		gc.close();
+	}
+
+	public static void createButtons() {
+		towerButton = new Button("UI/towerButton.png", 30, 30);
+		startButton = new Button("UI/startButton.png",
+				Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 2);
+		quitButton = new Button("UI/quitButton.png",
+				Gdx.graphics.getWidth() / 2 - startButton.getSprite().getWidth() / 2,
+				Gdx.graphics.getHeight() / 2 - startButton.getSprite().getHeight() * 2);
+		unitButton = new Button("UI/ufoButton.png", 50, 50);
+		defenderButton = new Button("UI/defenderButton.png", 100, Gdx.graphics.getHeight() / 2);
+		attackerButton = new Button("UI/attackerButton.png",
+				Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
+	}
+
+	public void isometricPov() {
+		renderer.render();
+		Path p = new Path(0, 0);
+		troop = new TroopType1(Arrays.asList(p));
+		//RealWorldCoordinates coords = new RealWorldCoordinates(32, 32);
+		//troop.setRealWorldCoordinates(coords);
+		List<Troop> troops = Arrays.asList(troop);
+		renderer.getBatch().begin();
+		for (int i = 0; i < troops.size(); i++) {
+			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
+			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y, 48, 48);
+		}
+
+		if (player == 0) {
+			// DEFENDER
+			if (buildMode) {
+				Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
+				Sprite tmpSpriteTower2 = new Sprite(tmpTower);
+				Vector2 testIso = snap(Gdx.input.getX(), Gdx.input.getY());
+				renderer.getBatch().draw(tmpSpriteTower2, testIso.x - 24, testIso.y - 8, 48, 94);
+			}
+
+		} else {
+
+		}
+
+
 		renderer.getBatch().end();
 	}
-	public  void defenderPOV(){
+
+	public void defenderPOV() {
 		isometricPov();
 		batch.begin();
 		towerButton.getSprite().draw(batch);
 		Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
 		Sprite tmpSpriteTower = new Sprite(tmpTower);
+
 		if (buildMode) {
 
-			tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY());
 			batch.setColor(0, 200, 0, 0.5f);
+			
+
 			batch.draw(tmpSpriteTower, Gdx.input.getX() - 24, Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
 		}
 		batch.end();
 
 	}
 
-	public  void attackerPOV(){
+	public void attackerPOV() {
 		isometricPov();
 		batch.begin();
 		unitButton.getSprite().draw(batch);
 		unitNumber.getData().setScale(1.5f);
 		int x = EventManager.getUnitBuildPlan()[0][0];
-		String nr = new String(	""+x);
+		String nr = new String("" + x);
 
-		unitNumber.draw(batch,nr,unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10,unitButton.getY() + 25);
+		unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10, unitButton.getY() + 25);
 		batch.end();
 		isometricPov();
 	}
-	public void attackerTouchDown(int x,int y, int pointer, int button){
-		if(button == Buttons.LEFT){
-			if(unitButton.checkClick(x,y)){
-				EventManager.buildPlanChange(0,0,1);
-			}
-		}
-		if(button == Buttons.RIGHT){
-			if(unitButton.checkClick(x,y)){
-				EventManager.buildPlanChange(0,0,-1);
-			}
-		}
 
+	public void attackerTouchDown(int x, int y, int pointer, int button) {
+		if (button == Buttons.LEFT) {
+			if (unitButton.checkClick(x, y)) {
+				EventManager.buildPlanChange(0, 0, 1);
+			}
+		}
+		if (button == Buttons.RIGHT) {
+			if (unitButton.checkClick(x, y)) {
+				EventManager.buildPlanChange(0, 0, -1);
+			}
+		}
 	}
-	public void defenderTouchDown(int x,int y, int pointer, int button){
-		if(button == Buttons.LEFT) {
-			if(currentScreen == Screen.MAIN_MENU){
 
-				if(startButton.checkClick(x,y))
+	public Vector2 snap(int x, int y) {
+		Vector2 coords =  new Vector2(x * 2, height - (y * 2));
+		RealWorldCoordinates rwc = isometricToRealWorldCoordinate(coords);
+		int xMult = rwc.getX() / 64;
+		int yMult = rwc.getY() / 64;
+		System.out.println(xMult + ", " + yMult);
+		RealWorldCoordinates nrwc = new RealWorldCoordinates(32 + yMult * 64, 32 + xMult * 64);
+		return realWorldCooridinateToIsometric(nrwc);
+	}
+
+	public void defenderTouchDown(int x, int y, int pointer, int button) {
+		if (button == Buttons.LEFT) {
+			if (currentScreen == Screen.MAIN_MENU) {
+
+				if (startButton.checkClick(x, y))
 					currentScreen = Screen.GAME;
-				else if(quitButton.checkClick(x,y)) {
+				else if (quitButton.checkClick(x, y)) {
 					quitButton.dispose();
 					startButton.dispose();
 					Gdx.app.exit();
 				}
 			}
-			if(buildMode){
-				//Place tower
-			}
+			if (buildMode) {
+				// Place tower
 
-			if(towerButton.checkClick(x,y) ) {
+				
+
+			}
+			if (towerButton.checkClick(x, y)) {
 				System.out.println("Clicked towerButton");
 				if (!buildMode)
 					buildMode = true;
 			}
 		}
-		if(button == Buttons.RIGHT){
-			if(buildMode)
+		if (button == Buttons.RIGHT) {
+			if (buildMode)
 				buildMode = false;
 		}
 	}
+
 	@Override
-	public void create () {
+	public void create() {
 
 		batch = new SpriteBatch();
 		unitNumber = new BitmapFont();
@@ -170,31 +206,29 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		Gdx.input.setInputProcessor(this);
 	}
 
-	//float x = 0;
-	//float y = 0;
+	// float x = 0;
+	// float y = 0;
 
 	@Override
-	public void render () {
+	public void render() {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		if(currentScreen == Screen.MAIN_MENU){
+		if (currentScreen == Screen.MAIN_MENU) {
 			batch.begin();
 			startButton.getSprite().draw(batch);
 			quitButton.getSprite().draw(batch);
 			batch.end();
-		}
-		else if(currentScreen == Screen.CHOOSE_FACTION){
+		} else if (currentScreen == Screen.CHOOSE_FACTION) {
 			batch.begin();
 			defenderButton.getSprite().draw(batch);
 			attackerButton.getSprite().draw(batch);
 			batch.end();
-		}
-		else {
+		} else {
 			elapsedTime = Gdx.graphics.getDeltaTime();
 			//update(elapsedTime)
-			if(player == 0)
+			if (player == 0)
 				defenderPOV();
-			if(player == 1)
+			if (player == 1)
 				attackerPOV();
 		}
 
@@ -203,14 +237,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
-
-		//camera.viewportWidth = width;
-		//camera.viewportHeight = height;
+		// camera.viewportWidth = width;
+		// camera.viewportHeight = height;
 		camera.update();
 	}
-	
+
 	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();
 		renderer.dispose();
 		map.dispose();
@@ -223,22 +256,48 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 	public Vector2 cartesianToIsometric(float x, float y) {
 		Vector2 isometric = new Vector2();
-        isometric.x = x - y;
-        isometric.y = (x + y) * 0.5f;
-        return isometric;
+		isometric.x = x - y;
+		isometric.y = (x + y) * 0.5f;
+		return isometric;
+	}
+
+	public Vector2 isometricToCartesian(float x, float y) {
+		Vector2 cartesian = new Vector2();
+		cartesian.x = (2.0f * y + x) * 0.5f;
+		cartesian.y = (2.0f * y - x) * 0.5f;
+		return cartesian;
+	}
+
+
+	public RealWorldCoordinates isometricToRealWorldCoordinate(Vector2 vector) {
+
+		Vector2 diff = cartesianToIsometric(1280, 1280);
+		//diff.x -= 128;
+		//diff.y -= 64; 
+
+		Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
+
+		int x = (int) (v2.x + diff.x);
+		int y = (int) (v2.y + diff.y);
+
+		return new RealWorldCoordinates(y, x);
 	}
 
 	public Vector2 realWorldCooridinateToIsometric(RealWorldCoordinates rwc) {
-		Vector2 diff = cartesianToIsometric(1280 - 128, 1280 - 64);
-		Vector2 v2 = cartesianToIsometric(rwc.getX() - diff.x, rwc.getY() - diff.y);
+		Vector2 diff = cartesianToIsometric(1280, 1280);
+		float x = rwc.getX() - diff.x;
+		float y = rwc.getY() - diff.y;
+		Vector2 v2 = cartesianToIsometric(x, y);
+		v2.y += 38;
 		return v2;
 	}
+
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
-		if(keycode == Input.Keys.ESCAPE && currentScreen == Screen.GAME)
+		if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.GAME)
 			currentScreen = Screen.CHOOSE_FACTION;
-		else if(keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
+		else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
 			currentScreen = Screen.MAIN_MENU;
 		return false;
 	}
@@ -261,34 +320,32 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		int x = screenX;
 		int y = Gdx.graphics.getHeight() - screenY;
 		System.out.println("Clicked at x = " + x + " y = " + y);
-		if(button == Buttons.LEFT) {
-			if(currentScreen == Screen.MAIN_MENU){
+		if (button == Buttons.LEFT) {
+			if (currentScreen == Screen.MAIN_MENU) {
 
-				if(startButton.checkClick(x,y))
+				if (startButton.checkClick(x, y))
 					currentScreen = Screen.CHOOSE_FACTION;
-				else if(quitButton.checkClick(x,y)) {
+				else if (quitButton.checkClick(x, y)) {
 					quitButton.dispose();
 					startButton.dispose();
 					Gdx.app.exit();
 				}
 				System.out.println(currentScreen);
-			}
-			else if(currentScreen == Screen.CHOOSE_FACTION){
-				if(defenderButton.checkClick(x,y)){
+			} else if (currentScreen == Screen.CHOOSE_FACTION) {
+				if (defenderButton.checkClick(x, y)) {
 					player = 0;
 					currentScreen = Screen.GAME;
-				}
-				else if(attackerButton.checkClick(x,y)) {
+				} else if (attackerButton.checkClick(x, y)) {
 					player = 1;
 					currentScreen = Screen.GAME;
 				}
 			}
 
 		}
-		if(player == 1)
-			attackerTouchDown(x,y,pointer,button);
-		if(player == 0)
-			defenderTouchDown(x,y,pointer,button);
+		if (player == 1)
+			attackerTouchDown(x, y, pointer, button);
+		if (player == 0)
+			defenderTouchDown(x, y, pointer, button);
 		return false;
 	}
 
@@ -296,12 +353,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		int x = screenX;
 		int y = Gdx.graphics.getHeight() - screenY;
-		/*if(button == Buttons.LEFT) {
-			if(startButton.checkClick(x, y)) {
-				currentScreen = Screen.MAIN_MENU;
-				startButton.setPressedStatus(false);
-			}
-		}*/
+		/*
+		 * if(button == Buttons.LEFT) { if(startButton.checkClick(x, y)) { currentScreen
+		 * = Screen.MAIN_MENU; startButton.setPressedStatus(false); } }
+		 */
 		return false;
 	}
 
