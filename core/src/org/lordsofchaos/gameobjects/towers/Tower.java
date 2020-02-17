@@ -78,9 +78,11 @@ public class Tower extends InteractiveObject {
 
         for (int a = y; a < ylimit; a++) {
             for (int b = x; b <  xlimit; b++) {
-                if (GameController.getMatrixObject(a,b) instanceof Path){
-                    //System.out.println("the path coords: " + a + "," + b);
-                    count++;
+                if (GameController.inBounds(a,b)) {
+                    if (GameController.getMatrixObject(a, b) instanceof Path) {
+                        //System.out.println("the path coords: " + a + "," + b);
+                        count++;
+                    }
                 }
             }
         }
@@ -101,16 +103,18 @@ public class Tower extends InteractiveObject {
             // defenders base to the tiles
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
-                    if (GameController.getMatrixObject(a, b) instanceof Path) {
-                        tempco = new MatrixCoordinates(a, b);
+                    if (GameController.inBounds(a,b)) {
+                        if (GameController.getMatrixObject(a, b) instanceof Path) {
+                            tempco = new MatrixCoordinates(a, b);
 
-                        ydistance = defenderbase.getY() - tempco.getY();
-                        xdistance = defenderbase.getX() - tempco.getX();
+                            ydistance = defenderbase.getY() - tempco.getY();
+                            xdistance = defenderbase.getX() - tempco.getX();
 
-                        distancetemp = Math.sqrt((ydistance * ydistance) + (xdistance * xdistance));
+                            distancetemp = Math.sqrt((ydistance * ydistance) + (xdistance * xdistance));
 
-                        temp[count] = new Pair(tempco, distancetemp);
-                        count++;
+                            temp[count] = new Pair(tempco, distancetemp);
+                            count++;
+                        }
                     }
 
                 }

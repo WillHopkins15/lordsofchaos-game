@@ -328,6 +328,16 @@ public class GameController {
         return true;
     }
 
+    public static boolean inBounds(int y, int x){
+        if (x < 0 || y < 0
+                || x >= width || x >= height)
+        {
+            return false;
+        }
+        return true;
+
+    }
+
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
