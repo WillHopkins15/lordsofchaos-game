@@ -46,6 +46,8 @@ public class GameController {
 
     // list of all troops currently on screen
     protected static List<Troop> troops = new ArrayList<Troop>();
+
+    // list of all towers in matrix
     protected static List<Tower> towers = new ArrayList<Tower>();
 
     protected final static String ATTACKERNAME = "blank";
@@ -62,6 +64,11 @@ public class GameController {
 
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
+
+    public static List<Tower> getTowers() {
+        return towers;
+    }
+
 
     public static MatrixObject[][] getMap() {
         return map;
@@ -297,6 +304,7 @@ public class GameController {
         }
         // other if's to be added when new towers are added
 
+        towers.add(tower);
         tile.setTower(tower);
         return tower;
     }
