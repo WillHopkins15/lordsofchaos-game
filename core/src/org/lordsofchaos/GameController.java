@@ -307,7 +307,10 @@ public class GameController {
     
     private static void troopDies(Troop troop)
     {
-    	//sound and graphic to remove the troop;
+    	if (troops.contains(troop))
+        {
+            troops.remove(troop);
+        }
     }
 
     public static MatrixObject getMatrixObject(int y, int x) {
