@@ -43,6 +43,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button unitButton;
 	private static Button defenderButton;
 	private static Button attackerButton;
+	private static Button endTurnButton;
 	//move to player
 	private static Texture healthBarTexture;
 	private static Texture healthTexture;
@@ -52,8 +53,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Texture coinTexture;
 	private Sprite coinSprite;
 	private static BitmapFont coinCounter;
-	private int currentHp = 75;
+	private int currentHp = 50;
 	//
+	private float hpSpriteW;
 	private BitmapFont unitNumber;
 	int width = 1280;
 	final int height = 720;
@@ -73,7 +75,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 
 	public static void createButtons() {
-		towerButton = new Button("UI/towerButton.png", 30, 30);
+		towerButton = new Button("UI/towerButton.png", 30, 50);
 		startButton = new Button("UI/startButton.png",
 				Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 2);
 		quitButton = new Button("UI/quitButton.png",
@@ -83,6 +85,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		defenderButton = new Button("UI/defenderButton.png", 100, Gdx.graphics.getHeight() / 2);
 		attackerButton = new Button("UI/attackerButton.png",
 				Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
+		endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200  );
 	}
 
 	public void isometricPov() {
@@ -129,18 +132,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 
 	public void healthPercentage(){
-		if(currentHp>1) {
 			float result = currentHp / 100.0f;
-			//healthSprite.setScale(1);
-			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), healthSprite.getWidth() * result, healthSprite.getHeight());
-			//healthSprite.setScale(1.5f);
-		}
-		currentHp = 1;
+			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW* result, healthSprite.getHeight());
 	}
 
 	public void defenderPOV() {
 		isometricPov();
 		batch.begin();
+
 		towerButton.getSprite().draw(batch);
 		/*tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY());
 		batch.setColor(0, 200, 0, 0.5f);
@@ -153,9 +152,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		hpCounter.getData().setScale(1.5f);
 		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
 		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
-		//coinCounter.draw(batch,)
-
+		String tmpCoinCounter = GameController.defender.getCurrentMoney() + "";
+		coinCounter.getData().setScale(2.0f);
+		coinCounter.draw(batch,tmpCoinCounter,Gdx.graphics.getWidth() - 120,Gdx.graphics.getHeight() - 50);
 		coinSprite.draw(batch);
+		endTurnButton.getSprite().draw(batch);
 		batch.end();
 
 	}
@@ -227,11 +228,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 					//tmpCursor.dispose();
 				}
 			}
+			else if(endTurnButton.checkClick(x,y) && !buildMode){
+				//end turn
+			}
 		}
 		if(button == Buttons.RIGHT){
 			if(buildMode) {
 				buildMode = false;
 				//Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+			}
+			else if(!buildMode){
+					RealWorldCoordinates tmpCoordinates = snap(Gdx.input.getX(),Gdx.input.getY());
+					//removeTower(tmpCoordinates.getX,tmpCoordinates.getY)
 			}
 		}
 
@@ -260,6 +268,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		healthBarSprite = new Sprite(healthBarTexture);
 		healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
 		healthSprite = new Sprite(healthTexture);
+
 		healthSprite.setScale(5);
 		healthSprite.setPosition(225,Gdx.graphics.getHeight()- 64);
 		healthBarSprite.setScale(5);
@@ -268,8 +277,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		coinSprite = new Sprite(coinTexture);
 		coinSprite.setScale(1.5f);
 		//
+		GameController.initialise();
+		hpSpriteW = healthSprite.getWidth();
 		currentScreen = Screen.MAIN_MENU;
 		Gdx.input.setInputProcessor(this);
+
 	}
 
 	// float x = 0;
