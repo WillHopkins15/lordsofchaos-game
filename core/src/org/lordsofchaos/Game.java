@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Input.Keys;
 import org.lordsofchaos.network.GameClient;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
@@ -116,7 +117,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		isometricPov();
 		batch.begin();
 		towerButton.getSprite().draw(batch);
-		
+
 		batch.end();
 
 	}
