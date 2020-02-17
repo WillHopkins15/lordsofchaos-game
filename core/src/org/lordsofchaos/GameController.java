@@ -41,7 +41,11 @@ public class GameController {
     //
 
     private static int scaleFactor = 64;
+<<<<<<< HEAD
     // Height and Width of the map
+=======
+    //Height and Width of the map
+>>>>>>> 7697e6764d1c091d07ee5d329df246526dab710e
     private static int height;
     private static int width;
     @SuppressWarnings("unused")
@@ -103,6 +107,7 @@ public class GameController {
         EventManager.initialise(6, getPaths().size());
         debugVisualiseMap();
     }
+<<<<<<< HEAD
 
     public static void sendData() {
         // send towerBuilds and unitBuildPlan over network
@@ -112,6 +117,21 @@ public class GameController {
 
         // server needs to send BuildPhaseData to EventManager like this:
         // EventManager.recieveBuildPhaseData(bpd);
+=======
+    
+    public static void sendData()
+    {
+    	// send towerBuilds and unitBuildPlan over network
+    	BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), 
+    			EventManager.getTowerBuilds());
+    	
+    	// then clear data ready for next turn
+    }
+
+    public static void recieveNetworkData(BuildPhaseData bpd)
+    {
+        EventManager.recieveBuildPhaseData(bpd);
+>>>>>>> 7697e6764d1c091d07ee5d329df246526dab710e
     }
 
     private static void resetBuildTimer() {
@@ -259,9 +279,19 @@ public class GameController {
             }
         }
     }
+<<<<<<< HEAD
 
     private static void troopDies(Troop troop) {
         // sound and graphic to remove the troop;
+=======
+    
+    private static void troopDies(Troop troop)
+    {
+    	if (troops.contains(troop))
+        {
+            troops.remove(troop);
+        }
+>>>>>>> 7697e6764d1c091d07ee5d329df246526dab710e
     }
 
     public static MatrixObject getMatrixObject(int y, int x) {
@@ -295,6 +325,7 @@ public class GameController {
         tile.setTower(tower);
         return tower;
     }
+<<<<<<< HEAD
 
     private static boolean inBounds(MatrixCoordinates mc) {
         if (mc.getX() < 0 || mc.getY() < 0 || mc.getX() > width || mc.getY() > height) {
@@ -320,5 +351,41 @@ public class GameController {
             return false; // else it is a tile, but a tower exists here already
         }
         return true;
+=======
+    
+    private static boolean inBounds(MatrixCoordinates mc)
+    {
+    	if (mc.getX() < 0 || mc.getY() < 0
+    			|| mc.getX() >= width || mc.getY() >= height)
+    	{
+    		return false;
+    	}
+    	return true;
+    }
+    
+    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc)
+    {
+    	// convert realWorldCoords to matrix
+    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
+
+    	// check if given mc is actually within the bounds of the matrix
+    	if (!inBounds(mc))
+    	{
+    		return false;
+    	}
+    	
+    	// check if this matrix position is legal
+    	MatrixObject mo = map[mc.getY()][mc.getX()];
+    	if (mo.getClass() == Path.class)
+    	{
+    		return false; // cannot place towers on path
+    	}
+    	else if ((mo.getClass() == Tile.class)
+    			&& (((Tile) mo).getTower()) != null)
+    	{
+    		return false; // else it is a tile, but a tower exists here already
+    	}
+    	return true;
+>>>>>>> 7697e6764d1c091d07ee5d329df246526dab710e
     }
 }

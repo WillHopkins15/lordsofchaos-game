@@ -16,7 +16,7 @@ public class RealWorldCoordinates extends Coordinates
 		//int y = (GameController.getMap().length - mc.getY()) * sf;
 		int y = mc.getY() * sf;
 		int x = mc.getX() * sf;
-		setY(y);
-		setX(x);
+		setY(y+(sf/2)); // offset by 32
+		setX(x+(sf/2));
 	}
 }
