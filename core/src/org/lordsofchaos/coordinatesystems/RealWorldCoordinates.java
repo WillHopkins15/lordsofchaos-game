@@ -2,21 +2,18 @@ package org.lordsofchaos.coordinatesystems;
 
 import org.lordsofchaos.GameController;
 
-public class RealWorldCoordinates extends Coordinates
-{
-	public RealWorldCoordinates(int y, int x)
-	{
+public class RealWorldCoordinates extends Coordinates {
+	public RealWorldCoordinates(int y, int x) {
 		setY(y);
 		setX(x);
 	}
-	
-	public RealWorldCoordinates(MatrixCoordinates mc)
-	{
+
+	public RealWorldCoordinates(MatrixCoordinates mc) {
 		int sf = GameController.getScaleFactor();
-		//int y = (GameController.getMap().length - mc.getY()) * sf;
+		// int y = (GameController.getMap().length - mc.getY()) * sf;
 		int y = mc.getY() * sf;
 		int x = mc.getX() * sf;
-		setY(y+(sf/2)); // offset by 32
-		setX(x+(sf/2));
+		setY(y + (sf / 2)); // offset by 32
+		setX(x + (sf / 2));
 	}
 }

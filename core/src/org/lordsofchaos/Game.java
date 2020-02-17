@@ -24,6 +24,7 @@ import com.badlogic.gdx.Input.Keys;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
@@ -36,6 +37,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	IsometricTiledMapRenderer renderer;
 	TiledMap map;
 	Troop troop;
+	private static float verticalOffset = 8;
 	private static int player;
 	private static Button towerButton;
 	private static boolean buildMode = false;
@@ -79,14 +81,19 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.render();
 		Path p = new Path(0, 0);
 		troop = new TroopType1(Arrays.asList(p));
-		// RealWorldCoordinates coords = new RealWorldCoordinates(32, 32);
-		// troop.setRealWorldCoordinates(coords);
-		List<Troop> troops = Arrays.asList(troop);
+
+		List<Troop> troops = GameController.getTroops();
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y, 48, 48);
+			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y - verticalOffset, 48, 48);
 		}
+
+		/*List<Troop> towers = GameController.get();
+		for (int i = 0; i < troops.size(); i++) {
+			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
+			renderer.getBatch().draw(troop.getSprite(), coordinates.x - 24, coordinates.y - verticalOffset, 48, 48);
+		}*/
 
 		if (player == 0) {
 			// DEFENDER
@@ -102,7 +109,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				}
 
 				Vector2 coords = realWorldCooridinateToIsometric(rwc);
-				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - 8, 48, 94);
+				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - verticalOffset, 48, 94);
 				renderer.getBatch().setColor(Color.WHITE);
 			}
 
@@ -173,6 +180,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			}
 			if (buildMode) {
 				// Place tower
+				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
+				if (GameController.verifyTowerPlacement(rwc)) {
+					EventManager.towerPlaced(TowerType.type1, rwc);
+					buildMode = false;
+				}
 
 			}
 			if (towerButton.checkClick(x, y)) {
