@@ -66,6 +66,11 @@ public class GameController {
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
 
+    public static WaveState getWaveState()
+    {
+        return waveState;
+    }
+
     public static List<Tower> getTowers() {
         return towers;
     }
