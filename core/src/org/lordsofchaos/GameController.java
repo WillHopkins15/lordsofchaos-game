@@ -148,6 +148,7 @@ public class GameController {
             }
 
             System.out.println("Attacker build phase begins");
+
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
             waveState = WaveState.Play;
@@ -295,6 +296,20 @@ public class GameController {
     private static void troopDies(Troop troop) {
         if (troops.contains(troop)) {
             troops.remove(troop);
+
+            // look through the path this troop is on and remove it from the Path it's contained in
+            for (int i = 0; i < troop.getPath().size(); i++)
+            {
+                Path path = troop.getPath().get(i);
+                for (int j = 0; j < troop.getPath().get(i).getTroops().size(); j++)
+                {
+                    if (troop.equals(path.getTroops().get(j)))
+                    {
+                        path.removeTroop(troop);
+                        break;
+                    }
+                }
+            }
         }
     }
 

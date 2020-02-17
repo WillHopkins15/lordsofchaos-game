@@ -29,7 +29,7 @@ public class Troop extends InteractiveObject
     protected int currentHealth;
     protected int maxHealth;
     protected DamageType armourType;
-    protected List < Path > path;
+    protected List<Path> path;
     protected Sprite sprite;
     protected boolean moved;
     protected boolean targeted;
@@ -78,13 +78,12 @@ public class Troop extends InteractiveObject
         this.path = path;
     }
 
-    public List < Path > getPath() {
+    public List <Path> getPath() {
         if (path == null) {
-        return new ArrayList < Path > ();
+            path = new ArrayList <Path>();
         }
          return path;
     }
-    //
 
     public Sprite getSprite() {
         return sprite;
