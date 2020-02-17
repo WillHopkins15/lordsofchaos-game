@@ -49,7 +49,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private Screen currentScreen;
 	private float elapsedTime;
 
-
 	public static void main(String[] args) {
 		setupClient();
 	}
@@ -79,8 +78,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.render();
 		Path p = new Path(0, 0);
 		troop = new TroopType1(Arrays.asList(p));
-		//RealWorldCoordinates coords = new RealWorldCoordinates(32, 32);
-		//troop.setRealWorldCoordinates(coords);
+		// RealWorldCoordinates coords = new RealWorldCoordinates(32, 32);
+		// troop.setRealWorldCoordinates(coords);
 		List<Troop> troops = Arrays.asList(troop);
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
@@ -93,14 +92,22 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			if (buildMode) {
 				Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
 				Sprite tmpSpriteTower2 = new Sprite(tmpTower);
-				Vector2 testIso = snap(Gdx.input.getX(), Gdx.input.getY());
-				renderer.getBatch().draw(tmpSpriteTower2, testIso.x - 24, testIso.y - 8, 48, 94);
+				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
+
+				if (GameController.verifyTowerPlacement(rwc)) {
+					renderer.getBatch().setColor(0, 200, 0, 0.5f);
+				} else {
+					renderer.getBatch().setColor(200, 0, 0, 0.5f);
+				}
+
+				Vector2 coords = realWorldCooridinateToIsometric(rwc);
+				renderer.getBatch().draw(tmpSpriteTower2, coords.x - 24, coords.y - 8, 48, 94);
+				renderer.getBatch().setColor(Color.WHITE);
 			}
 
 		} else {
 
 		}
-
 
 		renderer.getBatch().end();
 	}
@@ -109,16 +116,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		isometricPov();
 		batch.begin();
 		towerButton.getSprite().draw(batch);
-		Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
-		Sprite tmpSpriteTower = new Sprite(tmpTower);
-
-		if (buildMode) {
-
-			batch.setColor(0, 200, 0, 0.5f);
-			
-
-			batch.draw(tmpSpriteTower, Gdx.input.getX() - 24, Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
-		}
+		
 		batch.end();
 
 	}
@@ -131,7 +129,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		int x = EventManager.getUnitBuildPlan()[0][0];
 		String nr = new String("" + x);
 
-		unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10, unitButton.getY() + 25);
+		unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10,
+				unitButton.getY() + 25);
 		batch.end();
 		isometricPov();
 	}
@@ -149,14 +148,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		}
 	}
 
-	public Vector2 snap(int x, int y) {
-		Vector2 coords =  new Vector2(x * 2, height - (y * 2));
-		RealWorldCoordinates rwc = isometricToRealWorldCoordinate(coords);
-		int xMult = rwc.getX() / 64;
-		int yMult = rwc.getY() / 64;
-		System.out.println(xMult + ", " + yMult);
-		RealWorldCoordinates nrwc = new RealWorldCoordinates(32 + yMult * 64, 32 + xMult * 64);
-		return realWorldCooridinateToIsometric(nrwc);
+	public RealWorldCoordinates roundToCentreTile(RealWorldCoordinates rwc) {
+		MatrixCoordinates matrixCoords = new MatrixCoordinates(rwc);
+		return new RealWorldCoordinates(32 + matrixCoords.getY() * 64, 32 + matrixCoords.getX() * 64);
+	}
+
+	public RealWorldCoordinates snap(int x, int y) {
+		Vector2 coords = new Vector2(x * 2, height - (y * 2));
+		return roundToCentreTile(isometricToRealWorldCoordinate(coords));
 	}
 
 	public void defenderTouchDown(int x, int y, int pointer, int button) {
@@ -173,8 +172,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			}
 			if (buildMode) {
 				// Place tower
-
-				
 
 			}
 			if (towerButton.checkClick(x, y)) {
@@ -225,7 +222,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			batch.end();
 		} else {
 			elapsedTime = Gdx.graphics.getDeltaTime();
-			//update(elapsedTime)
+			// update(elapsedTime)
 			if (player == 0)
 				defenderPOV();
 			if (player == 1)
@@ -268,12 +265,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		return cartesian;
 	}
 
-
 	public RealWorldCoordinates isometricToRealWorldCoordinate(Vector2 vector) {
 
 		Vector2 diff = cartesianToIsometric(1280, 1280);
-		//diff.x -= 128;
-		//diff.y -= 64; 
+		// diff.x -= 128;
+		// diff.y -= 64;
 
 		Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
 
