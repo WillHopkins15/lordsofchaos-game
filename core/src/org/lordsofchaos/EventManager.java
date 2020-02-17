@@ -31,7 +31,7 @@ public class EventManager {
 			this.towerType = towerType;
 			this.rwc = rwc;
 			Texture texture = new Texture(Gdx.files.internal("towers/" + towerType.getSpriteName() + ".png"));
-        	this.sprite = new Sprite(texture);
+			this.sprite = new Sprite(texture);
 		}
 
 		public RealWorldCoordinates getRealWorldCoordinates() {
@@ -58,16 +58,13 @@ public class EventManager {
 		resetEventManager();
 	}
 
-	public static void towerRemoved(TowerBuild tbp)
-	{
-		if (towerBuilds.contains(tbp))
-		{
+	public static void towerRemoved(TowerBuild tbp) {
+		if (towerBuilds.contains(tbp)) {
 			towerBuilds.remove(tbp);
 		}
 	}
-	
-	public static int[][] getUnitBuildPlan()
-	{
+
+	public static int[][] getUnitBuildPlan() {
 		return unitBuildPlan;
 	}
 
@@ -77,8 +74,7 @@ public class EventManager {
 
 	public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
 		TowerBuild tbp = new TowerBuild(towerType, rwc);
-		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(towerType, rwc))
-		{
+		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(towerType, rwc)) {
 			towerBuilds.add(tbp);
 		}
 	}

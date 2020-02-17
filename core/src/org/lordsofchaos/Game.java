@@ -15,13 +15,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.Input.Keys;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
@@ -400,13 +398,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
 		int x = screenX;
 		int y = Gdx.graphics.getHeight() - screenY;
 		System.out.println("Clicked at x = " + x + " y = " + y);
 		if (button == Buttons.LEFT) {
 			if (currentScreen == Screen.MAIN_MENU) {
-
 				if (startButton.checkClick(x, y))
 					currentScreen = Screen.CHOOSE_FACTION;
 				else if (quitButton.checkClick(x, y)) {
@@ -424,7 +420,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 					currentScreen = Screen.GAME;
 				}
 			}
-
 		}
 		if (player == 1)
 			attackerTouchDown(x, y, pointer, button);

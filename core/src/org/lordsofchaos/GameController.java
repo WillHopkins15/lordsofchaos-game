@@ -6,7 +6,6 @@ import java.util.List;
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
@@ -66,13 +65,11 @@ public class GameController {
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
 
-    public static float getBuildPhaseTimer()
-    {
+    public static float getBuildPhaseTimer() {
         return buildTimer;
     }
 
-    public static WaveState getWaveState()
-    {
+    public static WaveState getWaveState() {
         return waveState;
     }
 
@@ -141,7 +138,7 @@ public class GameController {
         addMoneyTimer = 0;
     }
 
-    public static void endPhase () {
+    public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
 
@@ -157,9 +154,7 @@ public class GameController {
             System.out.println("Play begins");
             wave++;
             resetBuildTimer();
-        }
-        else
-        {
+        } else {
             waveState = WaveState.DefenderBuild;
 
             // reset all tower cooldowns
@@ -325,57 +320,45 @@ public class GameController {
         tile.setTower(tower);
         return tower;
     }
-    
-    public static boolean inBounds(MatrixCoordinates mc)
-    {
-    	if (mc.getX() < 0 || mc.getY() < 0
-    			|| mc.getX() >= width || mc.getY() >= height)
-    	{
-    		return false;
-    	}
-    	return true;
+
+    public static boolean inBounds(MatrixCoordinates mc) {
+        if (mc.getX() < 0 || mc.getY() < 0 || mc.getX() >= width || mc.getY() >= height) {
+            return false;
+        }
+        return true;
     }
 
     // want to find the cost of a tower before it has been placed
-    private static int getTowerTypeCost(TowerType towerType)
-    {
-        if (towerType == TowerType.type1)
-        {
+    private static int getTowerTypeCost(TowerType towerType) {
+        if (towerType == TowerType.type1) {
             return 50;
-        }
-        else
-        {
+        } else {
             return 0;
         }
     }
-    
-    public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc)
-    {
-    	// convert realWorldCoords to matrix
-    	MatrixCoordinates mc = new MatrixCoordinates(rwc);
 
-    	// check if given mc is actually within the bounds of the matrix
-    	if (!inBounds(mc))
-    	{
-    		return false;
-    	}
+    public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
+        // convert realWorldCoords to matrix
+        MatrixCoordinates mc = new MatrixCoordinates(rwc);
 
-    	if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney())
-        {
+        // check if given mc is actually within the bounds of the matrix
+        if (!inBounds(mc)) {
             return false;
         }
-    	
-    	// check if this matrix position is legal
-    	MatrixObject mo = map[mc.getY()][mc.getX()];
-    	if (mo.getClass() == Path.class)
-    	{
-    		return false; // cannot place towers on path
-    	}
-    	else if ((mo.getClass() == Tile.class)
-    			&& (((Tile) mo).getTower()) != null)
-    	{
-    		return false; // else it is a tile, but a tower exists here already
-    	}
-    	return true;
+
+        if (clientPlayerType != null) {
+            if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney()) {
+                return false;
+            }
+        }
+
+        // check if this matrix position is legal
+        MatrixObject mo = map[mc.getY()][mc.getX()];
+        if (mo.getClass() == Path.class) {
+            return false; // cannot place towers on path
+        } else if ((mo.getClass() == Tile.class) && (((Tile) mo).getTower()) != null) {
+            return false; // else it is a tile, but a tower exists here already
+        }
+        return true;
     }
 }
