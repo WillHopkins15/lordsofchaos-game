@@ -67,11 +67,7 @@ public class Tower extends InteractiveObject
         //List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
         MatrixCoordinates tempco;
-        //fake coordinates have been given for timebeing;
-        MatrixCoordinates defenderbase = new MatrixCoordinates(0,0);
-
-        //need to be able to call the actual instance of the defender object before this method will work
-        //defenderbase = new MatrixCoordinates(defender.getCoordinates());
+        MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
 
         //creating the numerical bounds for the tiles that would be in range
         int y = (matrixco.getY() - getRange());
