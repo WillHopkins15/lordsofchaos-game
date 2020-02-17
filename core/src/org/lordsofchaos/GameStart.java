@@ -74,7 +74,7 @@ public class GameStart{
         int size = GameController.troops.size();
 
         for (int i = 0; i < size; i++) {
-            (GameController.troops.get(i)).move();
+            (GameController.troops.get(i)).move(0f);
 
             if (GameController.troops.get(i).getAtEnd()) {
                 GameController.troops.remove((GameController.troops.get(i)));
@@ -85,7 +85,7 @@ public class GameStart{
     public void shootTroops()  {
         if (!GameController.towers.isEmpty()) {
             for (int j = 0; j < GameController.towers.size(); j++){
-                GameController.towers.get(j).shoot();
+                //GameController.towers.get(j).shoot();
             }
         }
     }

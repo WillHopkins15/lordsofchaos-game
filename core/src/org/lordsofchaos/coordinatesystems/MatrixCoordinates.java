@@ -13,9 +13,9 @@ public class MatrixCoordinates extends Coordinates
 	public MatrixCoordinates(RealWorldCoordinates rwc)
 	{
 		int sf = GameController.getScaleFactor();
-		int y = rwc.getY() / sf;
-		int x = rwc.getX() / sf;
-		setY(y);
+		int y = (Math.round(rwc.getY() / sf));
+		int x =  (Math.round(rwc.getX() / sf));
+		setY(GameController.getMap().length - y);
 		setX(x);
 	}
 }

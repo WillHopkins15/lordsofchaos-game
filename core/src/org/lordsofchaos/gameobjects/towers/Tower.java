@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
+import javafx.util.Pair;
+import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -15,9 +17,12 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.MapGenerator;
+import org.lordsofchaos.player.Defender;
 
 public class Tower extends InteractiveObject
 {
+	protected float shootTimer = 0;
+	protected float shootTimerLimit = 3;
     protected int range;
     protected DamageType damageType;
     protected Troop target;
@@ -58,36 +63,116 @@ public class Tower extends InteractiveObject
     {
         // use range to find all in-range path objects in matrix
         inRange = new ArrayList<Path>();
-        List<Coordinates> temp = new ArrayList<Coordinates>();
+
+        //List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
         MatrixCoordinates tempco;
+        //fake coordinates have been given for timebeing;
+        MatrixCoordinates defenderbase = new MatrixCoordinates(0,0);
 
+        //need to be able to call the actual instance of the defender object before this method will work
+        //defenderbase = new MatrixCoordinates(defender.getCoordinates());
+
+        //creating the numerical bounds for the tiles that would be in range
         int y = (matrixco.getY() - getRange());
         int ylimit = (y + 1 + (range * 2));
 
         int x = (matrixco.getX() - getRange());
         int xlimit = (x + 1 + (range * 2));
 
+        int count = 0;
+
         for (int a = y; a < ylimit; a++) {
             for (int b = x; b <  xlimit; b++) {
-                tempco = new MatrixCoordinates(a,b);
-                temp.add(tempco);
+                if (GameController.getMatrixObject(a,b) instanceof Path){
+                    count++;
+                }
+            }
+        }
+        if (count != 0) {
+
+
+            for (int a = y; a < ylimit; a++) {
+                for (int b = x; b < xlimit; b++) {
+                    if (GameController.getMatrixObject(a, b) instanceof Path) {
+                        count++;
+                    }
+                }
+            }
+
+            Pair temp[] = new Pair[count];
+
+            count = 0;
+
+            int ydistance;
+            int xdistance;
+
+            double distancetemp;
+
+            //loop to add the coordinates of the tiles to that are paths to a pair
+            //the key of the pair is the coordinates and the value is the distance from the defenders base to the tiles
+            for (int a = y; a < ylimit; a++) {
+                for (int b = x; b < xlimit; b++) {
+                    if (GameController.getMatrixObject(a, b) instanceof Path) {
+                        tempco = new MatrixCoordinates(a, b);
+
+                        ydistance = defenderbase.getY() - tempco.getY();
+                        xdistance = defenderbase.getX() - tempco.getX();
+
+                        distancetemp = Math.sqrt((ydistance * ydistance) + (xdistance * xdistance));
+
+                        temp[count] = new Pair(tempco, distancetemp);
+                        count++;
+                    }
+
+                }
+            }
+
+            sort(temp,0, count -1);
+
+            //loop to add path tiles to arraylist inRange in descending order of distance to defender base
+            for (int i = 0; i < temp.length; i++) {
+                MatrixCoordinates tco = (MatrixCoordinates) temp[i].getKey();
+
+                //had slight issue with the casting should be fine but could be an issue in debugging
+                inRange.add((Path) GameController.getMatrixObject(tco.getY(),tco.getX()));
+            }
+
+        }
+
+    }
+
+    public int partition(Pair tiles[], int l, int h) {
+
+        double pivot = (double) tiles[h].getValue();
+        int i = (l - 1);
+        for (int j = l; j < h; j++) {
+
+            if ((double) tiles[j].getValue() > pivot) {
+
+                i++;
+
+                Pair temp = tiles[i];
+                tiles[i] = tiles[j];
+                tiles[j] = temp;
             }
         }
 
-        //will have to make edit to this when there are multiple paths;
-        List<Coordinates> path = new ArrayList<Coordinates>();
-        path = (MapGenerator.getPath1());
-        Collections.reverse(path);
+        Pair temp = tiles[i+1];
+        tiles[i+1] = tiles[h];
+        tiles[h] = temp;
 
-        for (int i = 0; i < path.size(); i++) {
-            if ((temp.contains(path.get(i)))) {
-                //need to add the path tile;
-                GameController.getMatrixObject(path.get(i).getY(),path.get(i).getX());
-            }
+        return i+1;
+    }
 
+    public void sort(Pair tiles[], int l, int h) {
+        if (l < h) {
+
+            int part = partition(tiles,l,h);
+
+            sort(tiles, l, part -1);
+            sort(tiles, part + 1, h);
         }
-
     }
     
     private Troop findNearestTroop()
@@ -117,10 +202,20 @@ public class Tower extends InteractiveObject
         return null;
     }
     
-    public void shoot()
+    public void resetTimer()
     {
-        target = findNearestTroop();
-        GameController.shootTroop(this, target);
+    	shootTimer = 0;
+    }
+    
+    public void shoot(float deltaTime)
+    {
+    	shootTimer += deltaTime;
+    	if (shootTimer > shootTimerLimit)
+    	{
+    		target = findNearestTroop();
+    		GameController.shootTroop(this, target);
+    		resetTimer();
+    	}
     }
 
 }
