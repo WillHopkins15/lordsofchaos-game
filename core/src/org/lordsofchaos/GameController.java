@@ -335,6 +335,8 @@ public class GameController {
         return true;
     }
 
+
+
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
