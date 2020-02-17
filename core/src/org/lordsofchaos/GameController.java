@@ -326,7 +326,7 @@ public class GameController {
         return tower;
     }
     
-    private static boolean inBounds(MatrixCoordinates mc)
+    public static boolean inBounds(MatrixCoordinates mc)
     {
     	if (mc.getX() < 0 || mc.getY() < 0
     			|| mc.getX() >= width || mc.getY() >= height)
