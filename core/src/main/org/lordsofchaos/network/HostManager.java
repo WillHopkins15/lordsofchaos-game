@@ -1,5 +1,6 @@
 package org.lordsofchaos.network;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,13 +19,15 @@ import java.util.Scanner;
  */
 public class HostManager
 {
+    private static final String HOSTFILE = new File("knownhosts").getAbsolutePath();
+    
     /**
      * @return A list of known hostnames
      * @throws IOException If an I/O error occurs opening the source file
      */
     static ArrayList<String> getHosts() throws IOException {
         ArrayList<String> hosts = new ArrayList<>();
-        try (Scanner file = new Scanner(Paths.get("knownhosts"))) {
+        try (Scanner file = new Scanner(Paths.get(HOSTFILE))) {
             while (file.hasNext())
                 hosts.add(file.nextLine());
         }
@@ -42,7 +45,7 @@ public class HostManager
         if (getHosts().contains(hostname)) {
             return;
         }
-        try (FileWriter fw = new FileWriter("knownhosts", true); PrintWriter file = new PrintWriter(fw)) {
+        try (FileWriter fw = new FileWriter(HOSTFILE, true); PrintWriter file = new PrintWriter(fw)) {
             System.out.printf("Host %s not recognised... Adding to known hosts\n", hostname);
             file.println(hostname);
         }

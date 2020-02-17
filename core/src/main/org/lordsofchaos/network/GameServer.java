@@ -3,10 +3,6 @@ package org.lordsofchaos.network;
 import javafx.util.Pair;
 import lombok.SneakyThrows;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +15,12 @@ import java.util.List;
  *
  * @author Will Hopkins
  */
-public class GameServer
+public class GameServer extends Thread
 {
     public static final int SERV_PORT = 5148;
     protected static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
+    private static ConnectionListener connectionListener;
+    public boolean running = true;
     
     public GameServer() {
     }
@@ -37,25 +35,6 @@ public class GameServer
             connections.remove(player1);
             connections.remove(player2);
         }
-    }
-    
-    /**
-     * Converts an object into a byte stream and sends it through an open UDP socket to
-     * the given player.
-     *
-     * @param sock      Datagram socket to send packet through
-     * @param recipient Local IP/port number pair of recipient
-     * @param contents  Object to serialize and send
-     */
-    @SneakyThrows
-    public static void sendPacket(DatagramSocket sock, Pair<InetAddress, Integer> recipient, Object contents) {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutputStream oout = new ObjectOutputStream(bout);
-        oout.writeObject(contents);
-        oout.flush();
-        byte[] bytes = bout.toByteArray();
-        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getKey(), recipient.getValue());
-        sock.send(packet);
     }
     
     /**
@@ -77,17 +56,24 @@ public class GameServer
     }
     
     public static void main(String[] args) {
-        new GameServer().run();
+        new GameServer().start();
+    }
+    
+    public void close() {
+        connectionListener.running = false;
+        running = false;
     }
     
     @SneakyThrows
     public void run() {
         String servAddress = InetAddress.getLocalHost().getHostName();
         HostManager.addHost(servAddress);
-        new ConnectionListener(SERV_PORT).start();
+        connectionListener = new ConnectionListener(SERV_PORT);
+        connectionListener.start();
         System.out.printf("Server started on %s\n", servAddress);
         
-        while (true) {
+        running = true;
+        while (running) {
             pairPlayers();
             Thread.sleep(1000);
         }

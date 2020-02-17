@@ -3,6 +3,8 @@ package org.lordsofchaos;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
 
+import java.io.Serializable;
+
 public class EventManager
 {
     // 6 unit types, 3 paths
@@ -45,7 +47,7 @@ public class EventManager
     // TowerBuild tells you what sort of tower has been placed and where,
     // GameController then uses this to create instances of towers
     // GameController contains a list of TowerBuilds which will be sent over the network
-    public static class TowerBuild
+    public static class TowerBuild implements Serializable
     {
         private RealWorldCoordinates rwc;
         private TowerType towerType;

@@ -39,11 +39,11 @@ public class Game extends ApplicationAdapter
     private static void setupClient() {
         GameClient gc = new GameClient();
         if (gc.makeConnection()) {
-            gc.runGame();
+            gc.start();
         }
         gc.close();
     }
-
+    
     @Override
     public void create() {
         
