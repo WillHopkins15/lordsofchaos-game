@@ -75,14 +75,14 @@ public class Troop extends InteractiveObject
     }
 
     public void setPath(List < Path > path) {
-        //this.path = path;
+        this.path = path;
     }
 
     public List < Path > getPath() {
-        //if (path == null) {
+        if (path == null) {
         return new ArrayList < Path > ();
-        //}
-        // return path;
+        }
+         return path;
     }
     //
 
@@ -132,7 +132,9 @@ public class Troop extends InteractiveObject
         // move along set path
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
 
-        int index = path.indexOf(GameController.getMatrixObject(currentco.getY(),currentco.getX()));
+        Path foundPath = (Path)GameController.getMatrixObject(currentco.getY(),currentco.getX());
+
+        int index = path.indexOf(foundPath);
         if (index != (path.size() - 1)) {
             MatrixCoordinates nexttile;
             nexttile = (getPath().get(index + 1)).getMatrixPosition();

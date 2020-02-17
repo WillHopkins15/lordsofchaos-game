@@ -28,7 +28,7 @@ public class GameController {
 
     // timing
     private static float buildTimer = 0;
-    private static float buildTimeLimit = 30;
+    private static float buildTimeLimit = 0;//30;
 
     private static float unitSpawnTimer = 0;
     private static float unitSpawnTimeLimit = 1;
