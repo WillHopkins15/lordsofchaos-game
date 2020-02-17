@@ -25,7 +25,6 @@ import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.graphics.*;
 
-
 public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
@@ -43,7 +42,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button unitButton;
 	private static Button defenderButton;
 	private static Button attackerButton;
-	//move to player
+	// move to player
 	private static Texture healthBarTexture;
 	private static Texture healthTexture;
 	private static Sprite healthBarSprite;
@@ -94,19 +93,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(troops.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 48);
+			renderer.getBatch().draw(troops.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 48);
 		}
 
 		List<Tower> towers = GameController.getTowers();
 		for (int i = 0; i < towers.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(towers.get(i).getRealWorldCoordinates());
-			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 94);
+			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
+					coordinates.y - verticalSpriteOffset, 48, 94);
 		}
 
 		if (player == 0) {
 			// DEFENDER
 			if (buildMode) {
-				Texture tmpTower = new Texture(Gdx.files.internal("towers/Tower.png"));
+				Texture tmpTower = new Texture(Gdx.files.internal("towers/TowerType1.png"));
 				Sprite tmpSpriteTower2 = new Sprite(tmpTower);
 				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
@@ -128,12 +129,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().end();
 	}
 
-	public void healthPercentage(){
-		if(currentHp>1) {
+	public void healthPercentage() {
+		if (currentHp > 1) {
 			float result = currentHp / 100.0f;
-			//healthSprite.setScale(1);
-			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), healthSprite.getWidth() * result, healthSprite.getHeight());
-			//healthSprite.setScale(1.5f);
+			// healthSprite.setScale(1);
+			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), healthSprite.getWidth() * result,
+					healthSprite.getHeight());
+			// healthSprite.setScale(1.5f);
 		}
 		currentHp = 1;
 	}
@@ -142,18 +144,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		isometricPov();
 		batch.begin();
 		towerButton.getSprite().draw(batch);
-		/*tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY());
-		batch.setColor(0, 200, 0, 0.5f);
-		batch.draw(tmpSpriteTower, Gdx.input.getX() - 24, Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
-		*/
+		/*
+		 * tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,
+		 * Gdx.graphics.getHeight() - Gdx.input.getY()); batch.setColor(0, 200, 0,
+		 * 0.5f); batch.draw(tmpSpriteTower, Gdx.input.getX() - 24,
+		 * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
+		 */
 		healthPercentage();
 		healthBarSprite.draw(batch);
 		healthSprite.draw(batch);
-		String nr = currentHp +"";
+		String nr = currentHp + "";
 		hpCounter.getData().setScale(1.5f);
-		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
-		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
-		//coinCounter.draw(batch,)
+		hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
+		coinSprite.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 72);
+		// coinCounter.draw(batch,)
 
 		coinSprite.draw(batch);
 		batch.end();
@@ -222,19 +226,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				System.out.println("Clicked towerButton");
 				if (!buildMode) {
 					buildMode = true;
-					//Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
-					//Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
-					//tmpCursor.dispose();
+					// Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
+					// Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
+					// tmpCursor.dispose();
 				}
 			}
 		}
-		if(button == Buttons.RIGHT){
-			if(buildMode) {
+		if (button == Buttons.RIGHT) {
+			if (buildMode) {
 				buildMode = false;
-				//Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+				// Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+			} else {
+				MatrixCoordinates mc = new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY()));
+				
 			}
 		}
-
 
 	}
 
@@ -255,15 +261,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		camera.update();
 		createButtons();
 		renderer.setView(camera);
-		//move to player
+		// move to player
 		healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
 		healthBarSprite = new Sprite(healthBarTexture);
 		healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
 		healthSprite = new Sprite(healthTexture);
 		healthSprite.setScale(5);
-		healthSprite.setPosition(225,Gdx.graphics.getHeight()- 64);
+		healthSprite.setPosition(225, Gdx.graphics.getHeight() - 64);
 		healthBarSprite.setScale(5);
-		healthBarSprite.setPosition(170,Gdx.graphics.getHeight() - 70);
+		healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
 		coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
 		coinSprite = new Sprite(coinTexture);
 		coinSprite.setScale(1.5f);

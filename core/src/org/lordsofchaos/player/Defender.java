@@ -12,7 +12,7 @@ public class Defender extends Player {
         setCurrentMoney(50);
         setHealth(100);
         //change this when the actual coordinate for the game is decided
-        RealWorldCoordinates coord = new RealWorldCoordinates(8,4);  
+        RealWorldCoordinates coord = new RealWorldCoordinates(19,19);  
         setCoordinates(coord);
         setMoneyBoost(50);
         

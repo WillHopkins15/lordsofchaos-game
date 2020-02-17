@@ -16,63 +16,56 @@ import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.Path;
 
-public class Tower extends InteractiveObject
-{
-	protected float shootTimer = 0;
-	protected float shootTimerLimit = 3;
+public class Tower extends InteractiveObject {
+    protected float shootTimer = 0;
+    protected float shootTimerLimit = 3;
     protected int range;
     protected DamageType damageType;
     protected Troop target;
     protected List<Path> inRange;
     protected Sprite sprite;
-    
-    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, 
-             int range, DamageType damageType){
+
+    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType) {
         super(spriteName, rwc, cost, damage);
         setRange(range);
         setDamageType(damageType);
-        Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
+        Texture texture = new Texture(Gdx.files.internal("towers/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
     }
-    
+
     // Getters and Setters
-    public void setRange(int range)
-    {
+    public void setRange(int range) {
         this.range = range;
         findPathInRange();
     }
-    
-    public int getRange()
-    {
+
+    public int getRange() {
         return range;
     }
-    
+
     public Sprite getSprite() {
         return sprite;
     }
 
-    public void setDamageType(DamageType damageType)
-    {
+    public void setDamageType(DamageType damageType) {
         this.damageType = damageType;
     }
-    
-    public DamageType getDamageType()
-    {
+
+    public DamageType getDamageType() {
         return damageType;
     }
     //
-    
-    private void findPathInRange()
-    {
+
+    private void findPathInRange() {
         // use range to find all in-range path objects in matrix
         inRange = new ArrayList<Path>();
 
-        //List<Coordinates> temp = new ArrayList<Coordinates>();
+        // List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
         MatrixCoordinates tempco;
         MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
 
-        //creating the numerical bounds for the tiles that would be in range
+        // creating the numerical bounds for the tiles that would be in range
         int y = (matrixco.getY() - getRange());
         int ylimit = (y + 1 + (range * 2));
 
@@ -82,14 +75,13 @@ public class Tower extends InteractiveObject
         int count = 0;
 
         for (int a = y; a < ylimit; a++) {
-            for (int b = x; b <  xlimit; b++) {
-                if (GameController.getMatrixObject(a,b) instanceof Path){
+            for (int b = x; b < xlimit; b++) {
+                if (GameController.getMatrixObject(a, b) instanceof Path) {
                     count++;
                 }
             }
         }
         if (count != 0) {
-
 
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
@@ -108,8 +100,9 @@ public class Tower extends InteractiveObject
 
             double distancetemp;
 
-            //loop to add the coordinates of the tiles to that are paths to a pair
-            //the key of the pair is the coordinates and the value is the distance from the defenders base to the tiles
+            // loop to add the coordinates of the tiles to that are paths to a pair
+            // the key of the pair is the coordinates and the value is the distance from the
+            // defenders base to the tiles
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
@@ -127,14 +120,16 @@ public class Tower extends InteractiveObject
                 }
             }
 
-            sort(temp,0, count -1);
+            sort(temp, 0, count - 1);
 
-            //loop to add path tiles to arraylist inRange in descending order of distance to defender base
+            // loop to add path tiles to arraylist inRange in descending order of distance
+            // to defender base
             for (int i = 0; i < temp.length; i++) {
                 MatrixCoordinates tco = (MatrixCoordinates) temp[i].getKey();
 
-                //had slight issue with the casting should be fine but could be an issue in debugging
-                inRange.add((Path) GameController.getMatrixObject(tco.getY(),tco.getX()));
+                // had slight issue with the casting should be fine but could be an issue in
+                // debugging
+                inRange.add((Path) GameController.getMatrixObject(tco.getY(), tco.getX()));
             }
 
         }
@@ -157,27 +152,25 @@ public class Tower extends InteractiveObject
             }
         }
 
-        Pair temp = tiles[i+1];
-        tiles[i+1] = tiles[h];
+        Pair temp = tiles[i + 1];
+        tiles[i + 1] = tiles[h];
         tiles[h] = temp;
 
-        return i+1;
+        return i + 1;
     }
 
     public void sort(Pair tiles[], int l, int h) {
         if (l < h) {
 
-            int part = partition(tiles,l,h);
+            int part = partition(tiles, l, h);
 
-            sort(tiles, l, part -1);
+            sort(tiles, l, part - 1);
             sort(tiles, part + 1, h);
         }
     }
-    
-    private Troop findNearestTroop()
-    {
-        if (inRange != null && !inRange.isEmpty())
-        {
+
+    private Troop findNearestTroop() {
+        if (inRange != null && !inRange.isEmpty()) {
             // loop through inRange path objects to find closest troop
             int count = 0;
 
@@ -200,21 +193,18 @@ public class Tower extends InteractiveObject
         }
         return null;
     }
-    
-    public void resetTimer()
-    {
-    	shootTimer = 0;
+
+    public void resetTimer() {
+        shootTimer = 0;
     }
-    
-    public void shoot(float deltaTime)
-    {
-    	shootTimer += deltaTime;
-    	if (shootTimer > shootTimerLimit)
-    	{
-    		target = findNearestTroop();
-    		GameController.shootTroop(this, target);
-    		resetTimer();
-    	}
+
+    public void shoot(float deltaTime) {
+        shootTimer += deltaTime;
+        if (shootTimer > shootTimerLimit) {
+            target = findNearestTroop();
+            GameController.shootTroop(this, target);
+            resetTimer();
+        }
     }
 
 }
