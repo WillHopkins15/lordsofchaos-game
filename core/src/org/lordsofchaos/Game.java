@@ -7,11 +7,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -25,6 +22,8 @@ import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.graphics.*;
+import org.lordsofchaos.player.Attacker;
+
 public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
@@ -40,6 +39,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button unitButton;
 	private static Button defenderButton;
 	private static Button attackerButton;
+	//move to player
+	private static Texture healthBarTexture;
+	private static Texture healthTexture;
+	private static Sprite healthBarSprite;
+	private static Sprite healthSprite;
+	private static BitmapFont hpCounter;
+	private static Texture coinTexture;
+	private Sprite coinSprite;
+	private static BitmapFont coinCounter;
+	private int currentHp = 75;
+	//
 	private BitmapFont unitNumber;
 	int width =  1280;
 	final int height = 720;
@@ -85,6 +95,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		}
 		renderer.getBatch().end();
 	}
+	public void healthPercentage(){
+		if(currentHp>1) {
+			float result = currentHp / 100.0f;
+			//healthSprite.setScale(1);
+			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), healthSprite.getWidth() * result, healthSprite.getHeight());
+			//healthSprite.setScale(1.5f);
+		}
+		currentHp = 1;
+	}
 	public  void defenderPOV(){
 		isometricPov();
 		batch.begin();
@@ -97,6 +116,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			batch.setColor(0, 200, 0, 0.5f);
 			batch.draw(tmpSpriteTower, Gdx.input.getX() - 24, Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
 		}
+		healthPercentage();
+		healthBarSprite.draw(batch);
+		healthSprite.draw(batch);
+		String nr = currentHp +"";
+		hpCounter.getData().setScale(1.5f);
+		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
+		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
+		//coinCounter.draw(batch,)
+
+		coinSprite.draw(batch);
 		batch.end();
 
 	}
@@ -144,14 +173,22 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 			if(towerButton.checkClick(x,y) ) {
 				System.out.println("Clicked towerButton");
-				if (!buildMode)
+				if (!buildMode) {
 					buildMode = true;
+					Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
+					Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
+					tmpCursor.dispose();
+				}
 			}
 		}
 		if(button == Buttons.RIGHT){
-			if(buildMode)
+			if(buildMode) {
 				buildMode = false;
+				Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+			}
 		}
+
+
 	}
 	@Override
 	public void create () {
@@ -159,6 +196,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		batch = new SpriteBatch();
 		unitNumber = new BitmapFont();
 		unitNumber.setColor(Color.WHITE);
+		hpCounter = new BitmapFont();
+		hpCounter.setColor(Color.WHITE);
+		coinCounter = new BitmapFont();
+		coinCounter.setColor(Color.WHITE);
 		map = new TmxMapLoader().load("maps/Isometric.tmx");
 		renderer = new IsometricTiledMapRenderer(map);
 		camera = new OrthographicCamera(width * 2, height * 2);
@@ -166,6 +207,19 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		camera.update();
 		createButtons();
 		renderer.setView(camera);
+		//move to player
+		healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
+		healthBarSprite = new Sprite(healthBarTexture);
+		healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
+		healthSprite = new Sprite(healthTexture);
+		healthSprite.setScale(5);
+		healthSprite.setPosition(225,Gdx.graphics.getHeight()- 64);
+		healthBarSprite.setScale(5);
+		healthBarSprite.setPosition(170,Gdx.graphics.getHeight() - 70);
+		coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
+		coinSprite = new Sprite(coinTexture);
+		coinSprite.setScale(1.5f);
+		//
 		currentScreen = Screen.MAIN_MENU;
 		Gdx.input.setInputProcessor(this);
 	}
