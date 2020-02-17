@@ -153,7 +153,20 @@ public class GameController {
         }
         else
         {
-            // not implementing for now
+            waveState = WaveState.DefenderBuild;
+
+            // reset all tower cooldowns
+            if (!GameController.towers.isEmpty()) {
+                for (int j = 0; j < GameController.towers.size(); j++) {
+                    GameController.towers.get(j).resetTimer();
+                }
+            }
+
+            // make sure to reset all tower build plans and unit build plans
+            EventManager.resetEventManager();
+
+            resetAddMoneyTimer();
+            resetUnitSpawnTimer();
         }
     }
 
@@ -179,20 +192,7 @@ public class GameController {
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
-                waveState = WaveState.DefenderBuild;
-
-                // reset all tower cooldowns
-                if (!GameController.towers.isEmpty()) {
-                    for (int j = 0; j < GameController.towers.size(); j++) {
-                        GameController.towers.get(j).resetTimer();
-                    }
-                }
-
-                // make sure to reset all tower build plans and unit build plans
-                EventManager.resetEventManager();
-
-                resetAddMoneyTimer();
-                resetUnitSpawnTimer();
+                endPhase();
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
