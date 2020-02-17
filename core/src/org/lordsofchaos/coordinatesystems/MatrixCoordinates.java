@@ -15,7 +15,7 @@ public class MatrixCoordinates extends Coordinates
 		int sf = GameController.getScaleFactor();
 		int y = (Math.round(rwc.getY() / sf));
 		int x =  (Math.round(rwc.getX() / sf));
-		setY(GameController.getMap().length - y);
+		setY(y);
 		setX(x);
 	}
 }

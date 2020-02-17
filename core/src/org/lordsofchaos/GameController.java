@@ -352,18 +352,18 @@ public class GameController {
     private static boolean inBounds(MatrixCoordinates mc)
     {
     	if (mc.getX() < 0 || mc.getY() < 0
-    			|| mc.getX() > width || mc.getY() > height)
+    			|| mc.getX() >= width || mc.getY() >= height)
     	{
     		return false;
     	}
     	return true;
     }
     
-    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc) 
+    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc)
     {
     	// convert realWorldCoords to matrix
     	MatrixCoordinates mc = new MatrixCoordinates(rwc);
-    	
+
     	// check if given mc is actually within the bounds of the matrix
     	if (!inBounds(mc))
     	{
