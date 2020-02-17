@@ -223,7 +223,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 			batch.end();
 		} else {
 			elapsedTime = Gdx.graphics.getDeltaTime();
-			// update(elapsedTime)
+			GameController.update(elapsedTime);
 			if (player == 0)
 				defenderPOV();
 			if (player == 1)
