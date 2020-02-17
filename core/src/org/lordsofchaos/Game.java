@@ -21,6 +21,7 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Input.Keys;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
@@ -95,7 +96,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				Sprite tmpSpriteTower2 = new Sprite(tmpTower);
 				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
-				if (GameController.verifyTowerPlacement(rwc)) {
+				if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
 					renderer.getBatch().setColor(0, 200, 0, 0.5f);
 				} else {
 					renderer.getBatch().setColor(200, 0, 0, 0.5f);
