@@ -6,6 +6,7 @@ import java.util.List;
 import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
@@ -317,8 +318,21 @@ public class GameController {
     	}
     	return true;
     }
+
+    // want to find the cost of a tower before it has been placed
+    private static int getTowerTypeCost(TowerType towerType)
+    {
+        if (towerType == TowerType.type1)
+        {
+            return 50;
+        }
+        else
+        {
+            return 0;
+        }
+    }
     
-    public static boolean verifyTowerPlacement(RealWorldCoordinates rwc)
+    public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc)
     {
     	// convert realWorldCoords to matrix
     	MatrixCoordinates mc = new MatrixCoordinates(rwc);
@@ -328,6 +342,11 @@ public class GameController {
     	{
     		return false;
     	}
+
+    	if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney())
+        {
+            return false;
+        }
     	
     	// check if this matrix position is legal
     	MatrixObject mo = map[mc.getY()][mc.getX()];
