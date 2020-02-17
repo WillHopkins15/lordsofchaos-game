@@ -209,7 +209,10 @@ public class Tower extends InteractiveObject {
         shootTimer += deltaTime;
         if (shootTimer > shootTimerLimit) {
             target = findNearestTroop();
-            GameController.shootTroop(this, target);
+            // if target is null, no troops are in range
+            if (target != null) {
+                GameController.shootTroop(this, target);
+            }
             resetTimer();
         }
     }
