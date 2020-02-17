@@ -121,9 +121,11 @@ public class GameController {
     			EventManager.getTowerBuilds());
     	
     	// then clear data ready for next turn
-    	
-    	// server needs to send BuildPhaseData to EventManager like this:
-    	//EventManager.recieveBuildPhaseData(bpd);
+    }
+
+    public static void recieveNetworkData(BuildPhaseData bpd)
+    {
+        EventManager.recieveBuildPhaseData(bpd);
     }
     
     private static void resetBuildTimer()
