@@ -2,12 +2,8 @@ package org.lordsofchaos.network;
 
 import javafx.util.Pair;
 import lombok.SneakyThrows;
-import org.lordsofchaos.BuildPhaseData;
 
-import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
-import java.time.LocalTime;
 
 /**
  * Thread for running an instance of the game over UDP.
@@ -28,14 +24,8 @@ public class GameInstance extends UDPSocket
         super();
         attacker = player1;
         defender = player2;
-        int threadPort = socket.getLocalPort();
-        System.out.printf("Thread spawned on port %d\n", threadPort);
+        System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
         sendToPlayers("Echo");
-    }
-    
-    public void close() {
-        running = false;
-        socket.close();
     }
     
     @SneakyThrows
@@ -52,12 +42,17 @@ public class GameInstance extends UDPSocket
         }
     }
     
-    protected void sendToPlayers(Object message) {
-        sendPacket(attacker, message);
-        sendPacket(defender, message);
+    /**
+     * Sends an object to both players who are connected to the server.
+     *
+     * @param contents Object to send
+     */
+    private void sendToPlayers(Object contents) {
+        sendPacket(attacker, contents);
+        sendPacket(defender, contents);
     }
     
-    public void createInputThread() {
+    protected void createInputThread() {
         new Thread(() -> {
             while (running) {
                 receiveData();
@@ -65,7 +60,7 @@ public class GameInstance extends UDPSocket
         }).start();
     }
     
-    public void createOutputThread() {
+    protected void createOutputThread() {
         new Thread(() -> {
             while (running) {
                 sendToPlayers(gameState);
@@ -76,26 +71,5 @@ public class GameInstance extends UDPSocket
                 }
             }
         }).start();
-    }
-    
-    @SneakyThrows
-    private void receiveData() {
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        
-        try {
-            socket.receive(packet);
-        } catch (SocketTimeoutException e) {
-            System.out.println("Receive timed out");
-        }
-        
-        Object received = getObjectFromBytes(packet.getData());
-        if (received == null) {
-            System.out.printf("Received null from %d\n", packet.getPort());
-        } else if (received.getClass() == String.class) {
-            System.out.printf("[%s] Message from %d: %s\n", LocalTime.now(), packet.getPort(), received);
-        } else if (received.getClass() == BuildPhaseData.class) {
-            System.out.printf("[%d] Received game state\n", socket.getLocalPort());
-            gameState = (BuildPhaseData) received;
-        }
     }
 }

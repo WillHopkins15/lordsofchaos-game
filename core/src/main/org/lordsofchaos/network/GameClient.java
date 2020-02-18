@@ -4,12 +4,13 @@ import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
-import java.net.*;
-import java.time.LocalTime;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 /**
- * Client which periodically sends game data over UDP to a server. Contains
- * methods which handle sent and received packet data.
+ * Client which periodically sends game data over UDP to a server running a game
+ * instance.
  *
  * @author Will Hopkins
  */
@@ -19,6 +20,9 @@ public class GameClient extends UDPSocket
     private InetAddress address; //address of connected server thread
     private Pair<InetAddress, Integer> server;
     
+    /**
+     * Creates a UDP Datagram socket on an available port.
+     */
     public GameClient() {
         super();
     }
@@ -65,12 +69,13 @@ public class GameClient extends UDPSocket
         socket.setSoTimeout(1000);
         createInputThread();
         createOutputThread();
+        
         while (running) {
         
         }
     }
     
-    void createInputThread() {
+    protected void createInputThread() {
         new Thread(() -> {
             while (running) {
                 receiveData();
@@ -78,7 +83,7 @@ public class GameClient extends UDPSocket
         }).start();
     }
     
-    void createOutputThread() {
+    protected void createOutputThread() {
         new Thread(() -> {
             while (running) {
                 sendToServer(gameState);
@@ -91,45 +96,27 @@ public class GameClient extends UDPSocket
         }).start();
     }
     
-    @SneakyThrows
-    private DatagramPacket receiveData() {
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        try {
-            socket.receive(packet);
-        } catch (SocketException e) {
-            System.out.println("Socket closed, ending...");
-            return packet;
-        } catch (SocketTimeoutException e) {
-            System.out.println("Receive timed out");
-        }
-        Object ob = getObjectFromBytes(packet.getData());
-        if (ob == null) {
-            //Do nothing
-        } else if (ob.getClass() == String.class) {
-            System.out.printf("[%s] Message from server: %s\n", LocalTime.now(), ob);
-        } else {
-            System.out.printf("[%d] Received game state\n", socket.getLocalPort());
-            setGameState((BuildPhaseData) ob);
-        }
-        return packet;
-    }
-    
+    /**
+     * Sends an object to the server
+     *
+     * @param contents Object to send
+     */
     private void sendToServer(Object contents) {
-        if (contents != null) {
-            System.out.printf("[%d] not null\n", socket.getLocalPort());
-        }
         sendPacket(server, contents);
     }
     
-    public void close() {
-        running = false;
-        socket.close();
-    }
-    
+    /**
+     * @return Current game state
+     */
     public BuildPhaseData getGameState() {
         return this.gameState;
     }
     
+    /**
+     * Updates the current game state
+     *
+     * @param state New game state
+     */
     public void setGameState(BuildPhaseData state) {
         this.gameState = state;
     }

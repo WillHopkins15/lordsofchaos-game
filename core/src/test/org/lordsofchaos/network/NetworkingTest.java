@@ -10,7 +10,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 public class NetworkingTest
 {
@@ -38,7 +39,6 @@ public class NetworkingTest
         gameState = new BuildPhaseData(units, tbp);
         
         //Connect both players to server and start
-        BuildPhaseData finalGameState = gameState;
         new Thread(() -> {
             if (player1.makeConnection()) {
                 //player1.setGameState(finalGameState);
