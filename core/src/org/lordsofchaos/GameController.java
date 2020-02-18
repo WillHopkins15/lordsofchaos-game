@@ -158,6 +158,8 @@ public class GameController {
         } else {
             waveState = WaveState.DefenderBuild;
 
+            System.out.println("Defender build phase begins");
+
             // reset all tower cooldowns
             if (!GameController.towers.isEmpty()) {
                 for (int j = 0; j < GameController.towers.size(); j++) {
@@ -167,7 +169,6 @@ public class GameController {
 
             // make sure to reset all tower build plans and unit build plans
             EventManager.resetEventManager();
-
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
         }
@@ -178,7 +179,6 @@ public class GameController {
         if (waveState == WaveState.DefenderBuild) {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
-            // waveState = WaveState.AttackerBuild;
             if (buildTimer > buildTimeLimit) {
                 endPhase();
             }
@@ -266,8 +266,14 @@ public class GameController {
         // remove any troops that have reached the end
         for (int i = 0; i < troopsToRemove.size(); i++)
         {
-            GameController.troops.remove(troopsToRemove.get(i));
+            troopReachesDefender(troopsToRemove.get(i));
         }
+    }
+
+    private static void troopReachesDefender(Troop troop)
+    {
+        defender.takeDamage(troop.getDamage());
+        troopDies(troop);
     }
 
     public static void shootTroops(float deltaTime) {
@@ -359,8 +365,6 @@ public class GameController {
         }
         return true;
     }
-
-
 
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {

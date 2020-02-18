@@ -40,6 +40,14 @@ public class Defender extends Player {
 
     }
 
+    public void takeDamage(int damage)
+    {
+        int tmp = getHealth() - damage;
+        if (tmp < 0)
+            tmp = 0;
+        setHealth(tmp);
+    }
+
     public void setHealth(int Health) {
         this.Health = Health;
     }
