@@ -14,8 +14,9 @@ import java.net.InetAddress;
  */
 public class ConnectionListener extends Thread
 {
-    private DatagramSocket socket;
     private static byte[] buffer = new byte[256];
+    public boolean running = true;
+    private DatagramSocket socket;
     
     /**
      * Creates a UDP DatagramSocket on the specified port, if the port is available.
@@ -29,7 +30,7 @@ public class ConnectionListener extends Thread
     
     @SneakyThrows
     public void run() {
-        while (true) {
+        while (running) {
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             socket.receive(packet);
             
@@ -40,5 +41,6 @@ public class ConnectionListener extends Thread
             socket.send(packet);
             GameServer.addConnection(address, port);
         }
+        System.out.println("Connection Listener killed.");
     }
 }
