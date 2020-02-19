@@ -18,8 +18,8 @@ import java.net.UnknownHostException;
 public class GameClient extends UDPSocket
 {
     public int port = 0; //port number of connected server thread
-    private InetAddress address; //address of connected server thread
     private Pair<InetAddress, Integer> server;
+    private byte[] buffer = new byte[256];
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -41,6 +41,7 @@ public class GameClient extends UDPSocket
         socket.setSoTimeout(5000);
         DatagramPacket packet;
         for (String item : HostManager.getHosts()) {
+            InetAddress address;
             try {
                 address = InetAddress.getByName(item);
                 packet = new DatagramPacket(buffer, buffer.length, address, GameServer.SERV_PORT);
@@ -50,14 +51,16 @@ public class GameClient extends UDPSocket
                 System.out.printf("Host %s not available.\n", item);
                 continue;
             }
-    
+            
             System.out.println("Server found!");
             System.out.println("Looking for opponent...");
             socket.setSoTimeout(0); //Stop socket from timing out
             socket.receive(packet);
-            port = packet.getPort();
             
             System.out.println("Found game.");
+            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), getObjectFromBytes(packet.getData()));
+            port = packet.getPort();
+            server = new Pair<>(address, port);
             return true;
         }
         System.out.println("No Servers Online.");
@@ -66,7 +69,6 @@ public class GameClient extends UDPSocket
     
     @SneakyThrows
     public void run() {
-        server = new Pair<>(address, port);
         System.out.printf("Connected to %s on port %d\n", server.getKey(), server.getValue());
         socket.setSoTimeout(1000);
         createInputThread();
@@ -77,49 +79,29 @@ public class GameClient extends UDPSocket
         }
     }
     
-    protected void createInputThread() {
-        new Thread(() -> {
-            while (running) {
-                receiveData();
-            }
-        }).start();
-    }
-    
-    protected void createOutputThread() {
-        new Thread(() -> {
-            while (running) {
-                sendToServer(gameState);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    running = false;
-                }
-            }
-        }).start();
-    }
-    
     /**
      * Sends an object to the server
      *
      * @param contents Object to send
      */
-    private void sendToServer(Object contents) {
-        sendPacket(server, contents);
+    @Override
+    protected void send(Object contents) {
+        sendObject(server, contents);
     }
     
     /**
      * @return Current game state
      */
     public BuildPhaseData getGameState() {
-        return this.gameState;
+        return gameState;
     }
     
     /**
      * Updates the current game state
      *
-     * @param state New game state
+     * @param gameState New game state
      */
-    public void setGameState(BuildPhaseData state) {
-        this.gameState = state;
+    public void setGameState(BuildPhaseData gameState) {
+        this.gameState = gameState;
     }
 }

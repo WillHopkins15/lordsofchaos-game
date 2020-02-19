@@ -25,13 +25,14 @@ public class GameInstance extends UDPSocket
         attacker = player1;
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
-        sendToPlayers("Echo");
+        sendObject(attacker, "Attacker");
+        sendObject(defender, "Defender");
     }
     
     @SneakyThrows
     public void run() {
-        sendToPlayers("Connected");
-        sendToPlayers("Starting game...");
+        send("Connected");
+        send("Starting game...");
         
         socket.setSoTimeout(500);
         createInputThread();
@@ -47,29 +48,9 @@ public class GameInstance extends UDPSocket
      *
      * @param contents Object to send
      */
-    private void sendToPlayers(Object contents) {
-        sendPacket(attacker, contents);
-        sendPacket(defender, contents);
-    }
-    
-    protected void createInputThread() {
-        new Thread(() -> {
-            while (running) {
-                receiveData();
-            }
-        }).start();
-    }
-    
-    protected void createOutputThread() {
-        new Thread(() -> {
-            while (running) {
-                sendToPlayers(gameState);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    running = false;
-                }
-            }
-        }).start();
+    @Override
+    protected void send(Object contents) {
+        sendObject(attacker, contents);
+        sendObject(defender, contents);
     }
 }

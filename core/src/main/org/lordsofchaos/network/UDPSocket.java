@@ -6,7 +6,6 @@ import org.lordsofchaos.BuildPhaseData;
 
 import java.io.*;
 import java.net.*;
-import java.time.LocalTime;
 
 /**
  * Class that abstracts sending and receiving objects over a DatagramSocket.
@@ -15,11 +14,10 @@ import java.time.LocalTime;
  */
 public abstract class UDPSocket extends Thread
 {
-    private static final Object LOCK = new Object();
     protected boolean running = true;
     protected DatagramSocket socket;
     protected BuildPhaseData gameState = null;
-    protected byte[] buffer = new byte[1024];
+    private byte[] buffer = new byte[1024]; //Needs to be big enough to hold the game state object
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -37,16 +35,14 @@ public abstract class UDPSocket extends Thread
      * @param contents  Object to serialize and send
      */
     @SneakyThrows
-    protected void sendPacket(Pair<InetAddress, Integer> recipient, Object contents) {
+    protected void sendObject(Pair<InetAddress, Integer> recipient, Object contents) {
         if (!socket.isClosed()) {
-            synchronized (LOCK) {
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                ObjectOutputStream oout = new ObjectOutputStream(bout);
-                oout.writeObject(contents);
-                byte[] bytes = bout.toByteArray();
-                DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getKey(), recipient.getValue());
-                socket.send(packet);
-            }
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            ObjectOutputStream oout = new ObjectOutputStream(bout);
+            oout.writeObject(contents);
+            byte[] bytes = bout.toByteArray();
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getKey(), recipient.getValue());
+            socket.send(packet);
         } else {
             System.out.println("Packet not sent: Socket closed");
         }
@@ -61,17 +57,15 @@ public abstract class UDPSocket extends Thread
      */
     @SneakyThrows
     protected Object getObjectFromBytes(byte[] bytes) {
-        synchronized (LOCK) {
-            ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-            ObjectInputStream oin = new ObjectInputStream(bin);
-            Object obj = null;
-            try {
-                obj = oin.readObject();
-            } catch (EOFException ex) {
-                System.out.println("EOF");
-            }
-            return obj;
+        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+        ObjectInputStream oin = new ObjectInputStream(bin);
+        Object obj = null;
+        try {
+            obj = oin.readObject();
+        } catch (EOFException ex) {
+            System.out.println("EOF");
         }
+        return obj;
     }
     
     /**
@@ -81,7 +75,7 @@ public abstract class UDPSocket extends Thread
      * game state data.
      */
     @SneakyThrows
-    protected void receiveData() {
+    protected void receiveObject() {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         
         try {
@@ -91,13 +85,14 @@ public abstract class UDPSocket extends Thread
             return;
         } catch (SocketTimeoutException e) {
             System.out.println("Receive timed out.");
+            return;
         }
         
         Object received = getObjectFromBytes(packet.getData());
         if (received == null) {
-            System.out.printf("Received null from %d\n", packet.getPort());
+            System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
         } else if (received.getClass() == String.class) {
-            System.out.printf("[%s] Message from %d: %s\n", LocalTime.now(), packet.getPort(), received);
+            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(), received);
         } else if (received.getClass() == BuildPhaseData.class) {
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
@@ -107,14 +102,33 @@ public abstract class UDPSocket extends Thread
     /**
      * Creates a thread for listening for Datagram packets and processing the data within.
      */
-    protected abstract void createInputThread();
+    protected void createInputThread() {
+        new Thread(() -> {
+            while (running) {
+                receiveObject();
+            }
+        }).start();
+    }
     
     /**
      * Creates a thread for sending Datagram packets concurrently.
      */
-    protected abstract void createOutputThread();
+    protected void createOutputThread() {
+        new Thread(() -> {
+            while (running) {
+                send(gameState);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    running = false;
+                }
+            }
+        }).start();
+    }
     
     public abstract void run();
+    
+    protected abstract void send(Object contents);
     
     /**
      * Closes the socket if open and kills any open threads.
