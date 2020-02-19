@@ -20,6 +20,7 @@ public class GameClient extends UDPSocket
     public int port = 0; //port number of connected server thread
     private Pair<InetAddress, Integer> server;
     private byte[] buffer = new byte[256];
+    private String playerType = "";
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -58,7 +59,8 @@ public class GameClient extends UDPSocket
             socket.receive(packet);
             
             System.out.println("Found game.");
-            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), getObjectFromBytes(packet.getData()));
+            playerType = (String) getObjectFromBytes(packet.getData());
+            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             port = packet.getPort();
             server = new Pair<>(address, port);
             return true;
@@ -103,5 +105,12 @@ public class GameClient extends UDPSocket
      */
     public void setGameState(BuildPhaseData gameState) {
         this.gameState = gameState;
+    }
+    
+    /**
+     * @return Assigned player type - either Attacker or Defender
+     */
+    public String getPlayerType() {
+        return this.playerType;
     }
 }
