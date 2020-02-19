@@ -7,6 +7,7 @@ import org.lordsofchaos.BuildPhaseData;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 /**
  * Client which periodically sends game data over UDP to a server running a game
@@ -38,17 +39,18 @@ public class GameClient extends UDPSocket
     @SneakyThrows
     public boolean makeConnection() {
         socket.setSoTimeout(5000);
+        DatagramPacket packet;
         for (String item : HostManager.getHosts()) {
-            address = InetAddress.getByName(item);
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, GameServer.SERV_PORT);
-            socket.send(packet);
             try {
+                address = InetAddress.getByName(item);
+                packet = new DatagramPacket(buffer, buffer.length, address, GameServer.SERV_PORT);
+                socket.send(packet);
                 socket.receive(packet);
-            } catch (SocketTimeoutException e) {
-                System.out.printf("Host %s not available.\n", address);
+            } catch (SocketTimeoutException | UnknownHostException e) {
+                System.out.printf("Host %s not available.\n", item);
                 continue;
             }
-            
+    
             System.out.println("Server found!");
             System.out.println("Looking for opponent...");
             socket.setSoTimeout(0); //Stop socket from timing out
