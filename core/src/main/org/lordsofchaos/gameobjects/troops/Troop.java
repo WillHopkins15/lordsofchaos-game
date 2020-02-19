@@ -209,9 +209,6 @@ public class Troop extends InteractiveObject
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
-                System.out.println("previous direction: " + previousdir);
-                System.out.println("current direction: " + direction);
-                System.out.println(previousdir.equals(direction));
                 previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
