@@ -1,6 +1,7 @@
 package org.lordsofchaos;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -91,6 +92,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		troop = new TroopType1(Arrays.asList(p));
 
 		List<Troop> troops = GameController.getTroops();
+		Collections.sort(troops);
 		renderer.getBatch().begin();
 		for (int i = 0; i < troops.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(troops.get(i).getRealWorldCoordinates());
@@ -99,6 +101,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		}
 
 		List<TowerBuild> towerBuilds = EventManager.getTowerBuilds();
+		Collections.sort(towerBuilds);
 		for (int i = 0; i < towerBuilds.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(towerBuilds.get(i).getRealWorldCoordinates());
 
@@ -109,6 +112,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		}
 
 		List<Tower> towers = GameController.getTowers();
+		Collections.sort(towers);
 		for (int i = 0; i < towers.size(); i++) {
 			Vector2 coordinates = realWorldCooridinateToIsometric(towers.get(i).getRealWorldCoordinates());
 			renderer.getBatch().draw(towers.get(i).getSprite(), coordinates.x - horizontalSpriteOffset,
