@@ -27,13 +27,9 @@ public class EventManager {
 	public static class TowerBuild implements Serializable {
 		private RealWorldCoordinates rwc;
 		private TowerType towerType;
-		private Sprite sprite;
 
 		public TowerBuild(TowerType towerType, RealWorldCoordinates rwc) {
 			this.towerType = towerType;
-			this.rwc = rwc;
-			Texture texture = new Texture(Gdx.files.internal("towers/" + towerType.getSpriteName() + ".png"));
-			this.sprite = new Sprite(texture);
 		}
 
 		public RealWorldCoordinates getRealWorldCoordinates() {
@@ -43,11 +39,6 @@ public class EventManager {
 		public TowerType getTowerType() {
 			return towerType;
 		}
-
-		public Sprite getSprite() {
-			return sprite;
-		}
-
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof TowerBuild) {
