@@ -23,6 +23,7 @@ public class Tower extends InteractiveObject {
     protected DamageType damageType;
     protected Troop target;
     protected List<Path> inRange;
+    protected Boolean isCompleted;
 
     public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType) {
         super(spriteName, rwc, cost, damage);
@@ -30,6 +31,17 @@ public class Tower extends InteractiveObject {
         setDamageType(damageType);
         Texture texture = new Texture(Gdx.files.internal("towers/" + spriteName + ".png"));
 		this.sprite = new Sprite(texture);
+        isCompleted = false;
+    }
+
+    public Boolean getIsCompleted()
+    {
+        return isCompleted;
+    }
+
+    public void setIsCompleted()
+    {
+        isCompleted = true;
     }
 
     // Getters and Setters

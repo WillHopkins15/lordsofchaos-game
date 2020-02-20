@@ -49,6 +49,10 @@ public class GameController {
     // list of all towers in matrix
     protected static List<Tower> towers = new ArrayList<Tower>();
 
+    // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
+    protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
+
+
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
 
@@ -142,9 +146,10 @@ public class GameController {
             waveState = WaveState.AttackerBuild;
 
             // create all towers
-            //for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-            //    createTower(EventManager.getTowerBuilds().get(i));
-            //}
+            for (int i = 0; i < towersPlacedThisTurn.size(); i++) {
+                towersPlacedThisTurn.get(i).setIsCompleted();
+            }
+            towersPlacedThisTurn.clear();
 
             System.out.println("Attacker build phase begins");
 
@@ -349,6 +354,7 @@ public class GameController {
         // other if's to be added when new towers are added
 
         towers.add(tower);
+        towersPlacedThisTurn.add(tower);
         tile.setTower(tower);
         return tower;
     }
