@@ -198,7 +198,6 @@ public class GameController {
                 endPhase();
                 addMoney();
 
-
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
@@ -211,6 +210,7 @@ public class GameController {
         attacker.addMoney();
         defender.addMoney();
     }
+
     private static void addMoney(float deltaTime) {
         addMoneyTimer += deltaTime;
         if (addMoneyTimer > addMoneyTimeLimit) {
@@ -270,14 +270,12 @@ public class GameController {
         }
 
         // remove any troops that have reached the end
-        for (int i = 0; i < troopsToRemove.size(); i++)
-        {
+        for (int i = 0; i < troopsToRemove.size(); i++) {
             troopReachesDefender(troopsToRemove.get(i));
         }
     }
 
-    private static void troopReachesDefender(Troop troop)
-    {
+    private static void troopReachesDefender(Troop troop) {
         defender.takeDamage(troop.getDamage());
         troopDies(troop);
     }
@@ -309,14 +307,12 @@ public class GameController {
         if (troops.contains(troop)) {
             troops.remove(troop);
 
-            // look through the path this troop is on and remove it from the Path it's contained in
-            for (int i = 0; i < troop.getPath().size(); i++)
-            {
+            // look through the path this troop is on and remove it from the Path it's
+            // contained in
+            for (int i = 0; i < troop.getPath().size(); i++) {
                 Path path = troop.getPath().get(i);
-                for (int j = 0; j < troop.getPath().get(i).getTroops().size(); j++)
-                {
-                    if (troop.equals(path.getTroops().get(j)))
-                    {
+                for (int j = 0; j < troop.getPath().get(i).getTroops().size(); j++) {
+                    if (troop.equals(path.getTroops().get(j))) {
                         path.removeTroop(troop);
                         break;
                     }
