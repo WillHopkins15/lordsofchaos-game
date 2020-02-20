@@ -20,6 +20,7 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
+import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.Button;
 import org.lordsofchaos.graphics.Screen;
@@ -52,12 +53,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static BitmapFont coinCounter;
     private static GameClient client;
     final int height = 720;
+    int width = 1280;
     SpriteBatch batch;
     OrthographicCamera camera;
     IsometricTiledMapRenderer renderer;
     TiledMap map;
-    Troop troop;
-    int width = 1280;
     private Sprite coinSprite;
     private int currentHp = 50;
     private float hpSpriteW;
@@ -89,21 +89,25 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void isometricPov() {
         renderer.render();
 
-        List<GameObject> sprites = new ArrayList<GameObject>();
-        sprites.addAll(GameController.getTowers());
-        sprites.addAll(GameController.getTroops());
-        Collections.sort(sprites);
+        List<GameObject> objectsToAdd = new ArrayList<GameObject>();
+        objectsToAdd.addAll(GameController.getTowers());
+        objectsToAdd.addAll(GameController.getTroops());
+        Collections.sort(objectsToAdd);
 
         renderer.getBatch().begin();
 
-        for (int i = 0; i < sprites.size(); i++) {
-            Sprite sprite = sprites.get(i).getSprite();
-            Vector2 coordinates = realWorldCooridinateToIsometric(sprites.get(i).getRealWorldCoordinates());
-            /*if (sprites.get(i) instanceof TowerBuild) {
-                renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
-            }*/
-            System.out.println(renderer.getBatch().getColor());
-            renderer.getBatch().draw(sprite, coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 48 * sprite.getHeight() / sprite.getWidth());
+        for (int i = 0; i < objectsToAdd.size(); i++) {
+            GameObject object = objectsToAdd.get(i);
+            Sprite sprite = object.getSprite();
+            Vector2 coordinates = realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
+            if (object instanceof Tower) {
+                Tower tower = (Tower) object;
+                if (!tower.getIsCompleted()) {
+                    renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
+                }
+            }
+            renderer.getBatch().draw(sprite, coordinates.x - horizontalSpriteOffset,
+                    coordinates.y - verticalSpriteOffset, 48, 48 * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
         }
 
@@ -115,9 +119,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
                 if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
-                    renderer.getBatch().setColor(0, 200, 0, 0.5f);
+                    renderer.getBatch().setColor(0, 1, 0, 0.5f);
                 } else {
-                    renderer.getBatch().setColor(200, 0, 0, 0.5f);
+                    renderer.getBatch().setColor(1, 0, 0, 0.5f);
                 }
 
                 Vector2 coords = realWorldCooridinateToIsometric(rwc);
@@ -371,14 +375,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public RealWorldCoordinates isometricToRealWorldCoordinate(Vector2 vector) {
 
         Vector2 diff = cartesianToIsometric(1280, 1280);
-        // diff.x -= 128;
-        // diff.y -= 64;
-
         Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
-
         int x = (int) (v2.x + diff.x);
         int y = (int) (v2.y + diff.y);
-
         return new RealWorldCoordinates(y, x);
     }
 
