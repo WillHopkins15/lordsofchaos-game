@@ -43,4 +43,9 @@ public class ConnectionListener extends Thread
         }
         System.out.println("Connection Listener killed.");
     }
+    
+    public void close() {
+        running = false;
+        socket.close();
+    }
 }

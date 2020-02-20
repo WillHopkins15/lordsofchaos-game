@@ -17,10 +17,10 @@ import java.util.List;
  */
 public class GameServer extends Thread
 {
-    public static final int SERV_PORT = 5148;
-    protected static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
+    protected static final int SERV_PORT = 5148;
+    private static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
     private static ConnectionListener connectionListener;
-    public boolean running = true;
+    private boolean running = true;
     
     public GameServer() {
     }
@@ -60,7 +60,7 @@ public class GameServer extends Thread
     }
     
     public void close() {
-        connectionListener.running = false;
+        connectionListener.close();
         running = false;
     }
     

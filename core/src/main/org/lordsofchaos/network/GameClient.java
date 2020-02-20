@@ -17,7 +17,6 @@ import java.net.UnknownHostException;
  */
 public class GameClient extends UDPSocket
 {
-    public int port = 0; //port number of connected server thread
     private Pair<InetAddress, Integer> server;
     private byte[] buffer = new byte[256];
     private String playerType = "";
@@ -61,7 +60,8 @@ public class GameClient extends UDPSocket
             System.out.println("Found game.");
             playerType = (String) getObjectFromBytes(packet.getData());
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
-            port = packet.getPort();
+            //port number of connected server thread
+            int port = packet.getPort();
             server = new Pair<>(address, port);
             return true;
         }
@@ -112,5 +112,16 @@ public class GameClient extends UDPSocket
      */
     public String getPlayerType() {
         return this.playerType;
+    }
+    
+    /**
+     * @return InetAdress/Port number pair of connected server
+     * @throws Exception If client has not connected to a server.
+     */
+    public Pair<InetAddress, Integer> getServer() throws Exception {
+        if (server == null) {
+            throw new Exception("Connection to a server has not been made.");
+        }
+        return this.server;
     }
 }

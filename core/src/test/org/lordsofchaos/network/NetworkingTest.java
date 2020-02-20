@@ -53,11 +53,19 @@ public class NetworkingTest
         }).start();
         
         //Wait for game instance to be set up
-        while (player1.port == 0 || player2.port == 0) {
+        int port1 = 0;
+        int port2 = 0;
+        try {
+            port1 = player1.getServer().getValue();
+            port2 = player2.getServer().getValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        while (port1 == 0 || port2 == 0) {
             Thread.sleep(500);
         }
-        assertNotEquals("Client1 not connected to server", 0, player1.port);
-        assertNotEquals("Client2 not connected to server", 0, player2.port);
+        assertNotEquals("Client1 not connected to server", 0, port1);
+        assertNotEquals("Client2 not connected to server", 0, port2);
         
         //kill central server to free up threads
         server.close();
