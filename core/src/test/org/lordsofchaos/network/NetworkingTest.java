@@ -52,6 +52,7 @@ public class NetworkingTest
             }
         }).start();
         
+        Thread.sleep(2000);
         //Wait for game instance to be set up
         int port1 = 0;
         int port2 = 0;

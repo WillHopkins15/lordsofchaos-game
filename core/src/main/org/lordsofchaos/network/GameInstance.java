@@ -2,6 +2,7 @@ package org.lordsofchaos.network;
 
 import javafx.util.Pair;
 import lombok.SneakyThrows;
+import org.lordsofchaos.BuildPhaseData;
 
 import java.net.InetAddress;
 
@@ -52,5 +53,10 @@ public class GameInstance extends UDPSocket
     protected void send(Object contents) {
         sendObject(attacker, contents);
         sendObject(defender, contents);
+    }
+    
+    @Override
+    protected void setGameState(BuildPhaseData gameState) {
+        this.gameState = gameState;
     }
 }

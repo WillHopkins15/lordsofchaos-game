@@ -96,6 +96,7 @@ public abstract class UDPSocket extends Thread
         } else if (received.getClass() == BuildPhaseData.class) {
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
+            setGameState(gameState);
         }
     }
     
@@ -129,6 +130,8 @@ public abstract class UDPSocket extends Thread
     public abstract void run();
     
     protected abstract void send(Object contents);
+    
+    protected abstract void setGameState(BuildPhaseData gameState);
     
     /**
      * Closes the socket if open and kills any open threads.

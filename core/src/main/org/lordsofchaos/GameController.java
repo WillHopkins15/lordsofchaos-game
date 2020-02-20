@@ -20,7 +20,7 @@ import org.lordsofchaos.player.Player;
 
 public class GameController {
 
-    enum WaveState {
+    public enum WaveState {
         DefenderBuild, AttackerBuild, Play
     }
 
@@ -115,14 +115,14 @@ public class GameController {
         debugVisualiseMap();
     }
 
-    public static void sendData() {
+    public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
-
+        return bpd;
         // then clear data ready for next turn
     }
 
-    public static void recieveNetworkData(BuildPhaseData bpd) {
+    public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
     }
 

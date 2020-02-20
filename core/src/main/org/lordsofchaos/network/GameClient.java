@@ -3,6 +3,7 @@ package org.lordsofchaos.network;
 import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
+import org.lordsofchaos.GameController;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -77,7 +78,8 @@ public class GameClient extends UDPSocket
         createOutputThread();
         
         while (running) {
-        
+            this.gameState = GameController.getGameState();
+            Thread.sleep(100);
         }
     }
     
@@ -105,6 +107,7 @@ public class GameClient extends UDPSocket
      */
     public void setGameState(BuildPhaseData gameState) {
         this.gameState = gameState;
+        GameController.setGameState(this.gameState);
     }
     
     /**
@@ -131,5 +134,20 @@ public class GameClient extends UDPSocket
     
     public boolean isAttacker() {
         return this.getPlayerType().equals("Attacker");
+    }
+    
+    public String getCurrentWave() {
+        return GameController.getWaveState().toString();
+    }
+    
+    @Override
+    protected void createInputThread() {
+        new Thread(() -> {
+            while (running) {
+                if (getCurrentWave().equals(getPlayerType())) {
+                    receiveObject();
+                }
+            }
+        }).start();
     }
 }
