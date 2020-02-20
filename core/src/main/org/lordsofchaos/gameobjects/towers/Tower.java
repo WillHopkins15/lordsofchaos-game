@@ -23,13 +23,13 @@ public class Tower extends InteractiveObject {
     protected DamageType damageType;
     protected Troop target;
     protected List<Path> inRange;
-    protected Sprite sprite;
 
-    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType, Sprite sprite) {
+    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType) {
         super(spriteName, rwc, cost, damage);
         setRange(range);
         setDamageType(damageType);
-        this.sprite = sprite;
+        Texture texture = new Texture(Gdx.files.internal("towers/" + spriteName + ".png"));
+		this.sprite = new Sprite(texture);
     }
 
     // Getters and Setters
@@ -40,10 +40,6 @@ public class Tower extends InteractiveObject {
 
     public int getRange() {
         return range;
-    }
-
-    public Sprite getSprite() {
-        return sprite;
     }
 
     public void setDamageType(DamageType damageType) {
