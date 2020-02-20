@@ -462,8 +462,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         System.out.println("Clicked at x = " + x + " y = " + y);
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
-                if (startButton.checkClick(x, y))
+                if (startButton.checkClick(x, y)) {
+                    setupClient();
                     currentScreen = Screen.CHOOSE_FACTION;
+                }
                 else if (quitButton.checkClick(x, y)) {
                     quitButton.dispose();
                     startButton.dispose();
@@ -471,12 +473,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
-                if (defenderButton.checkClick(x, y)) {
+                if (defenderButton.checkClick(x, y) && client.isDefender()) {
                     player = 0;
                     setupClient();
 
                     currentScreen = Screen.GAME;
-                } else if (attackerButton.checkClick(x, y)) {
+                } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
                     player = 1;
                     currentScreen = Screen.GAME;
                 }

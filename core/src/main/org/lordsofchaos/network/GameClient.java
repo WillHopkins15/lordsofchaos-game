@@ -124,4 +124,12 @@ public class GameClient extends UDPSocket
         }
         return this.server;
     }
+    
+    public boolean isDefender() {
+        return this.getPlayerType().equals("Defender");
+    }
+    
+    public boolean isAttacker() {
+        return this.getPlayerType().equals("Attacker");
+    }
 }
