@@ -2,7 +2,9 @@ package org.lordsofchaos;
 
 import java.util.Arrays;
 import java.util.List;
+import java.lang.System;
 
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -44,6 +46,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button defenderButton;
 	private static Button attackerButton;
 	private static Button endTurnButton;
+	private static BitmapFont endTurnFont;
 	//move to player if possible
 	private static Texture healthBarTexture;
 	private static Texture healthTexture;
@@ -53,14 +56,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Texture coinTexture;
 	private Sprite coinSprite;
 	private static BitmapFont coinCounter;
-	private int currentHp = 50;
+	private  int lastTurnTime;
 	//
 	private float hpSpriteW;
+	private float timerChangeTurn;
 	private BitmapFont unitNumber;
 	int width = 1280;
 	final int height = 720;
 	private Screen currentScreen;
 	private float elapsedTime;
+	private boolean changedTurn = false;
 
 	public static void main(String[] args) {
 		setupClient();
@@ -145,14 +150,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 
 	public void healthPercentage(){
-			float result = currentHp / 100.0f;
+			float result = GameController.defender.getHealth() / 100.0f;
 			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
 	}
 	public void showHealth(){
 		healthPercentage();
 		healthBarSprite.draw(batch);
 		healthSprite.draw(batch);
-		String nr = currentHp + "";
+		String nr = GameController.defender.getHealth() + "";
 		hpCounter.getData().setScale(1.5f);
 		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
 
@@ -180,6 +185,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 		showCoins(GameController.defender);
 		endTurnButton.getSprite().draw(batch);
+		if(changedTurn) changeTurn(2,"Attacker' Turn");
 		batch.end();
 
 	}
@@ -197,8 +203,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		endTurnButton.getSprite().draw(batch);
 		showHealth();
 		showCoins(GameController.attacker);
+		if(changedTurn) changeTurn(2,"     Action   ");
 		batch.end();
-		isometricPov();
 	}
 
 	public void attackerTouchDown(int x, int y, int pointer, int button) {
@@ -209,6 +215,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 				}
 				else if(endTurnButton.checkClick(x,y)){
 					GameController.endPhase();
+					changedTurn = true;
+
 				}
 			}
 			if (button == Buttons.RIGHT) {
@@ -228,7 +236,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		Vector2 coords = new Vector2(x * 2, height - (y * 2));
 		return roundToCentreTile(isometricToRealWorldCoordinate(coords));
 	}
-
+	public void changeTurn(float targetTime, String currentPlayer){
+		timerChangeTurn += Gdx.graphics.getDeltaTime();
+		System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
+		if(timerChangeTurn < targetTime) {
+			endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
+			System.out.println("Printing text!");
+		}
+		else changedTurn = false;
+	}
 	public void defenderTouchDown(int x, int y, int pointer, int button) {
 		if(GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
 			if (button == Buttons.LEFT) {
@@ -261,6 +277,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 					}
 				} else if (endTurnButton.checkClick(x, y) && !buildMode) {
 					 GameController.endPhase();
+					 changedTurn = true;
+
 				}
 			}
 			if (button == Buttons.RIGHT) {
@@ -281,6 +299,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	public void create() {
 
 		batch = new SpriteBatch();
+		endTurnFont = new BitmapFont();
+		endTurnFont.setColor(255,255,255,1f);
+		endTurnFont.getData().setScale(3f);
 		unitNumber = new BitmapFont();
 		unitNumber.setColor(Color.WHITE);
 		hpCounter = new BitmapFont();
@@ -308,6 +329,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		coinSprite = new Sprite(coinTexture);
 		coinSprite.setScale(1.5f);
 		//
+		//endTurnTexture = new Texture(Gdx.files.internal("UI/"))
 		GameController.initialise();
 		hpSpriteW = healthSprite.getWidth();
 		currentScreen = Screen.MAIN_MENU;
@@ -322,6 +344,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	public void render() {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		//batch.begin();
 		if (currentScreen == Screen.MAIN_MENU) {
 			batch.begin();
 			startButton.getSprite().draw(batch);
@@ -335,10 +358,19 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		} else {
 			elapsedTime = Gdx.graphics.getDeltaTime();
 			GameController.update(elapsedTime);
+			/*if(changedTurn == true) {
+				System.out.println("Turn Ended");
+				lastTurnTime = (int) System.nanoTime();
+				if(GameController.getWaveState() == GameController.WaveState.DefenderBuild)
+					changeTurn(2000000000,"Attacker's Turn",batch);
+				if(GameController.getWaveState() == GameController.WaveState.AttackerBuild)
+					changeTurn(2000000000,"Action",batch);
+			}*/
 			if (player == 0)
 				defenderPOV();
 			if (player == 1)
 				attackerPOV();
+
 		}
 
 	}
