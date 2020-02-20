@@ -2,11 +2,10 @@ package org.lordsofchaos;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -143,9 +142,9 @@ public class GameController {
             waveState = WaveState.AttackerBuild;
 
             // create all towers
-            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                createTower(EventManager.getTowerBuilds().get(i));
-            }
+            //for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+            //    createTower(EventManager.getTowerBuilds().get(i));
+            //}
 
             System.out.println("Attacker build phase begins");
 
@@ -336,7 +335,7 @@ public class GameController {
         }
     }
 
-    private static Tower createTower(TowerBuild tbp) {
+    public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
 
         // convert realWorldCoords to matrix

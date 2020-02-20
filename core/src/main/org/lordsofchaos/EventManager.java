@@ -12,45 +12,14 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
 public class EventManager {
 	private static int troopTypes;
 	private static int pathCount;
 
 	private static int[][] unitBuildPlan;
-	private static List<TowerBuild> towerBuilds;
-
-	// TowerBuild tells you what sort of tower has been placed and where,
-	// GameController then uses this to create instances of towers
-	// GameController contains a list of TowerBuilds which will be sent over the
-	// network
-	public static class TowerBuild implements Serializable {
-		private RealWorldCoordinates rwc;
-		private TowerType towerType;
-
-		public TowerBuild(TowerType towerType, RealWorldCoordinates rwc) {
-			this.towerType = towerType;
-		}
-
-		public RealWorldCoordinates getRealWorldCoordinates() {
-			return rwc;
-		}
-
-		public TowerType getTowerType() {
-			return towerType;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof TowerBuild) {
-				TowerBuild towerBuild = (TowerBuild) obj;
-				MatrixCoordinates thisMC = new MatrixCoordinates(getRealWorldCoordinates());
-				MatrixCoordinates otherMC = new MatrixCoordinates(towerBuild.getRealWorldCoordinates());
-				return thisMC.equals(otherMC);
-			}
-			return false;
-		}
-
-	}
+	private static List<SerializableTower> towerBuilds;
 
 	public static void recieveBuildPhaseData(BuildPhaseData bpd) {
 		unitBuildPlan = bpd.getUnitBuildPlan();
@@ -63,9 +32,10 @@ public class EventManager {
 		resetEventManager();
 	}
 
-	public static void towerRemoved(TowerBuild tbp) {
+	public static void towerRemoved(SerializableTower tbp) {
 		if (towerBuilds.contains(tbp)) {
 			towerBuilds.remove(tbp);
+			// add function in gc to remove tower
 		}
 	}
 
@@ -73,20 +43,21 @@ public class EventManager {
 		return unitBuildPlan;
 	}
 
-	public static List<TowerBuild> getTowerBuilds() {
+	public static List<SerializableTower> getTowerBuilds() {
 		return towerBuilds;
 	}
 
 	public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
-		TowerBuild tbp = new TowerBuild(towerType, rwc);
+		SerializableTower tbp = new SerializableTower(towerType, rwc);
 		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(towerType, rwc)) {
 			towerBuilds.add(tbp);
+			GameController.createTower(tbp);
 		}
 	}
 
 	public static void resetEventManager() {
 		unitBuildPlan = new int[troopTypes][pathCount];
-		towerBuilds = new ArrayList<TowerBuild>();
+		towerBuilds = new ArrayList<SerializableTower>();
 	}
 
 	public static void buildPlanChange(int unitType, int path, int change) {

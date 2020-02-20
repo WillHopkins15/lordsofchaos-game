@@ -16,22 +16,16 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import org.lordsofchaos.EventManager.TowerBuild;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
-import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.Troop;
-import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.graphics.Button;
 import org.lordsofchaos.graphics.Screen;
-import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
