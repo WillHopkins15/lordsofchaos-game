@@ -60,10 +60,9 @@ public class NetworkingTest
             port2 = player2.getServer().getValue();
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(0);
         }
-        while (port1 == 0 || port2 == 0) {
-            Thread.sleep(500);
-        }
+        
         assertNotEquals("Client1 not connected to server", 0, port1);
         assertNotEquals("Client2 not connected to server", 0, port2);
         
