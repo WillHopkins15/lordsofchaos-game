@@ -11,8 +11,10 @@ public class DesktopLauncher {
 
 		config.width = 1280;
 		config.height = 720;
+		System.out.println("TEST");
 		GameController.initialise();
 
 		new LwjglApplication(new Game(), config);
+
 	}
 }

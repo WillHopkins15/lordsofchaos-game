@@ -26,7 +26,7 @@ import org.lordsofchaos.gameobjects.troops.*;
 import org.lordsofchaos.matrixobjects.Path;
 import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.graphics.*;
-
+import org.lordsofchaos.player.*;
 public class Game extends ApplicationAdapter implements InputProcessor {
 
 	SpriteBatch batch;
@@ -44,7 +44,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Button unitButton;
 	private static Button defenderButton;
 	private static Button attackerButton;
-	// move to player
+	private static Button endTurnButton;
+	//move to player if possible
 	private static Texture healthBarTexture;
 	private static Texture healthTexture;
 	private static Sprite healthBarSprite;
@@ -53,8 +54,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	private static Texture coinTexture;
 	private Sprite coinSprite;
 	private static BitmapFont coinCounter;
-	private int currentHp = 75;
+	private int currentHp = 50;
 	//
+	private float hpSpriteW;
 	private BitmapFont unitNumber;
 	int width = 1280;
 	final int height = 720;
@@ -74,7 +76,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 
 	public static void createButtons() {
-		towerButton = new Button("UI/towerButton.png", 30, 30);
+		towerButton = new Button("UI/towerButton.png", 30, 50);
 		startButton = new Button("UI/startButton.png",
 				Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 2);
 		quitButton = new Button("UI/quitButton.png",
@@ -84,6 +86,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		defenderButton = new Button("UI/defenderButton.png", 100, Gdx.graphics.getHeight() / 2);
 		attackerButton = new Button("UI/attackerButton.png",
 				Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
+		endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200  );
 	}
 
 	public void isometricPov() {
@@ -144,20 +147,32 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		renderer.getBatch().end();
 	}
 
-	public void healthPercentage() {
-		if (currentHp > 1) {
-			float result = currentHp / 100.0f;
-			// healthSprite.setScale(1);
-			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), healthSprite.getWidth() * result,
-					healthSprite.getHeight());
-			// healthSprite.setScale(1.5f);
-		}
-		currentHp = 1;
-	}
 
+	public void healthPercentage(){
+			float result = currentHp / 100.0f;
+			healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
+	}
+	public void showHealth(){
+		healthPercentage();
+		healthBarSprite.draw(batch);
+		healthSprite.draw(batch);
+		String nr = currentHp + "";
+		hpCounter.getData().setScale(1.5f);
+		hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
+
+	}
+	public void showCoins(Player player){
+		coinSprite.setPosition(Gdx.graphics.getWidth() - 200,Gdx.graphics.getHeight() - 72);
+		String tmpCoinCounter = player.getCurrentMoney() + "";
+		coinCounter.getData().setScale(2.0f);
+		coinCounter.draw(batch,tmpCoinCounter,Gdx.graphics.getWidth() - 120,Gdx.graphics.getHeight() - 50);
+
+		coinSprite.draw(batch);
+	}
 	public void defenderPOV() {
 		isometricPov();
 		batch.begin();
+
 		towerButton.getSprite().draw(batch);
 		/*
 		 * tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,
@@ -165,16 +180,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		 * 0.5f); batch.draw(tmpSpriteTower, Gdx.input.getX() - 24,
 		 * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
 		 */
-		healthPercentage();
-		healthBarSprite.draw(batch);
-		healthSprite.draw(batch);
-		String nr = currentHp + "";
-		hpCounter.getData().setScale(1.5f);
-		hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
-		coinSprite.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 72);
-		// coinCounter.draw(batch,)
+		showHealth();
 
-		coinSprite.draw(batch);
+		showCoins(GameController.defender);
+		endTurnButton.getSprite().draw(batch);
 		batch.end();
 
 	}
@@ -189,19 +198,27 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 		unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10,
 				unitButton.getY() + 25);
+		endTurnButton.getSprite().draw(batch);
+		showHealth();
+		showCoins(GameController.attacker);
 		batch.end();
 		isometricPov();
 	}
 
 	public void attackerTouchDown(int x, int y, int pointer, int button) {
-		if (button == Buttons.LEFT) {
-			if (unitButton.checkClick(x, y)) {
-				EventManager.buildPlanChange(0, 0, 1);
+		if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
+			if (button == Buttons.LEFT) {
+				if (unitButton.checkClick(x, y)) {
+					EventManager.buildPlanChange(0, 0, 1);
+				}
+				else if(endTurnButton.checkClick(x,y)){
+					GameController.endPhase();
+				}
 			}
-		}
-		if (button == Buttons.RIGHT) {
-			if (unitButton.checkClick(x, y)) {
-				EventManager.buildPlanChange(0, 0, -1);
+			if (button == Buttons.RIGHT) {
+				if (unitButton.checkClick(x, y)) {
+					EventManager.buildPlanChange(0, 0, -1);
+				}
 			}
 		}
 	}
@@ -217,46 +234,51 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 	}
 
 	public void defenderTouchDown(int x, int y, int pointer, int button) {
-		if (button == Buttons.LEFT) {
-			if (currentScreen == Screen.MAIN_MENU) {
+		if(GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+			if (button == Buttons.LEFT) {
+				if (currentScreen == Screen.MAIN_MENU) {
 
-				if (startButton.checkClick(x, y))
-					currentScreen = Screen.GAME;
-				else if (quitButton.checkClick(x, y)) {
-					quitButton.dispose();
-					startButton.dispose();
-					Gdx.app.exit();
+					if (startButton.checkClick(x, y))
+						currentScreen = Screen.GAME;
+					else if (quitButton.checkClick(x, y)) {
+						quitButton.dispose();
+						startButton.dispose();
+						Gdx.app.exit();
+					}
+				}
+				if (buildMode) {
+					// Place tower
+					RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
+					if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
+						EventManager.towerPlaced(TowerType.type1, rwc);
+						buildMode = false;
+					}
+
+				}
+				if (towerButton.checkClick(x, y)) {
+					System.out.println("Clicked towerButton");
+					if (!buildMode) {
+						buildMode = true;
+						// Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
+						// Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
+						// tmpCursor.dispose();
+					}
+				} else if (endTurnButton.checkClick(x, y) && !buildMode) {
+					 GameController.endPhase();
 				}
 			}
-			if (buildMode) {
-				// Place tower
-				RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-				if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
-					EventManager.towerPlaced(TowerType.type1, rwc);
+			if (button == Buttons.RIGHT) {
+				if (buildMode) {
 					buildMode = false;
+					// Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+				} else {
+					RealWorldCoordinates tmpCoordinates = snap(Gdx.input.getX(), Gdx.input.getY());
+					//removeTower(tmpCoordinates.getX,tmpCoordinates.getY)
+
 				}
 
 			}
-			if (towerButton.checkClick(x, y)) {
-				System.out.println("Clicked towerButton");
-				if (!buildMode) {
-					buildMode = true;
-					// Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
-					// Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
-					// tmpCursor.dispose();
-				}
-			}
 		}
-		if (button == Buttons.RIGHT) {
-			if (buildMode) {
-				buildMode = false;
-				// Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
-			} else {
-				MatrixCoordinates mc = new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY()));
-
-			}
-		}
-
 	}
 
 	@Override
@@ -281,6 +303,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		healthBarSprite = new Sprite(healthBarTexture);
 		healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
 		healthSprite = new Sprite(healthTexture);
+
 		healthSprite.setScale(5);
 		healthSprite.setPosition(225, Gdx.graphics.getHeight() - 64);
 		healthBarSprite.setScale(5);
@@ -289,8 +312,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 		coinSprite = new Sprite(coinTexture);
 		coinSprite.setScale(1.5f);
 		//
+		GameController.initialise();
+		hpSpriteW = healthSprite.getWidth();
 		currentScreen = Screen.MAIN_MENU;
 		Gdx.input.setInputProcessor(this);
+
 	}
 
 	// float x = 0;
@@ -424,6 +450,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 					currentScreen = Screen.GAME;
 				}
 			}
+
 		}
 		if (player == 1)
 			attackerTouchDown(x, y, pointer, button);

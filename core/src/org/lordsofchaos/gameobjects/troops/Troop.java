@@ -121,7 +121,7 @@ public class Troop extends InteractiveObject
 
     public void move(float deltaTime)
     {
-        moveTimer+= deltaTime;
+        moveTimer+= deltaTime * 3;
         if (moveTimer < moveTimeLimit)
         {
             return;

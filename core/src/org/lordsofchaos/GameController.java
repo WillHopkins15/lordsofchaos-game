@@ -328,14 +328,8 @@ public class GameController {
         return true;
     }
 
-    public static boolean inBounds(int y, int x){
-        if (x < 0 || y < 0
-                || x >= width || x >= height)
-        {
-            return false;
-        }
-        return true;
-
+    public static boolean inBounds(int y, int x) {
+        return !(x < 0 || y < 0 || x >= width || y >= height);
     }
 
     // want to find the cost of a tower before it has been placed
