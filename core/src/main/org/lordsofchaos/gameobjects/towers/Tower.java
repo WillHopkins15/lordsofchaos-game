@@ -78,13 +78,9 @@ public class Tower extends InteractiveObject {
 
         for (int a = y; a < ylimit; a++) {
             for (int b = x; b <  xlimit; b++) {
-<<<<<<< HEAD:core/src/main/lordsofchaos/gameobjects/towers/Tower.java
-                if (GameController.inBounds(a, b)) {
-=======
 
                 if (GameController.inBounds(a,b)) {
 
->>>>>>> 0d494275ea68f6b411af0c164c738f9770f0f427:core/src/main/org/lordsofchaos/gameobjects/towers/Tower.java
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
                         //System.out.println("the path coords: " + a + "," + b);
                         count++;
@@ -109,13 +105,9 @@ public class Tower extends InteractiveObject {
             // defenders base to the tiles
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
-<<<<<<< HEAD:core/src/main/lordsofchaos/gameobjects/towers/Tower.java
-                    if (GameController.inBounds(a, b)) {
-=======
 
                     if (GameController.inBounds(a,b)) {
 
->>>>>>> 0d494275ea68f6b411af0c164c738f9770f0f427:core/src/main/org/lordsofchaos/gameobjects/towers/Tower.java
                         if (GameController.getMatrixObject(a, b) instanceof Path) {
                             tempco = new MatrixCoordinates(a, b);
 
@@ -127,12 +119,9 @@ public class Tower extends InteractiveObject {
                             temp[count] = new Pair(tempco, distancetemp);
                             count++;
                         }
-<<<<<<< HEAD:core/src/main/lordsofchaos/gameobjects/towers/Tower.java
-=======
 
                     }
 
->>>>>>> 0d494275ea68f6b411af0c164c738f9770f0f427:core/src/main/org/lordsofchaos/gameobjects/towers/Tower.java
 
                     }
                 }

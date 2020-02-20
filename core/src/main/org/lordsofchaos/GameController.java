@@ -366,14 +366,10 @@ public class GameController {
     }
 
     public static boolean inBounds(int y, int x) {
-<<<<<<< HEAD:core/src/main/lordsofchaos/GameController.java
-        return !(x < 0 || y < 0 || x >= width || y >= height);
-=======
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return false;
         }
         return true;
->>>>>>> 0d494275ea68f6b411af0c164c738f9770f0f427:core/src/main/org/lordsofchaos/GameController.java
     }
 
     // want to find the cost of a tower before it has been placed
