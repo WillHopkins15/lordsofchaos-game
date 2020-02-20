@@ -3,6 +3,7 @@ package org.lordsofchaos;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ public class EventManager {
 	// GameController then uses this to create instances of towers
 	// GameController contains a list of TowerBuilds which will be sent over the
 	// network
-	public static class TowerBuild {
+	public static class TowerBuild implements Serializable
+	{
 		private RealWorldCoordinates rwc;
 		private TowerType towerType;
 		private Sprite sprite;
