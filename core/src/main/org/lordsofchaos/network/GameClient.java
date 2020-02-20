@@ -144,7 +144,7 @@ public class GameClient extends UDPSocket
     protected void createInputThread() {
         new Thread(() -> {
             while (running) {
-                if (getCurrentWave().equals(getPlayerType()+"Build")) {
+                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
                     receiveObject();
                 }
             }
