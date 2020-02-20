@@ -345,7 +345,7 @@ public class GameController {
         Tile tile = (Tile) map[mc.getY()][mc.getX()];
 
         if (tbp.getTowerType() == TowerType.type1) {
-            tower = new TowerType1(tbp.getRealWorldCoordinates(), tbp.getSprite());
+            tower = new TowerType1(tbp.getRealWorldCoordinates());
         }
         // other if's to be added when new towers are added
 

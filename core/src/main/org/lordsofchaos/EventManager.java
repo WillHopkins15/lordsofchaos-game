@@ -45,7 +45,7 @@ public class EventManager {
 				TowerBuild towerBuild = (TowerBuild) obj;
 				MatrixCoordinates thisMC = new MatrixCoordinates(getRealWorldCoordinates());
 				MatrixCoordinates otherMC = new MatrixCoordinates(towerBuild.getRealWorldCoordinates());
-				return thisMC.getX() == otherMC.getX() && thisMC.getY() == otherMC.getY();
+				return thisMC.equals(otherMC);
 			}
 			return false;
 		}

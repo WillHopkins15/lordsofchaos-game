@@ -19,6 +19,11 @@ public class MatrixCoordinates extends Coordinates
 		setX(clamp(x, 0, GameController.getMap()[0].length-1));
 	}
 
+	@Override
+	public boolean equals(Coordinates other) {
+		return other.getX() == getX() && other.getY() == getY();
+	}
+
 	private static int clamp(int value, int min, int max)
 	{
 		if (value < min)

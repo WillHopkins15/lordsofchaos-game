@@ -98,7 +98,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         List<GameObject> sprites = new ArrayList<GameObject>();
         sprites.addAll(GameController.getTowers());
         sprites.addAll(GameController.getTroops());
-        sprites.addAll(EventManager.getTowerBuilds());
         Collections.sort(sprites);
 
         renderer.getBatch().begin();
