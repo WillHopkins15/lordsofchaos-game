@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.lordsofchaos.coordinatesystems.Coordinates;
-import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
-import org.lordsofchaos.matrixobjects.MatrixObject;
-import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.matrixobjects.Tile;
+import main.lordsofchaos.coordinatesystems.Coordinates;
+import main.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import main.lordsofchaos.matrixobjects.MatrixObject;
+import main.lordsofchaos.matrixobjects.Tile;
 
 public class MapGenerator {
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(
