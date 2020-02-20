@@ -220,7 +220,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public RealWorldCoordinates snap(int x, int y) {
-        Vector2 coords = new Vector2(x * 2, height - (y * 2));
+        Vector2 coords = new Vector2(x * 2, Gdx.graphics.getHeight() - (y * 2));
         return roundToCentreTile(isometricToRealWorldCoordinate(coords));
     }
 

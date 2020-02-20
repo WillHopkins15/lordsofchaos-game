@@ -2,6 +2,8 @@ package org.lordsofchaos;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
@@ -65,6 +67,8 @@ public class GameController {
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
 
+    private static List<Coordinates> obstacles = new ArrayList<Coordinates>();
+
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
 
@@ -113,7 +117,8 @@ public class GameController {
         width = 20;
         wave = 0;
         paths = MapGenerator.generatePaths();
-        map = MapGenerator.generateMap(width, height, paths);
+        obstacles = MapGenerator.getObstacles();
+        map = MapGenerator.generateMap(width, height, paths, obstacles);
         EventManager.initialise(6, getPaths().size());
         debugVisualiseMap();
     }
@@ -401,8 +406,11 @@ public class GameController {
         MatrixObject mo = map[mc.getY()][mc.getX()];
         if (mo.getClass() == Path.class) {
             return false; // cannot place towers on path
-        } else if ((mo.getClass() == Tile.class) && (((Tile) mo).getTower()) != null) {
-            return false; // else it is a tile, but a tower exists here already
+        } else if (mo instanceof Tile) {
+            Tile tile = (Tile) mo;
+            if (tile.getTower() != null || !tile.getIsBuildable()) {
+                return false; // else it is a tile, but a tower exists here already
+            }
         }
         return true;
     }
