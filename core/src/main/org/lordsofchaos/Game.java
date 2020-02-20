@@ -105,9 +105,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         for (int i = 0; i < sprites.size(); i++) {
             Sprite sprite = sprites.get(i).getSprite();
             Vector2 coordinates = realWorldCooridinateToIsometric(sprites.get(i).getRealWorldCoordinates());
-            if (sprites.get(i) instanceof TowerBuild) {
+            /*if (sprites.get(i) instanceof TowerBuild) {
                 renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
-            }
+            }*/
             System.out.println(renderer.getBatch().getColor());
             renderer.getBatch().draw(sprite, coordinates.x - horizontalSpriteOffset, coordinates.y - verticalSpriteOffset, 48, 48 * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
