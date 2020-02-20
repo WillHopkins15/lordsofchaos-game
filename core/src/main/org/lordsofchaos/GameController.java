@@ -196,15 +196,21 @@ public class GameController {
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
                 endPhase();
+                addMoney();
+
+
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
                 spawnTroop(deltaTime);
-                addMoney(deltaTime);
             }
         }
     }
 
+    private static void addMoney() {
+        attacker.addMoney();
+        defender.addMoney();
+    }
     private static void addMoney(float deltaTime) {
         addMoneyTimer += deltaTime;
         if (addMoneyTimer > addMoneyTimeLimit) {
