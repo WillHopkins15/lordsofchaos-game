@@ -302,7 +302,12 @@ public class GameController {
             System.out.println();
             for (int x = 0; x < width; x++) {
                 if (map[y][x].getClass() == Tile.class) {
-                    System.out.print("- ");
+                    Tile t = (Tile) map[y][x];
+                    if (t.getIsBuildable()) {
+                        System.out.print("- ");
+                    } else {
+                        System.out.print("X ");
+                    }
                 } else if (map[y][x].getClass() == Path.class) {
                     System.out.print("@ ");
                 } else {
