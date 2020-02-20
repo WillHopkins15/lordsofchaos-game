@@ -1,7 +1,8 @@
 package org.lordsofchaos;
 
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.gameobjects.TowerType;
+import org.lordsofchaos.gameobjects.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -22,29 +23,31 @@ public class EventManager {
 	// GameController then uses this to create instances of towers
 	// GameController contains a list of TowerBuilds which will be sent over the
 	// network
-	public static class TowerBuild {
-		private RealWorldCoordinates rwc;
+	public static class TowerBuild extends GameObject {
 		private TowerType towerType;
-		private Sprite sprite;
 		
 		public TowerBuild(TowerType towerType, RealWorldCoordinates rwc) {
+			super(towerType.getSpriteName(), rwc);
 			this.towerType = towerType;
-			this.rwc = rwc;
 			Texture texture = new Texture(Gdx.files.internal("towers/" + towerType.getSpriteName() + ".png"));
 			this.sprite = new Sprite(texture);
-		}
-		
-		public RealWorldCoordinates getRealWorldCoordinates() {
-			return rwc;
 		}
 		
 		public TowerType getTowerType() {
 			return towerType;
 		}
-		
-		public Sprite getSprite() {
-			return sprite;
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof TowerBuild) {
+				TowerBuild towerBuild = (TowerBuild) obj;
+				MatrixCoordinates thisMC = new MatrixCoordinates(realWorldCoordinates);
+				MatrixCoordinates otherMC = new MatrixCoordinates(towerBuild.getRealWorldCoordinates());
+				return thisMC.getX() == otherMC.getX() && thisMC.getY() == otherMC.getY();
+			}
+			return false;
 		}
+		
 	}
 	
 	public static void recieveBuildPhaseData(BuildPhaseData bpd) {
@@ -78,7 +81,7 @@ public class EventManager {
 			towerBuilds.add(tbp);
 		}
 	}
-	
+
 	public static void resetEventManager() {
 		unitBuildPlan = new int[troopTypes][pathCount];
 		towerBuilds = new ArrayList<TowerBuild>();
