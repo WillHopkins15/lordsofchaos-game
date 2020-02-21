@@ -24,7 +24,7 @@ import org.lordsofchaos.player.*;
 public class Troop extends InteractiveObject
 {
     protected float moveTimer;
-    protected float moveTimeLimit = 0.1f;
+    protected float moveTimeLimit = 0.01f;
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -121,7 +121,7 @@ public class Troop extends InteractiveObject
 
     public void move(float deltaTime)
     {
-        moveTimer+= deltaTime * 3;
+        moveTimer+= deltaTime;
         if (moveTimer < moveTimeLimit)
         {
             return;

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleToIntFunction;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -60,9 +61,28 @@ public class EventManager {
 		towerBuilds = new ArrayList<SerializableTower>();
 	}
 
-	public static void buildPlanChange(int unitType, int path, int change) {
+	public static void buildPlanChange(int unitType, int path, int change, boolean troopSpawned) {
 		if (unitType < 0 || unitType > 5 || path < 0 || path > GameController.getPaths().size()) {
 			return; // unit or path doesn't exist
+		}
+
+		if (change == 1) {// if a troop has been added to the buildPlan
+			// check if can afford troop
+			if (GameController.canAffordTroop(unitType))
+			{
+				GameController.troopPurchases(unitType);
+			}
+			else
+			{
+				System.out.print("Can't afford troop type " + unitType + "!");
+				return;
+			}
+		}
+		else if (change == -1) {
+			// attacker should receive a refund if a troop has been cancelled
+			if (!troopSpawned) {
+				GameController.troopCancelled(unitType);
+			}
 		}
 
 		// get the number of units currently in the matrix position

@@ -250,7 +250,7 @@ public class GameController {
                     GameController.troops.add(new TroopType1(getPaths().get(path)));
 
                     // remove from build plan
-                    EventManager.buildPlanChange(0, path, -1);
+                    EventManager.buildPlanChange(0, path, -1, true);
                 }
             }
             // spawn troop into each path
@@ -356,6 +356,9 @@ public class GameController {
         towers.add(tower);
         towersPlacedThisTurn.add(tower);
         tile.setTower(tower);
+
+        // we have already checked if the defender can afford this tower, so now take away money
+        defender.addMoney(-tower.getCost());
         return tower;
     }
 
@@ -376,10 +379,42 @@ public class GameController {
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
-            return 50;
+            return 10;
         } else {
             return 0;
         }
+    }
+
+    private static int getTroopTypeCost(int troopType)
+    {
+        if (troopType == 0)
+        {
+            return 10;
+        }
+        else return 0;
+        // add elses for other troops here
+    }
+
+    // used by EventManager
+    public static boolean canAffordTroop(int troopType)
+    {
+        return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+    }
+
+    private static boolean canAffordTower(TowerType towerType)
+    {
+        return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
+    }
+
+    // once a purchase has been verified and added to event manager, finally need to take money from attacker
+    public static void troopPurchases(int troopType)
+    {
+        attacker.addMoney(-getTroopTypeCost(troopType));
+    }
+
+    public static void troopCancelled(int troopType)
+    {
+        attacker.addMoney(getTroopTypeCost(troopType));
     }
 
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
@@ -391,10 +426,10 @@ public class GameController {
             return false;
         }
 
-        if (clientPlayerType != null) {
-            if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney()) {
-                return false;
-            }
+        if (!canAffordTower(towerType))
+        {
+            System.out.println("Can't afford tower type " + towerType + "!");
+            return false;
         }
 
         // check if this matrix position is legal
