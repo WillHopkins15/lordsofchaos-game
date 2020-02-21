@@ -44,7 +44,7 @@ public class GameClient extends UDPSocket
             InetAddress address;
             try {
                 address = InetAddress.getByName(item);
-                packet = new DatagramPacket(buffer, buffer.length, address, GameServer.SERV_PORT);
+                packet = new DatagramPacket(buffer, buffer.length, address, 5148);
                 socket.send(packet);
                 socket.receive(packet);
             } catch (SocketTimeoutException | UnknownHostException e) {

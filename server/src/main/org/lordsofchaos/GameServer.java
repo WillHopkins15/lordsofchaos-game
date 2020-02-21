@@ -1,7 +1,9 @@
-package org.lordsofchaos.network;
+package org.lordsofchaos;
 
 import javafx.util.Pair;
 import lombok.SneakyThrows;
+import org.lordsofchaos.network.GameInstance;
+import org.lordsofchaos.network.HostManager;
 
 import java.net.InetAddress;
 import java.util.ArrayList;

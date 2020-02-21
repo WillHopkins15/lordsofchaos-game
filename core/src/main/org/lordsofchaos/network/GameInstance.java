@@ -49,6 +49,7 @@ public class GameInstance extends UDPSocket
         out.writeUTF("Attacker");
         //Wait for receiver to close their end of the socket to avoid a TIME_WAIT which relys
         //on the kernel to release the port. A TIME_WAIT can last anywhere from 1 to 4 minutes.
+        //Info at https://hea-www.harvard.edu/~fine/Tech/addrinuse.html
         Thread.sleep(1000);
         out.close();
         socket.close();

@@ -25,7 +25,7 @@ public class HostManager
      * @return A list of known hostnames
      * @throws IOException If an I/O error occurs opening the source file
      */
-    static ArrayList<String> getHosts() throws IOException {
+    public static ArrayList<String> getHosts() throws IOException {
         ArrayList<String> hosts = new ArrayList<>();
         try (Scanner file = new Scanner(Paths.get(HOSTFILE))) {
             while (file.hasNext())
@@ -41,7 +41,7 @@ public class HostManager
      * @param hostname The server to add's hostname
      * @throws IOException If an I/O error occurs opening the source file
      */
-    static void addHost(String hostname) throws IOException {
+    public static void addHost(String hostname) throws IOException {
         if (getHosts().contains(hostname)) {
             return;
         }
