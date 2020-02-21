@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.lordsofchaos.BuildPhaseData;
-import org.lordsofchaos.EventManager;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class NetworkingTest
         BuildPhaseData gameState;
         //init game state
         int[][] units = new int[6][3];
-        ArrayList<EventManager.TowerBuild> tbp = new ArrayList<>();
+        ArrayList<SerializableTower> tbp = new ArrayList<>();
         gameState = new BuildPhaseData(units, tbp);
         
         //Connect both players to server and start

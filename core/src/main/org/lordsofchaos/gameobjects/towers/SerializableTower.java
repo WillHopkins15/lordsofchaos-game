@@ -26,6 +26,7 @@ public class SerializableTower implements Serializable {
     public TowerType getTowerType() {
         return towerType;
     }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SerializableTower) {
