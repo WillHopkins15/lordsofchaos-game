@@ -84,7 +84,7 @@ public abstract class UDPSocket extends Thread
             System.out.println("Socket closed, ending...");
             return;
         } catch (SocketTimeoutException e) {
-            System.out.println("Receive timed out.");
+            System.out.printf("[%d] Receive timed out.\n", socket.getLocalPort());
             return;
         }
         

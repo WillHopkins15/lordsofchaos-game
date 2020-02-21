@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class NetworkingTest
@@ -32,16 +32,14 @@ public class NetworkingTest
     
     @Test
     public void testGameStateSentOverNetworkAndUpdated() throws InterruptedException {
-        BuildPhaseData gameState;
         //init game state
         int[][] units = new int[6][3];
         ArrayList<SerializableTower> tbp = new ArrayList<>();
-        gameState = new BuildPhaseData(units, tbp);
+        BuildPhaseData gameState = new BuildPhaseData(units, tbp);
         
         //Connect both players to server and start
         new Thread(() -> {
             if (player1.makeConnection()) {
-                //player1.setGameState(finalGameState);
                 player1.start();
             }
         }).start();
@@ -52,20 +50,12 @@ public class NetworkingTest
             }
         }).start();
         
-        Thread.sleep(2000);
         //Wait for game instance to be set up
-        int port1 = 0;
-        int port2 = 0;
-        try {
-            port1 = player1.getServer().getValue();
-            port2 = player2.getServer().getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
+        Thread.sleep(2000);
         
-        assertNotEquals("Client1 not connected to server", 0, port1);
-        assertNotEquals("Client2 not connected to server", 0, port2);
+        //Check if both clients have connected
+        assertNotNull("Client1 not connected to server", player1.getServer());
+        assertNotNull("Client2 not connected to server", player2.getServer());
         
         //kill central server to free up threads
         server.close();

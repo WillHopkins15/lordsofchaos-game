@@ -66,6 +66,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private BitmapFont unitNumber;
     private Screen currentScreen;
     private float elapsedTime;
+    
+//    public static void main(String[] args) {
+//        setupClient();
+//    }
 
     private static void setupClient() {
         client = new GameClient();
