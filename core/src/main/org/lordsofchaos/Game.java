@@ -204,14 +204,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
             if (button == Buttons.LEFT) {
                 if (unitButton.checkClick(x, y)) {
-                    EventManager.buildPlanChange(0, 0, 1);
+                    EventManager.buildPlanChange(0, 0, 1, false);
                 } else if (endTurnButton.checkClick(x, y)) {
                     GameController.endPhase();
                 }
             }
             if (button == Buttons.RIGHT) {
                 if (unitButton.checkClick(x, y)) {
-                    EventManager.buildPlanChange(0, 0, -1);
+                    EventManager.buildPlanChange(0, 0, -1, false);
                 }
             }
         }
@@ -438,9 +438,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
                 if (defenderButton.checkClick(x, y) /* && client.isDefender() */) {
+                    GameController.setPlayerType(true);
                     player = 0;
                     currentScreen = Screen.GAME;
                 } else if (attackerButton.checkClick(x, y)/* && client.isAttacker() */) {
+                    GameController.setPlayerType(false);
                     player = 1;
                     currentScreen = Screen.GAME;
                 }
