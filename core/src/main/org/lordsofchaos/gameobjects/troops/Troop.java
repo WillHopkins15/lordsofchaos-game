@@ -3,14 +3,10 @@ package org.lordsofchaos.gameobjects.troops;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.sasl.RealmCallback;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-
-import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.GameStart;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
@@ -18,8 +14,6 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.player.*;
-
 
 public class Troop extends InteractiveObject
 {

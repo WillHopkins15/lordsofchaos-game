@@ -52,7 +52,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static Texture coinTexture;
     private static BitmapFont coinCounter;
     private static GameClient client;
-    private static Texture towerUnderConstructionTexture;
     private static Texture towerType1Texture;
     final int height = 720;
     int width = 1280;
@@ -410,13 +409,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean keyTyped(char character) {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -469,19 +466,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean scrolled(int amount) {
-        // TODO Auto-generated method stub
         return false;
     }
 
