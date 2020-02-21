@@ -8,11 +8,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import javafx.util.Pair;
+
+import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.matrixobjects.Path;
 
@@ -24,23 +27,22 @@ public class Tower extends InteractiveObject {
     protected Troop target;
     protected List<Path> inRange;
     protected Boolean isCompleted;
+    protected TowerType type;
 
-    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType) {
+    public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType, TowerType type) {
         super(spriteName, rwc, cost, damage);
         setRange(range);
         setDamageType(damageType);
-        Texture texture = new Texture(Gdx.files.internal("towers/" + spriteName + ".png"));
-		this.sprite = new Sprite(texture);
+        this.sprite = new Sprite(Game.getTowerTexture(type));
         isCompleted = false;
+        this.type = type;
     }
 
-    public Boolean getIsCompleted()
-    {
+    public Boolean getIsCompleted() {
         return isCompleted;
     }
 
-    public void setIsCompleted()
-    {
+    public void setIsCompleted() {
         isCompleted = true;
     }
 
@@ -69,28 +71,29 @@ public class Tower extends InteractiveObject {
 
         // List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
-        //System.out.println("matrixco is: " + matrixco.getY() + "," + matrixco.getX());
+        // System.out.println("matrixco is: " + matrixco.getY() + "," +
+        // matrixco.getX());
         MatrixCoordinates tempco;
         MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
 
-        //creating the numerical bounds for the tiles that would be in range
+        // creating the numerical bounds for the tiles that would be in range
 
         int y = (matrixco.getY() - getRange());
         int ylimit = (y + 1 + (range * 2));
-        //System.out.println("lower bound is:" + y + "upper bound is:" + ylimit);
+        // System.out.println("lower bound is:" + y + "upper bound is:" + ylimit);
         int x = (matrixco.getX() - getRange());
         int xlimit = (x + 1 + (range * 2));
-        //System.out.println("lower bound is:" + x + "upper bound is:" + xlimit);
+        // System.out.println("lower bound is:" + x + "upper bound is:" + xlimit);
 
         int count = 0;
 
         for (int a = y; a < ylimit; a++) {
-            for (int b = x; b <  xlimit; b++) {
+            for (int b = x; b < xlimit; b++) {
 
-                if (GameController.inBounds(a,b)) {
+                if (GameController.inBounds(a, b)) {
 
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
-                        //System.out.println("the path coords: " + a + "," + b);
+                        // System.out.println("the path coords: " + a + "," + b);
                         count++;
                     }
                 }
@@ -114,7 +117,7 @@ public class Tower extends InteractiveObject {
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
 
-                    if (GameController.inBounds(a,b)) {
+                    if (GameController.inBounds(a, b)) {
 
                         if (GameController.getMatrixObject(a, b) instanceof Path) {
                             tempco = new MatrixCoordinates(a, b);
@@ -130,10 +133,8 @@ public class Tower extends InteractiveObject {
 
                     }
 
-
-                    }
                 }
-
+            }
 
             sort(temp, 0, count - 1);
 

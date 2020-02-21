@@ -16,12 +16,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
-import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.Button;
 import org.lordsofchaos.graphics.Screen;
 import org.lordsofchaos.network.GameClient;
@@ -52,6 +52,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static Texture coinTexture;
     private static BitmapFont coinCounter;
     private static GameClient client;
+    private static Texture towerUnderConstructionTexture;
+    private static Texture towerType1Texture;
     final int height = 720;
     int width = 1280;
     SpriteBatch batch;
@@ -100,14 +102,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             GameObject object = objectsToAdd.get(i);
             Sprite sprite = object.getSprite();
             Vector2 coordinates = realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
+            int w = 48;
             if (object instanceof Tower) {
                 Tower tower = (Tower) object;
                 if (!tower.getIsCompleted()) {
                     renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
                 }
             }
-            renderer.getBatch().draw(sprite, coordinates.x - horizontalSpriteOffset,
-                    coordinates.y - verticalSpriteOffset, 48, 48 * sprite.getHeight() / sprite.getWidth());
+            renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
+                    w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
         }
 
@@ -276,6 +279,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void create() {
 
         batch = new SpriteBatch();
+
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
         hpCounter = new BitmapFont();
@@ -287,8 +291,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         camera = new OrthographicCamera(width * 2, height * 2);
         camera.position.set(width, 0, 10);
         camera.update();
-        createButtons();
+        //camera.setToOrtho(false, 1280, 720);
+        //renderer.getBatch().enableBlending();
         renderer.setView(camera);
+        createButtons();
         // move to player
         healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         healthBarSprite = new Sprite(healthBarTexture);
@@ -303,6 +309,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
         //
+        towerType1Texture = new Texture(Gdx.files.internal("towers/TowerType1.png"), true);
+
         GameController.initialise();
         hpSpriteW = healthSprite.getWidth();
         currentScreen = Screen.MAIN_MENU;
@@ -474,4 +482,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         // TODO Auto-generated method stub
         return false;
     }
+
+    public static Texture getTowerTexture(TowerType type) {
+        switch (type) {
+            default:
+                return towerType1Texture;
+        }
+    }
+
 }

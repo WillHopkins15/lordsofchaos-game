@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
+import org.lordsofchaos.gameobjects.TowerType;
 
-public class TowerType1 extends Tower
-{
+public class TowerType1 extends Tower {
 	private static String spriteName = "TowerType1";
 	private static int cost = 10;
 	private static int damage = 10;
@@ -15,7 +15,7 @@ public class TowerType1 extends Tower
 
 	public TowerType1(RealWorldCoordinates rwc)
 	{
-		super(spriteName, rwc, cost, damage, range, damageType);
+		super(spriteName, rwc, cost, damage, range, damageType, TowerType.type1);
 	}
 
 }

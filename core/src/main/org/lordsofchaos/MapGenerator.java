@@ -81,7 +81,12 @@ public class MapGenerator {
                 new MatrixCoordinates(1, 9), new MatrixCoordinates(1, 10), new MatrixCoordinates(1, 11),
                 new MatrixCoordinates(1, 12), new MatrixCoordinates(2, 8), new MatrixCoordinates(2, 9),
                 new MatrixCoordinates(2, 10), new MatrixCoordinates(2, 11), new MatrixCoordinates(2, 12),
-                new MatrixCoordinates(3, 8), new MatrixCoordinates(3, 9), new MatrixCoordinates(4, 9)
+                new MatrixCoordinates(3, 8), new MatrixCoordinates(3, 9), new MatrixCoordinates(4, 9),
+                // Defender's Base
+                new MatrixCoordinates(19, 17), new MatrixCoordinates(19, 18), new MatrixCoordinates(19, 19),
+                new MatrixCoordinates(18, 17), new MatrixCoordinates(18, 18), new MatrixCoordinates(18, 19),
+                new MatrixCoordinates(17, 17), new MatrixCoordinates(17, 18), new MatrixCoordinates(17, 19)
+
                 ));
 
     public static List<List<Path>> generatePaths() {
