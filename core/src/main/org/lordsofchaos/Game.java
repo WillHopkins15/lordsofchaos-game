@@ -30,7 +30,7 @@ import org.lordsofchaos.graphics.*;
 import org.lordsofchaos.player.*;
 public class Game extends ApplicationAdapter implements InputProcessor {
 
-    SpriteBatch batch;
+    private static SpriteBatch batch;
     OrthographicCamera camera;
     IsometricTiledMapRenderer renderer;
     TiledMap map;
@@ -57,27 +57,27 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static Texture coinTexture;
     private Sprite coinSprite;
     private static BitmapFont coinCounter;
+    private static GameClient client;
     private  int lastTurnTime;
     //
     private float hpSpriteW;
-    private float timerChangeTurn;
+    private static float timerChangeTurn;
     private BitmapFont unitNumber;
     int width = 1280;
     final int height = 720;
     private Screen currentScreen;
     private float elapsedTime;
-    private boolean changedTurn = false;
+    private static boolean changedTurn = false;
 
-    public static void main(String[] args) {
-        setupClient();
-    }
 
     private static void setupClient() {
         GameClient gc = new GameClient();
         if (gc.makeConnection()) {
             gc.start();
         }
-        gc.close();
+    }
+    public static void newTurn(){
+        changedTurn = true;
     }
 
     public static void createButtons() {
@@ -186,7 +186,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         showCoins(GameController.defender);
         endTurnButton.getSprite().draw(batch);
-        if(changedTurn) changeTurn(2,"Attacker' Turn");
+        if(changedTurn && GameController.getWaveState() == GameController.WaveState.AttackerBuild) changeTurn(2,"Attacker' Turn");
+        else if(changedTurn && GameController.getWaveState() == GameController.WaveState.DefenderBuild) changeTurn(2,"Defender's Turn");
         batch.end();
 
     }
@@ -204,7 +205,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         endTurnButton.getSprite().draw(batch);
         showHealth();
         showCoins(GameController.attacker);
-        if(changedTurn) changeTurn(2,"     Action   ");
+        if(changedTurn && GameController.getWaveState() == GameController.WaveState.AttackerBuild) changeTurn(2,"Attacker' Turn");
+        else if(changedTurn && GameController.getWaveState() == GameController.WaveState.Play) changeTurn(2," Play       ");
         batch.end();
     }
 
@@ -237,14 +239,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         Vector2 coords = new Vector2(x * 2, height - (y * 2));
         return roundToCentreTile(isometricToRealWorldCoordinate(coords));
     }
-    public void changeTurn(float targetTime, String currentPlayer){
+    public static void changeTurn(float targetTime, String currentPlayer){
         timerChangeTurn += Gdx.graphics.getDeltaTime();
         System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if(timerChangeTurn < targetTime) {
             endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
             System.out.println("Printing text!");
         }
-        else changedTurn = false;
+        else {
+            changedTurn = false;
+            timerChangeTurn = 0;
+        }
     }
     public void defenderTouchDown(int x, int y, int pointer, int button) {
         if(GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
@@ -463,7 +468,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
-                    setupClient();
+                   // setupClient();
                     currentScreen = Screen.CHOOSE_FACTION;
                 }
                 else if (quitButton.checkClick(x, y)) {
@@ -473,12 +478,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
-                if (defenderButton.checkClick(x, y) && client.isDefender()) {
+                if (defenderButton.checkClick(x, y) /*&& client.isDefender()*/) {
                     player = 0;
-                    setupClient();
+                    //setupClient();
 
                     currentScreen = Screen.GAME;
-                } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
+                } else if (attackerButton.checkClick(x, y)/* && client.isAttacker()*/) {
                     player = 1;
                     currentScreen = Screen.GAME;
                 }

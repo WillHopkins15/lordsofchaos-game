@@ -139,6 +139,7 @@ public class GameController {
     }
 
     public static void endPhase() {
+        Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
 
