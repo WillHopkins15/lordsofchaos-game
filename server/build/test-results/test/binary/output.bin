@@ -1,0 +1,50 @@
+Initiating Setup...
+/Server started on Williams-MacBook-Pro-6.local
+>Connection request received from /192.168.0.132 on port 61536
+Server found!
+Looking for opponent...
+>Connection request received from /192.168.0.132 on port 61537
+Server found!
+Looking for opponent...
+Thread spawned on port 61538
+Found game.
+[61536] Assigned to Attacker.
+*Connected to /192.168.0.132 on port 61538
+Found game.
+[61537] Assigned to Defender.
+[61536] Receive timed out.
+*Connected to /192.168.0.132 on port 61538
+-[61536] Message from 61538: Starting game...
+![61536] Received null from 61538
+![61538] Received null from 61536
+-[61537] Message from 61538: Starting game...
+![61537] Received null from 61538
+![61538] Received null from 61537
+![61536] Received null from 61538
+![61537] Received null from 61538
+![61538] Received null from 61536
+![61538] Received null from 61537
+TEST1
+![61536] Received null from 61538
+![61537] Received null from 61538
+[61538] Received game state
+![61538] Received null from 61537
+[61536] Received game state
+[61537] Received game state
+[61538] Received game state
+[61538] Received game state
+[61537] Received game state
+[61536] Received game state
+[61538] Received game state
+[61538] Received game state
+[61536] Received game state
+[61537] Received game state
+[61538] Received game state
+[61538] Received game state
+[61536] Received game state
+[61537] Received game state
+[61538] Received game state
+[61538] Received game state
+Initiating Cleanup...
+Socket closed, ending...
+Socket closed, ending...

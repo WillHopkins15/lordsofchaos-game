@@ -1,19 +1,20 @@
 package org.lordsofchaos.network;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
 import java.io.DataOutputStream;
-import java.net.*;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
 
 /**
  * Thread for running an instance of the game over UDP.
  */
 public class GameInstance extends UDPSocket
 {
-    private Pair<InetAddress, Integer> attacker;
-    private Pair<InetAddress, Integer> defender;
+    private ConnectionPoint attacker;
+    private ConnectionPoint defender;
     
     /**
      * Opens a new DatagramSocket on an available port for communication with the two players.
@@ -22,7 +23,7 @@ public class GameInstance extends UDPSocket
      * @param player2 defender
      */
     @SneakyThrows
-    public GameInstance(Pair<InetAddress, Integer> player1, Pair<InetAddress, Integer> player2) {
+    public GameInstance(ConnectionPoint player1, ConnectionPoint player2) {
         super();
         attacker = player1;
         defender = player2;
@@ -38,13 +39,13 @@ public class GameInstance extends UDPSocket
      * @param defender Inetaddress/port pair of client to make a defender
      */
     @SneakyThrows
-    private void connectAndSetTypes(Pair<InetAddress, Integer> attacker, Pair<InetAddress, Integer> defender) {
+    private void connectAndSetTypes(ConnectionPoint attacker, ConnectionPoint defender) {
         //Switch socket to TCP
         int localPort = socket.getLocalPort();
         InetAddress localAddress = InetAddress.getLocalHost();
         socket.close();
         
-        Socket socket = new Socket(attacker.getKey(), attacker.getValue(), localAddress, localPort);
+        Socket socket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Attacker");
         //Wait for receiver to close their end of the socket to avoid a TIME_WAIT which relys
@@ -54,7 +55,7 @@ public class GameInstance extends UDPSocket
         out.close();
         socket.close();
         
-        socket = new Socket(defender.getKey(), defender.getValue(), localAddress, localPort);
+        socket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
         out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Defender");
         out.close();

@@ -1,11 +1,13 @@
 package org.lordsofchaos.network;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
 import java.io.*;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
  * Class that abstracts sending and receiving objects over a DatagramSocket.
@@ -35,13 +37,13 @@ public abstract class UDPSocket extends Thread
      * @param contents  Object to serialize and send
      */
     @SneakyThrows
-    protected void sendObject(Pair<InetAddress, Integer> recipient, Object contents) {
+    protected void sendObject(ConnectionPoint recipient, Object contents) {
         if (!socket.isClosed()) {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             ObjectOutputStream oout = new ObjectOutputStream(bout);
             oout.writeObject(contents);
             byte[] bytes = bout.toByteArray();
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getKey(), recipient.getValue());
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(), recipient.getPort());
             socket.send(packet);
         } else {
             System.out.println("Packet not sent: Socket closed");

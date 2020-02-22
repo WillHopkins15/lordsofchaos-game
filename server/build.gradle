@@ -6,11 +6,11 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/main"]
 sourceSets.test.java.srcDirs = ["src/test"]
 
-project.ext.mainClassName = "org.lordsofchaos.server.GameServer"
+mainClassName = "org.lordsofchaos.server.GameServer"
 
-task runServer(dependsOn: classes, type: JavaExec) {
+task server(dependsOn: classes, type: JavaExec) {
+    main = mainClassName
     group = "Execution"
     description = "Runs the server"
     classpath = sourceSets.main.runtimeClasspath
-    main = project.mainClassName
 }

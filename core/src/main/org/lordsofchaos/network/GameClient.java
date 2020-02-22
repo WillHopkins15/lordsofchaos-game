@@ -1,6 +1,5 @@
 package org.lordsofchaos.network;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 import org.lordsofchaos.GameController;
@@ -17,7 +16,7 @@ import java.net.*;
  */
 public class GameClient extends UDPSocket
 {
-    private Pair<InetAddress, Integer> server;
+    private ConnectionPoint server;
     private byte[] buffer = new byte[256];
     private String playerType = "";
     
@@ -71,15 +70,15 @@ public class GameClient extends UDPSocket
         //Temporarily switch to TCP
         int port = socket.getLocalPort();
         socket.close();
-    
+        
         ServerSocket serv = new ServerSocket(port);
         serv.setSoTimeout(0);
         Socket tcpsock = serv.accept();
         DataInputStream in = new DataInputStream(new BufferedInputStream(tcpsock.getInputStream()));
         
-        server = new Pair<>(tcpsock.getInetAddress(), tcpsock.getPort());
+        server = new ConnectionPoint(tcpsock.getInetAddress(), tcpsock.getPort());
         playerType = in.readUTF();
-    
+        
         in.close();
         serv.close();
         tcpsock.close();
@@ -90,7 +89,7 @@ public class GameClient extends UDPSocket
     
     @SneakyThrows
     public void run() {
-        System.out.printf("Connected to %s on port %d\n", server.getKey(), server.getValue());
+        System.out.printf("Connected to %s on port %d\n", server.getAddress(), server.getPort());
         socket.setSoTimeout(1000);
         createInputThread();
         createOutputThread();
@@ -114,7 +113,7 @@ public class GameClient extends UDPSocket
     /**
      * @return InetAdress/Port number pair of connected server. Null if not connected
      */
-    public Pair<InetAddress, Integer> getServer() {
+    public ConnectionPoint getServer() {
         return server;
     }
     
@@ -153,7 +152,7 @@ public class GameClient extends UDPSocket
     public String getCurrentWave() {
         return GameController.getWaveState().toString();
     }
-    
+
 //    @Override
 //    protected void createInputThread() {
 //        new Thread(() -> {

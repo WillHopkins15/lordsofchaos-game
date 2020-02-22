@@ -67,9 +67,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Screen currentScreen;
     private float elapsedTime;
     
-//    public static void main(String[] args) {
-//        setupClient();
-//    }
+    public static void main(String[] args) {
+        setupClient();
+    }
 
     private static void setupClient() {
         client = new GameClient();
@@ -432,7 +432,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
-                    // setupClient();
+                     setupClient();
                     currentScreen = Screen.CHOOSE_FACTION;
                 } else if (quitButton.checkClick(x, y)) {
                     quitButton.dispose();
@@ -441,11 +441,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
-                if (defenderButton.checkClick(x, y) /* && client.isDefender() */) {
+                if (defenderButton.checkClick(x, y) && client.isDefender()) {
                     GameController.setPlayerType(true);
                     player = 0;
                     currentScreen = Screen.GAME;
-                } else if (attackerButton.checkClick(x, y)/* && client.isAttacker() */) {
+                } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
                     GameController.setPlayerType(false);
                     player = 1;
                     currentScreen = Screen.GAME;
