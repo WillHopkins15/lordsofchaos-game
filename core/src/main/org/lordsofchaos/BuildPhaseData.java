@@ -1,13 +1,15 @@
 package org.lordsofchaos;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
+
 import java.io.Serializable;
 import java.util.List;
 
 public class BuildPhaseData implements Serializable
 {
 	private int[][] unitBuildPlan;
-	private List<EventManager.TowerBuild> towerBuildPlan;
+	private List<SerializableTower> towerBuildPlan;
 	
-	public BuildPhaseData(int[][] unitBuildPlan, List<EventManager.TowerBuild> towerBuildPlan)
+	public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan)
 	{
 		this.unitBuildPlan = unitBuildPlan;
 		this.towerBuildPlan = towerBuildPlan;
@@ -18,7 +20,7 @@ public class BuildPhaseData implements Serializable
 		return unitBuildPlan;
 	}
 	
-	public List<EventManager.TowerBuild> getTowerBuildPlan()
+	public List<SerializableTower> getTowerBuildPlan()
 	{
 		return towerBuildPlan;
 	}

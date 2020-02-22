@@ -3,10 +3,11 @@ package org.lordsofchaos;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lordsofchaos.EventManager.TowerBuild;
+import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -20,7 +21,7 @@ import org.lordsofchaos.player.Player;
 
 public class GameController {
 
-    enum WaveState {
+    public enum WaveState {
         DefenderBuild, AttackerBuild, Play
     }
 
@@ -50,6 +51,10 @@ public class GameController {
     // list of all towers in matrix
     protected static List<Tower> towers = new ArrayList<Tower>();
 
+    // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
+    protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
+
+
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
 
@@ -61,6 +66,8 @@ public class GameController {
 
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
+
+    private static List<Coordinates> obstacles = new ArrayList<Coordinates>();
 
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
@@ -110,19 +117,20 @@ public class GameController {
         width = 20;
         wave = 0;
         paths = MapGenerator.generatePaths();
-        map = MapGenerator.generateMap(width, height, paths);
+        obstacles = MapGenerator.getObstacles();
+        map = MapGenerator.generateMap(width, height, paths, obstacles);
         EventManager.initialise(6, getPaths().size());
         debugVisualiseMap();
     }
 
-    public static void sendData() {
+    public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
-
+        return bpd;
         // then clear data ready for next turn
     }
 
-    public static void recieveNetworkData(BuildPhaseData bpd) {
+    public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
     }
 
@@ -144,9 +152,10 @@ public class GameController {
             waveState = WaveState.AttackerBuild;
 
             // create all towers
-            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                createTower(EventManager.getTowerBuilds().get(i));
+            for (int i = 0; i < towersPlacedThisTurn.size(); i++) {
+                towersPlacedThisTurn.get(i).setIsCompleted();
             }
+            towersPlacedThisTurn.clear();
 
             System.out.println("Attacker build phase begins");
 
@@ -199,7 +208,6 @@ public class GameController {
                 endPhase();
                 addMoney();
 
-
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
@@ -212,6 +220,7 @@ public class GameController {
         attacker.addMoney();
         defender.addMoney();
     }
+
     private static void addMoney(float deltaTime) {
         addMoneyTimer += deltaTime;
         if (addMoneyTimer > addMoneyTimeLimit) {
@@ -247,7 +256,7 @@ public class GameController {
                     GameController.troops.add(new TroopType1(getPaths().get(path)));
 
                     // remove from build plan
-                    EventManager.buildPlanChange(0, path, -1);
+                    EventManager.buildPlanChange(0, path, -1, true);
                 }
             }
             // spawn troop into each path
@@ -271,14 +280,12 @@ public class GameController {
         }
 
         // remove any troops that have reached the end
-        for (int i = 0; i < troopsToRemove.size(); i++)
-        {
+        for (int i = 0; i < troopsToRemove.size(); i++) {
             troopReachesDefender(troopsToRemove.get(i));
         }
     }
 
-    private static void troopReachesDefender(Troop troop)
-    {
+    private static void troopReachesDefender(Troop troop) {
         defender.takeDamage(troop.getDamage());
         troopDies(troop);
     }
@@ -296,7 +303,12 @@ public class GameController {
             System.out.println();
             for (int x = 0; x < width; x++) {
                 if (map[y][x].getClass() == Tile.class) {
-                    System.out.print("- ");
+                    Tile t = (Tile) map[y][x];
+                    if (t.getIsBuildable()) {
+                        System.out.print("- ");
+                    } else {
+                        System.out.print("X ");
+                    }
                 } else if (map[y][x].getClass() == Path.class) {
                     System.out.print("@ ");
                 } else {
@@ -310,14 +322,12 @@ public class GameController {
         if (troops.contains(troop)) {
             troops.remove(troop);
 
-            // look through the path this troop is on and remove it from the Path it's contained in
-            for (int i = 0; i < troop.getPath().size(); i++)
-            {
+            // look through the path this troop is on and remove it from the Path it's
+            // contained in
+            for (int i = 0; i < troop.getPath().size(); i++) {
                 Path path = troop.getPath().get(i);
-                for (int j = 0; j < troop.getPath().get(i).getTroops().size(); j++)
-                {
-                    if (troop.equals(path.getTroops().get(j)))
-                    {
+                for (int j = 0; j < troop.getPath().get(i).getTroops().size(); j++) {
+                    if (troop.equals(path.getTroops().get(j))) {
                         path.removeTroop(troop);
                         break;
                     }
@@ -341,7 +351,7 @@ public class GameController {
         }
     }
 
-    private static Tower createTower(TowerBuild tbp) {
+    public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
 
         // convert realWorldCoords to matrix
@@ -350,12 +360,16 @@ public class GameController {
         Tile tile = (Tile) map[mc.getY()][mc.getX()];
 
         if (tbp.getTowerType() == TowerType.type1) {
-            tower = new TowerType1(tbp.getRealWorldCoordinates(), tbp.getSprite());
+            tower = new TowerType1(tbp.getRealWorldCoordinates());
         }
         // other if's to be added when new towers are added
 
         towers.add(tower);
+        towersPlacedThisTurn.add(tower);
         tile.setTower(tower);
+
+        // we have already checked if the defender can afford this tower, so now take away money
+        defender.addMoney(-tower.getCost());
         return tower;
     }
 
@@ -376,10 +390,42 @@ public class GameController {
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
-            return 50;
+            return 10;
         } else {
             return 0;
         }
+    }
+
+    private static int getTroopTypeCost(int troopType)
+    {
+        if (troopType == 0)
+        {
+            return 10;
+        }
+        else return 0;
+        // add elses for other troops here
+    }
+
+    // used by EventManager
+    public static boolean canAffordTroop(int troopType)
+    {
+        return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+    }
+
+    private static boolean canAffordTower(TowerType towerType)
+    {
+        return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
+    }
+
+    // once a purchase has been verified and added to event manager, finally need to take money from attacker
+    public static void troopPurchases(int troopType)
+    {
+        attacker.addMoney(-getTroopTypeCost(troopType));
+    }
+
+    public static void troopCancelled(int troopType)
+    {
+        attacker.addMoney(getTroopTypeCost(troopType));
     }
 
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
@@ -391,18 +437,21 @@ public class GameController {
             return false;
         }
 
-        if (clientPlayerType != null) {
-            if (getTowerTypeCost(towerType) > clientPlayerType.getCurrentMoney()) {
-                return false;
-            }
+        if (!canAffordTower(towerType))
+        {
+            System.out.println("Can't afford tower type " + towerType + "!");
+            return false;
         }
 
         // check if this matrix position is legal
         MatrixObject mo = map[mc.getY()][mc.getX()];
         if (mo.getClass() == Path.class) {
             return false; // cannot place towers on path
-        } else if ((mo.getClass() == Tile.class) && (((Tile) mo).getTower()) != null) {
-            return false; // else it is a tile, but a tower exists here already
+        } else if (mo instanceof Tile) {
+            Tile tile = (Tile) mo;
+            if (tile.getTower() != null || !tile.getIsBuildable()) {
+                return false; // else it is a tile, but a tower exists here already
+            }
         }
         return true;
     }

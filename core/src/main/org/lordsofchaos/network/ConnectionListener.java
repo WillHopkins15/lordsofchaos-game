@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 /**
  * Thread for listening to new UDP connections on the specified port number. New connections
@@ -32,8 +33,11 @@ public class ConnectionListener extends Thread
     public void run() {
         while (running) {
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            socket.receive(packet);
-            
+            try {
+                socket.receive(packet);
+            } catch (SocketException ignored) {
+                return;
+            }
             InetAddress address = packet.getAddress();
             int port = packet.getPort();
             System.out.printf("Connection request received from %s on port %d\n", address, port);

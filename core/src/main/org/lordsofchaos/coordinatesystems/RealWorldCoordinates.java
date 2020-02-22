@@ -2,7 +2,10 @@ package org.lordsofchaos.coordinatesystems;
 
 import org.lordsofchaos.GameController;
 
-public class RealWorldCoordinates extends Coordinates {
+import java.io.Serializable;
+
+public class RealWorldCoordinates extends Coordinates implements Serializable
+{
 	public RealWorldCoordinates(int y, int x) {
 		setY(y);
 		setX(x);
