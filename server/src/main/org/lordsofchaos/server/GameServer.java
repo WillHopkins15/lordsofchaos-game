@@ -1,4 +1,4 @@
-package org.lordsofchaos;
+package org.lordsofchaos.server;
 
 import javafx.util.Pair;
 import lombok.SneakyThrows;
