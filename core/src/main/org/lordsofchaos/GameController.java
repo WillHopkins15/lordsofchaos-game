@@ -29,7 +29,7 @@ public class GameController {
 
     // timing
     private static float buildTimer = 0;
-    private static float buildTimeLimit = 5;
+    private static float buildTimeLimit = 30;
 
     private static float unitSpawnTimer = 0;
     private static float unitSpawnTimeLimit = 1;
@@ -53,7 +53,6 @@ public class GameController {
 
     // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
     protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
-
 
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
