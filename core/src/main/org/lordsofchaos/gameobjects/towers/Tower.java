@@ -65,6 +65,11 @@ public class Tower extends InteractiveObject {
     }
     //
 
+    public Troop getTarget()
+    {
+        return target;
+    }
+
     private void findPathInRange() {
         // use range to find all in-range path objects in matrix
         inRange = new ArrayList<Path>();
