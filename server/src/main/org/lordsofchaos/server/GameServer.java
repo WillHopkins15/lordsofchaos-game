@@ -69,7 +69,9 @@ public class GameServer extends Thread
     @SneakyThrows
     public void run() {
         String servAddress = InetAddress.getLocalHost().getHostName();
-        HostManager.addHost(servAddress);
+        if (!HostManager.hostRecognised(servAddress)) {
+            return;
+        }
         connectionListener = new ConnectionListener(SERV_PORT);
         connectionListener.start();
         System.out.printf("Server started on %s\n", servAddress);
