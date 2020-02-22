@@ -46,8 +46,11 @@ public class GameClient extends UDPSocket
                 packet = new DatagramPacket(buffer, buffer.length, address, 5148);
                 socket.send(packet);
                 socket.receive(packet);
-            } catch (SocketTimeoutException | UnknownHostException e) {
+            } catch (SocketTimeoutException e) {
                 System.out.printf("Host %s not available.\n", item);
+                continue;
+            } catch (UnknownHostException e) {
+                System.out.printf("Host %s not found.\n", item);
                 continue;
             }
             
@@ -90,7 +93,7 @@ public class GameClient extends UDPSocket
     @SneakyThrows
     public void run() {
         System.out.printf("Connected to %s on port %d\n", server.getAddress(), server.getPort());
-        socket.setSoTimeout(1000);
+        socket.setSoTimeout(500);
         createInputThread();
         createOutputThread();
         

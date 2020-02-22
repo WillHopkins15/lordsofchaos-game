@@ -16,10 +16,11 @@ import java.net.SocketTimeoutException;
  */
 public abstract class UDPSocket extends Thread
 {
-    protected boolean running = true;
+    protected volatile boolean running = true;
     protected DatagramSocket socket;
     protected BuildPhaseData gameState = null;
     private byte[] buffer = new byte[1024]; //Needs to be big enough to hold the game state object
+    private int timeoutCount = 0;
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -87,9 +88,15 @@ public abstract class UDPSocket extends Thread
             return;
         } catch (SocketTimeoutException e) {
             System.out.printf("[%d] Receive timed out.\n", socket.getLocalPort());
+            timeoutCount++;
+            if (timeoutCount >= 10) {
+                System.out.println("Connection dropped. Closing...");
+                this.close();
+            }
             return;
         }
         
+        timeoutCount = 0;
         Object received = getObjectFromBytes(packet.getData());
         if (received == null) {
             System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
