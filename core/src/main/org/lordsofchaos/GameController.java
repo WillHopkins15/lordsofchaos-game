@@ -418,14 +418,17 @@ public class GameController {
     }
 
     // once a purchase has been verified and added to event manager, finally need to take money from attacker
-    public static void troopPurchases(int troopType)
+    public static void troopPurchased(int troopType)
     {
         attacker.addMoney(-getTroopTypeCost(troopType));
     }
 
-    public static void troopCancelled(int troopType)
+    public static void troopCancelled(int troopType, int path)
     {
-        attacker.addMoney(getTroopTypeCost(troopType));
+        // check if build plan is empty at that place, if so, don't give a refund
+        if (EventManager.getUnitBuildPlan()[troopType][path] > 0) {
+            attacker.addMoney(getTroopTypeCost(troopType));
+        }
     }
 
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {

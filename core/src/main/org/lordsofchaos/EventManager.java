@@ -70,7 +70,7 @@ public class EventManager {
 			// check if can afford troop
 			if (GameController.canAffordTroop(unitType))
 			{
-				GameController.troopPurchases(unitType);
+				GameController.troopPurchased(unitType);
 			}
 			else
 			{
@@ -81,7 +81,7 @@ public class EventManager {
 		else if (change == -1) {
 			// attacker should receive a refund if a troop has been cancelled
 			if (!troopSpawned) {
-				GameController.troopCancelled(unitType);
+				GameController.troopCancelled(unitType, path);
 			}
 		}
 
