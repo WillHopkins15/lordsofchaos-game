@@ -96,6 +96,13 @@ public class Game extends ApplicationAdapter implements InputProcessor
         endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200);
     }
     
+    public static Texture getTowerTexture(TowerType type) {
+        switch (type) {
+            default:
+                return towerType1Texture;
+        }
+    }
+    
     public void isometricPov() {
         renderer.render();
         
@@ -284,6 +291,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
         }
     }
     
+    // float x = 0;
+    // float y = 0;
+    
     @Override
     public void create() {
         
@@ -326,9 +336,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
         Gdx.input.setInputProcessor(this);
         
     }
-    
-    // float x = 0;
-    // float y = 0;
     
     @Override
     public void render() {
@@ -479,41 +486,34 @@ public class Game extends ApplicationAdapter implements InputProcessor
             defenderTouchDown(x, y, pointer, button);
         return false;
     }
-        
-        @Override
-        public boolean touchUp ( int screenX, int screenY, int pointer, int button){
-            int x = screenX;
-            int y = Gdx.graphics.getHeight() - screenY;
-            /*
-             * if(button == Buttons.LEFT) { if(startButton.checkClick(x, y)) { currentScreen
-             * = Screen.MAIN_MENU; startButton.setPressedStatus(false); } }
-             */
-            return false;
-        }
-        
-        @Override
-        public boolean touchDragged ( int screenX, int screenY, int pointer){
-            // TODO Auto-generated method stub
-            return false;
-        }
-        
-        @Override
-        public boolean mouseMoved ( int screenX, int screenY){
-            // TODO Auto-generated method stub
-            return false;
-        }
-        
-        @Override
-        public boolean scrolled ( int amount){
-            // TODO Auto-generated method stub
-            return false;
-        }
-        
-        public static Texture getTowerTexture (TowerType type){
-            switch (type) {
-                default:
-                    return towerType1Texture;
-            }
-        }
-        
+    
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        int x = screenX;
+        int y = Gdx.graphics.getHeight() - screenY;
+        /*
+         * if(button == Buttons.LEFT) { if(startButton.checkClick(x, y)) { currentScreen
+         * = Screen.MAIN_MENU; startButton.setPressedStatus(false); } }
+         */
+        return false;
     }
+    
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+    @Override
+    public boolean scrolled(int amount) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    
+}

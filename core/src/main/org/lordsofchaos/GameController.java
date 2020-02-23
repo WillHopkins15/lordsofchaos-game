@@ -1,8 +1,5 @@
 package org.lordsofchaos;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
@@ -19,87 +16,73 @@ import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 import org.lordsofchaos.player.Player;
 
-public class GameController {
+import java.util.ArrayList;
+import java.util.List;
 
-    public enum WaveState {
-        DefenderBuild, AttackerBuild, Play
-    }
-
+public class GameController
+{
+    
+    protected final static String ATTACKERNAME = "blank";
+    protected final static String DEFENDERNAME = "blank";
+    public static Attacker attacker = new Attacker(ATTACKERNAME);
+    public static Defender defender = new Defender(DEFENDERNAME);
+    // this records if the player on the client machine is an attacker or a defender
+    public static Player clientPlayerType;
+    @SuppressWarnings("unused")
+    protected static int wave = 1;
+    // list of all troops currently on screen
+    protected static List<Troop> troops = new ArrayList<Troop>();
+    // list of all towers in matrix
+    protected static List<Tower> towers = new ArrayList<Tower>();
+    //
+    // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
+    protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
     private static WaveState waveState;
-
     // timing
     private static float buildTimer = 0;
     private static float buildTimeLimit = 5;
-
     private static float unitSpawnTimer = 0;
     private static float unitSpawnTimeLimit = 1;
-
     private static float addMoneyTimer = 0;
     private static float addMoneyTimeLimit = 1;
-    //
-
     private static int scaleFactor = 64;
     // Height and Width of the map
     private static int height;
     private static int width;
-    @SuppressWarnings("unused")
-    protected static int wave = 1;
-
-    // list of all troops currently on screen
-    protected static List<Troop> troops = new ArrayList<Troop>();
-
-    // list of all towers in matrix
-    protected static List<Tower> towers = new ArrayList<Tower>();
-
-    // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
-    protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
-
-
-    protected final static String ATTACKERNAME = "blank";
-    protected final static String DEFENDERNAME = "blank";
-
-    public static Attacker attacker = new Attacker(ATTACKERNAME);
-    public static Defender defender = new Defender(DEFENDERNAME);
-
-    // this records if the player on the client machine is an attacker or a defender
-    public static Player clientPlayerType;
-
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
-
     private static List<Coordinates> obstacles = new ArrayList<Coordinates>();
-
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
-
+    
     public static float getBuildPhaseTimer() {
         return buildTimer;
     }
-
+    
     public static WaveState getWaveState() {
         return waveState;
     }
-
+    
     public static List<Tower> getTowers() {
         return towers;
     }
-
+    
     public static MatrixObject[][] getMap() {
         return map;
     }
-
+    
     public static List<Troop> getTroops() {
         return troops;
     }
-
+    
     public static int getScaleFactor() {
         return scaleFactor;
     }
-
+    
     public static List<List<Path>> getPaths() {
         return paths;
     }
-
+    
     public static void setPlayerType(Boolean type) {
         if (type) {
             clientPlayerType = defender;
@@ -107,7 +90,7 @@ public class GameController {
             clientPlayerType = attacker;
         }
     }
-
+    
     public static void initialise() {
         buildTimer = 0;
         unitSpawnTimer = 0;
@@ -122,42 +105,42 @@ public class GameController {
         EventManager.initialise(6, getPaths().size());
         debugVisualiseMap();
     }
-
+    
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
         return bpd;
         // then clear data ready for next turn
     }
-
+    
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
     }
-
+    
     private static void resetBuildTimer() {
         buildTimer = 0;
     }
-
+    
     private static void resetUnitSpawnTimer() {
         unitSpawnTimer = 0;
     }
-
+    
     private static void resetAddMoneyTimer() {
         addMoneyTimer = 0;
     }
-
+    
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
-
+            
             // create all towers
             for (int i = 0; i < towersPlacedThisTurn.size(); i++) {
                 towersPlacedThisTurn.get(i).setIsCompleted();
             }
             towersPlacedThisTurn.clear();
-
+            
             System.out.println("Attacker build phase begins");
-
+            
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
             waveState = WaveState.Play;
@@ -166,23 +149,23 @@ public class GameController {
             resetBuildTimer();
         } else {
             waveState = WaveState.DefenderBuild;
-
+            
             System.out.println("Defender build phase begins");
-
+            
             // reset all tower cooldowns
             if (!GameController.towers.isEmpty()) {
                 for (int j = 0; j < GameController.towers.size(); j++) {
                     GameController.towers.get(j).resetTimer();
                 }
             }
-
+            
             // make sure to reset all tower build plans and unit build plans
             EventManager.resetEventManager();
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
         }
     }
-
+    
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
         if (waveState == WaveState.DefenderBuild) {
@@ -206,21 +189,20 @@ public class GameController {
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
                 endPhase();
                 addMoney();
-
+                
             } else {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
                 spawnTroop(deltaTime);
             }
         }
-        debugVisualiseMap();
     }
-
+    
     private static void addMoney() {
         attacker.addMoney();
         defender.addMoney();
     }
-
+    
     private static void addMoney(float deltaTime) {
         addMoneyTimer += deltaTime;
         if (addMoneyTimer > addMoneyTimeLimit) {
@@ -229,11 +211,11 @@ public class GameController {
             resetAddMoneyTimer();
         }
     }
-
+    
     private static Boolean unitBuildPlanEmpty() {
         int paths = EventManager.getUnitBuildPlan()[0].length;
         int types = EventManager.getUnitBuildPlan().length;
-
+        
         for (int path = 0; path < paths; path++) {
             for (int type = 0; type < types; type++) {
                 if (EventManager.getUnitBuildPlan()[type][path] != 0) {
@@ -241,10 +223,10 @@ public class GameController {
                 }
             }
         }
-
+        
         return true;
     }
-
+    
     private static void spawnTroop(float deltaTime) {
         unitSpawnTimer += deltaTime;
         if (unitSpawnTimer > unitSpawnTimeLimit) {
@@ -254,7 +236,7 @@ public class GameController {
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
                     // add troop to on screen troops
                     GameController.troops.add(new TroopType1(getPaths().get(path)));
-
+                    
                     // remove from build plan
                     EventManager.buildPlanChange(0, path, -1, true);
                 }
@@ -263,33 +245,33 @@ public class GameController {
             resetUnitSpawnTimer();
         }
     }
-
+    
     public static void moveTroops(float deltaTime) {
         int size = GameController.troops.size();
-
+        
         // any troops that reach the end will be stored here and removed at the end
         List<Troop> troopsToRemove = new ArrayList<Troop>();
-
+        
         // move troops
         for (int i = 0; i < size; i++) {
             (GameController.troops.get(i)).move(deltaTime);
-
+            
             if (GameController.troops.get(i).getAtEnd()) {
                 troopsToRemove.add((GameController.troops.get(i)));
             }
         }
-
+        
         // remove any troops that have reached the end
         for (int i = 0; i < troopsToRemove.size(); i++) {
             troopReachesDefender(troopsToRemove.get(i));
         }
     }
-
+    
     private static void troopReachesDefender(Troop troop) {
         defender.takeDamage(troop.getDamage());
         troopDies(troop);
     }
-
+    
     public static void shootTroops(float deltaTime) {
         if (!GameController.towers.isEmpty()) {
             for (int j = 0; j < GameController.towers.size(); j++) {
@@ -297,7 +279,7 @@ public class GameController {
             }
         }
     }
-
+    
     private static void debugVisualiseMap() {
         for (int y = height - 1; y > -1; y--) {
             System.out.println();
@@ -321,11 +303,11 @@ public class GameController {
             }
         }
     }
-
+    
     private static void troopDies(Troop troop) {
         if (troops.contains(troop)) {
             troops.remove(troop);
-
+            
             // look through the path this troop is on and remove it from the Path it's
             // contained in
             for (int i = 0; i < troop.getPath().size(); i++) {
@@ -339,58 +321,58 @@ public class GameController {
             }
         }
     }
-
+    
     public static MatrixObject getMatrixObject(int y, int x) {
         return map[y][x];
     }
-
+    
     public static void shootTroop(Tower tower, Troop troop) {
         // will have to call sound and graphics for shooting at troop
         int temp;
         temp = troop.getCurrentHealth() - tower.getDamage();
         troop.setCurrentHealth(temp);
-
+        
         if (troop.getCurrentHealth() <= 0) {
             troopDies(troop);
         }
     }
-
+    
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
-
+        
         // convert realWorldCoords to matrix
         MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
-
+        
         Tile tile = (Tile) map[mc.getY()][mc.getX()];
-
+        
         if (tbp.getTowerType() == TowerType.type1) {
             tower = new TowerType1(tbp.getRealWorldCoordinates());
         }
         // other if's to be added when new towers are added
-
+        
         towers.add(tower);
         towersPlacedThisTurn.add(tower);
         tile.setTower(tower);
-
+        
         // we have already checked if the defender can afford this tower, so now take away money
         defender.addMoney(-tower.getCost());
         return tower;
     }
-
+    
     public static boolean inBounds(MatrixCoordinates mc) {
         if (mc.getX() < 0 || mc.getY() < 0 || mc.getX() >= width || mc.getY() >= height) {
             return false;
         }
         return true;
     }
-
+    
     public static boolean inBounds(int y, int x) {
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return false;
         }
         return true;
     }
-
+    
     // want to find the cost of a tower before it has been placed
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
@@ -399,54 +381,46 @@ public class GameController {
             return 0;
         }
     }
-
-    private static int getTroopTypeCost(int troopType)
-    {
-        if (troopType == 0)
-        {
+    
+    private static int getTroopTypeCost(int troopType) {
+        if (troopType == 0) {
             return 10;
-        }
-        else return 0;
+        } else return 0;
         // add elses for other troops here
     }
-
+    
     // used by EventManager
-    public static boolean canAffordTroop(int troopType)
-    {
+    public static boolean canAffordTroop(int troopType) {
         return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
     }
-
-    private static boolean canAffordTower(TowerType towerType)
-    {
+    
+    private static boolean canAffordTower(TowerType towerType) {
         return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
-
+    
     // once a purchase has been verified and added to event manager, finally need to take money from attacker
-    public static void troopPurchases(int troopType)
-    {
+    public static void troopPurchases(int troopType) {
         attacker.addMoney(-getTroopTypeCost(troopType));
     }
-
-    public static void troopCancelled(int troopType)
-    {
+    
+    public static void troopCancelled(int troopType) {
         attacker.addMoney(getTroopTypeCost(troopType));
     }
-
+    
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
         // convert realWorldCoords to matrix
         MatrixCoordinates mc = new MatrixCoordinates(rwc);
-
+        
         // check if given mc is actually within the bounds of the matrix
         if (!inBounds(mc)) {
             return false;
         }
-
-        if (!canAffordTower(towerType))
-        {
+        
+        if (!canAffordTower(towerType)) {
             System.out.println("Can't afford tower type " + towerType + "!");
             return false;
         }
-
+        
         // check if this matrix position is legal
         MatrixObject mo = map[mc.getY()][mc.getX()];
         if (mo.getClass() == Path.class) {
@@ -458,5 +432,10 @@ public class GameController {
             }
         }
         return true;
+    }
+    
+    public enum WaveState
+    {
+        DefenderBuild, AttackerBuild, Play
     }
 }

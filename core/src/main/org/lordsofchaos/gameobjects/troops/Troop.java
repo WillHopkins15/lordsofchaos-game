@@ -1,24 +1,18 @@
 package org.lordsofchaos.gameobjects.troops;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.security.sasl.RealmCallback;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-
-
-import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.GameStart;
-import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.player.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Troop extends InteractiveObject
@@ -35,10 +29,10 @@ public class Troop extends InteractiveObject
     protected boolean targeted;
     protected boolean atEnd;
     private String previousdir = "nothing";
-
-
+    
+    
     public Troop(String spriteName, int cost, int damage,
-        float movementSpeed, int maxHealth, DamageType armourType, List < Path > path) {
+                 float movementSpeed, int maxHealth, DamageType armourType, List<Path> path) {
         super(spriteName, new RealWorldCoordinates(path.get(0).getMatrixPosition()), cost, damage);
         setMovementSpeed(movementSpeed);
         setCurrentHealth(maxHealth);
@@ -47,111 +41,106 @@ public class Troop extends InteractiveObject
         setAtEnd(false);
         Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
-
+        
     }
-
+    
+    public float getMovementSpeed() {
+        return movementSpeed;
+    }
+    
     // Getters and setters
     public void setMovementSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
     }
-
-    public float getMovementSpeed() {
-        return movementSpeed;
-    }
-
-    public void setMaxHealth(int health) {
-        maxHealth = health;
-    }
-
+    
     public int getMaxHealth() {
         return maxHealth;
     }
-
-    public void setCurrentHealth(int health) {
-        currentHealth = health;
+    
+    public void setMaxHealth(int health) {
+        maxHealth = health;
     }
-
+    
     public int getCurrentHealth() {
         return currentHealth;
     }
-
-    public void setPath(List < Path > path) {
+    
+    public void setCurrentHealth(int health) {
+        currentHealth = health;
+    }
+    
+    public List<Path> getPath() {
+        if (path == null) {
+            path = new ArrayList<Path>();
+        }
+        return path;
+    }
+    
+    public void setPath(List<Path> path) {
         this.path = path;
     }
-
-    public List <Path> getPath() {
-        if (path == null) {
-            path = new ArrayList <Path>();
-        }
-         return path;
-    }
-
+    
     public Sprite getSprite() {
         return sprite;
     }
-
-    public void setMoved(boolean moved) {
-        this.moved = moved;
-    }
-
+    
     public boolean getMoved() {
         return moved;
     }
-
+    
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+    
     public boolean getTargeted() {
         return targeted;
     }
-
+    
     public void setTargeted(boolean targeted) {
         this.targeted = targeted;
     }
-
+    
     public boolean getAtEnd() {
         return atEnd;
     }
-
+    
     public void setAtEnd(boolean atEnd) {
         this.atEnd = atEnd;
     }
-
-    private void resetTimer()
-    {
+    
+    private void resetTimer() {
         moveTimer = 0;
     }
-
-    public void move(float deltaTime)
-    {
-        moveTimer+= deltaTime;
-        if (moveTimer < moveTimeLimit)
-        {
+    
+    public void move(float deltaTime) {
+        moveTimer += deltaTime;
+        if (moveTimer < moveTimeLimit) {
             return;
         }
         resetTimer();
-
+        
         setMoved(false);
         // move along set path
-
+        
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
-
-        Path foundPath = (Path)GameController.getMatrixObject(currentco.getY(),currentco.getX());
-
+        
+        Path foundPath = (Path) GameController.getMatrixObject(currentco.getY(), currentco.getX());
+        
         int index = -1;
-
-        for (int i = 0; i < path.size(); i++)
-        {
+        
+        for (int i = 0; i < path.size(); i++) {
             if (path.get(i).getMatrixPosition().getY() == foundPath.getMatrixPosition().getY()
-            && path.get(i).getMatrixPosition().getX() == foundPath.getMatrixPosition().getX())
-            {
+                    && path.get(i).getMatrixPosition().getX() == foundPath.getMatrixPosition().getX()) {
                 index = i;
                 break;
             }
         }
-
+        
         if (index != (path.size() - 1)) {
             MatrixCoordinates nexttile;
             nexttile = (getPath().get(index + 1)).getMatrixPosition();
             String direction;
-
+            
             if ((currentco.getY() - nexttile.getY()) == 0) {
                 //x direction 
                 if ((currentco.getX() - nexttile.getX()) == 1) {
@@ -166,7 +155,7 @@ public class Troop extends InteractiveObject
                     direction = "south";
                 }
             }
-
+            
             if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
                 switch (previousdir) {
                     case "north":
@@ -181,12 +170,12 @@ public class Troop extends InteractiveObject
                     case "west":
                         realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
                         break;
-
+                    
                 }
-
+                
             }
-
-
+            
+            
             switch (direction) {
                 case "north":
                     realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
@@ -200,12 +189,10 @@ public class Troop extends InteractiveObject
                 case "west":
                     realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
                     break;
-
+                
             }
-
-
-
-
+            
+            
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
@@ -213,31 +200,30 @@ public class Troop extends InteractiveObject
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
                 setMoved(true);
-
+                
             }
-
-
+            
+            
         } else {
             (getPath().get(index)).removeTroop(this);
             damageBase();
             setAtEnd(true);
         }
-
+        
     }
-
-
-
+    
+    
     public void damageBase() {
         int temp;
         temp = GameStart.defender.getHealth() - getDamage();
-
+        
         if (temp <= 0) {
             GameStart.defender.setHealth(0);
             //end of game and relevant graphics and sound need to be done.
         } else {
             GameStart.defender.setHealth(temp);
         }
-
+        
     }
-
+    
 }

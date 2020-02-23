@@ -66,9 +66,9 @@ public class GameClient extends UDPSocket
             int port = packet.getPort();
             server = new ConnectionPoint(address, port);
             //
-            
+
 //            connectToServerAndGetPlayerType();
-            
+
 //            System.out.println("Found game.");
 //            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             
@@ -165,7 +165,7 @@ public class GameClient extends UDPSocket
     public String getCurrentWave() {
         return GameController.getWaveState().toString();
     }
-
+    
     @Override
     protected void createInputThread() {
         new Thread(() -> {

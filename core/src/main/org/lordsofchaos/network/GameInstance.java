@@ -31,7 +31,7 @@ public class GameInstance extends UDPSocket
         //connectAndSetTypes(attacker, defender);
         sendObject(attacker, "Attacker");
         sendObject(defender, "Defender");
-    
+        
     }
     
     /**

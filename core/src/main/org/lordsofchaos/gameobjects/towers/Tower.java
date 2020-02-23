@@ -1,9 +1,9 @@
 package org.lordsofchaos.gameobjects.towers;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import org.lordsofchaos.Pair;
 import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
+import org.lordsofchaos.Pair;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
@@ -43,22 +43,22 @@ public class Tower extends InteractiveObject
         isCompleted = true;
     }
     
+    public int getRange() {
+        return range;
+    }
+    
     // Getters and Setters
     public void setRange(int range) {
         this.range = range;
         findPathInRange();
     }
     
-    public int getRange() {
-        return range;
+    public DamageType getDamageType() {
+        return damageType;
     }
     
     public void setDamageType(DamageType damageType) {
         this.damageType = damageType;
-    }
-    
-    public DamageType getDamageType() {
-        return damageType;
     }
     //
     
