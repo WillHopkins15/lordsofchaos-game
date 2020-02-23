@@ -6,6 +6,7 @@ import java.util.List;
 
 public class BuildPhaseData implements Serializable
 {
+	private static final long serialVersionUID = 5084L;
 	private int[][] unitBuildPlan;
 	private List<SerializableTower> towerBuildPlan;
 	

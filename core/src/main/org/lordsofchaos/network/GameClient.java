@@ -108,8 +108,8 @@ public class GameClient extends UDPSocket
         createOutputThread();
         
         while (running) {
-//            this.gameState = GameController.getGameState();
-//            Thread.sleep(100);
+            this.gameState = GameController.getGameState();
+            Thread.sleep(100);
         }
     }
     
@@ -166,14 +166,14 @@ public class GameClient extends UDPSocket
         return GameController.getWaveState().toString();
     }
 
-//    @Override
-//    protected void createInputThread() {
-//        new Thread(() -> {
-//            while (running) {
-//                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
-//                    receiveObject();
-//                }
-//            }
-//        }).start();
-//    }
+    @Override
+    protected void createInputThread() {
+        new Thread(() -> {
+            while (running) {
+                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
+                    receiveObject();
+                }
+            }
+        }).start();
+    }
 }
