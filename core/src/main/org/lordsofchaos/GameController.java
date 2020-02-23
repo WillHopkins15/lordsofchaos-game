@@ -213,6 +213,7 @@ public class GameController {
                 spawnTroop(deltaTime);
             }
         }
+        debugVisualiseMap();
     }
 
     private static void addMoney() {
@@ -304,7 +305,11 @@ public class GameController {
                 if (map[y][x].getClass() == Tile.class) {
                     Tile t = (Tile) map[y][x];
                     if (t.getIsBuildable()) {
-                        System.out.print("- ");
+                        if (t.getTower() != null) {
+                            System.out.println("T ");
+                        } else {
+                            System.out.print("- ");
+                        }
                     } else {
                         System.out.print("X ");
                     }
