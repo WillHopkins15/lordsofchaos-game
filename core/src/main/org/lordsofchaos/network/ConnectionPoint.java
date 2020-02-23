@@ -19,4 +19,8 @@ public class ConnectionPoint
     public int getPort() {
         return this.port;
     }
+    
+    public String toString() {
+        return "Address: " + address.toString() + " Port: " + port;
+    }
 }

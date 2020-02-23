@@ -28,7 +28,10 @@ public class GameInstance extends UDPSocket
         attacker = player1;
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
-        connectAndSetTypes(attacker, defender);
+        //connectAndSetTypes(attacker, defender);
+        sendObject(attacker, "Attacker");
+        sendObject(defender, "Defender");
+    
     }
     
     /**
@@ -46,6 +49,7 @@ public class GameInstance extends UDPSocket
         socket.close();
         
         Socket socket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
+        socket.setKeepAlive(false);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Attacker");
         //Wait for receiver to close their end of the socket to avoid a TIME_WAIT which relys
@@ -56,6 +60,7 @@ public class GameInstance extends UDPSocket
         socket.close();
         
         socket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
+        socket.setKeepAlive(false);
         out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Defender");
         out.close();
