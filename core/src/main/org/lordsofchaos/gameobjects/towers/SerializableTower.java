@@ -37,5 +37,9 @@ public class SerializableTower implements Serializable {
         }
         return false;
     }
-
+     public String toString() {
+        String tower = this.towerType.getSpriteName();
+        String coords = rwc.toString();
+        return "Type: " + tower + " rwc: " + coords;
+     }
 }

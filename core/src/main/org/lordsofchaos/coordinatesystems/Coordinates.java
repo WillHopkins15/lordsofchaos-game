@@ -1,5 +1,7 @@
 package org.lordsofchaos.coordinatesystems;
 
+import java.text.Format;
+
 public abstract class Coordinates {
     private int x;
     private int y;
@@ -32,5 +34,9 @@ public abstract class Coordinates {
 
     public boolean equals(Coordinates other) {
         return getX() == other.getX() && getY() == other.getY();
+    }
+    
+    public String toString() {
+        return String.format("(%d,%d)", this.x, this.y);
     }
 }

@@ -106,6 +106,7 @@ public abstract class UDPSocket extends Thread
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
             setGameState(gameState);
+            System.out.println(gameState.toString());
         }
     }
     
