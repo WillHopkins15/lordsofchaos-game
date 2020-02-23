@@ -177,8 +177,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public void defenderPOV() {
-        isometricPov();
-        batch.begin();
+
 
         towerButton.getSprite().draw(batch);
         /*
@@ -191,15 +190,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         showCoins(GameController.defender);
         endTurnButton.getSprite().draw(batch);
-        if(changedTurn && GameController.getWaveState() == GameController.WaveState.AttackerBuild) changeTurn(2,"Attacker' Turn");
-        else if(changedTurn && GameController.getWaveState() == GameController.WaveState.DefenderBuild) changeTurn(2,"Defender's Turn");
-        batch.end();
 
     }
 
     public void attackerPOV() {
-        isometricPov();
-        batch.begin();
+
         unitButton.getSprite().draw(batch);
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
@@ -210,9 +205,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         endTurnButton.getSprite().draw(batch);
         showHealth();
         showCoins(GameController.attacker);
-        if(changedTurn && GameController.getWaveState() == GameController.WaveState.AttackerBuild) changeTurn(2,"Attacker' Turn");
-        else if(changedTurn && GameController.getWaveState() == GameController.WaveState.Play) changeTurn(2," Play       ");
-        batch.end();
     }
 
     public void attackerTouchDown(int x, int y, int pointer, int button) {
@@ -371,18 +363,25 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
-			/*if(changedTurn == true) {
-				System.out.println("Turn Ended");
-				lastTurnTime = (int) System.nanoTime();
-				if(GameController.getWaveState() == GameController.WaveState.DefenderBuild)
-					changeTurn(2000000000,"Attacker's Turn",batch);
-				if(GameController.getWaveState() == GameController.WaveState.AttackerBuild)
-					changeTurn(2000000000,"Action",batch);
-			}*/
+            isometricPov();
+            batch.begin();
             if (player == 0)
                 defenderPOV();
             if (player == 1)
                 attackerPOV();
+            if(changedTurn){
+                switch(GameController.getWaveState()){
+                    case AttackerBuild:
+                        changeTurn(2,"Attacker' Turn");
+                        break;
+                    case DefenderBuild:
+                        changeTurn(2,"Defender's Turn");
+                        break;
+                    case Play:
+                        changeTurn(2,"      Play     ");
+                }
+            }
+            batch.end();
 
         }
 
