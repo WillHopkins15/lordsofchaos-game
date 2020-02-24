@@ -134,9 +134,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
         Collections.sort(objectsToAdd);
         
         renderer.getBatch().begin();
-        
-        for (int i = 0; i < objectsToAdd.size(); i++) {
-            GameObject object = objectsToAdd.get(i);
+    
+        for (GameObject object : objectsToAdd) {
             Sprite sprite = object.getSprite();
             Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
             int w = 48;
@@ -146,7 +145,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
                 }
             }
-            
+        
             renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
                     w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
@@ -181,10 +180,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 renderer.getBatch().setColor(Color.WHITE);
             }
             
-        } else {
-        
         }
-        
+    
         renderer.getBatch().end();
     }
     
@@ -225,14 +222,13 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }*/
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
+        unitsSprite = new ArrayList<>();
         if (tmpUnits.size() > 0) {
-            unitsSprite = new ArrayList<>();
-            for (int i = 0; i < tmpUnits.size(); i++)
-                unitsSprite.add(new TroopSprite(tmpUnits.get(i)));
+            for (Troop tmpUnit : tmpUnits) unitsSprite.add(new TroopSprite(tmpUnit));
             System.out.println("X: " + unitsSprite.get(0).getX() + " Y: " + unitsSprite.get(0).getY() + " Size:" + unitsSprite.size());
-            for (int i = 0; i < unitsSprite.size(); i++) {
-                unitsSprite.get(i).getHealthBarSpriteBase().draw(batch);
-                unitsSprite.get(i).getHealthBarSpriteGreen().draw(batch);
+            for (TroopSprite troopSprite : unitsSprite) {
+                troopSprite.getHealthBarSpriteBase().draw(batch);
+                troopSprite.getHealthBarSpriteGreen().draw(batch);
                 System.out.println("Drawing Healthbar");
             }
         }
@@ -243,8 +239,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         if (tmpUnits.size() > 0) {
             unitsSprite = new ArrayList<>();
         }
-        for (int i = 0; i < unitsSprite.size(); i++)
-            unitsSprite.get(i).dispose();
+        for (TroopSprite troopSprite : unitsSprite) troopSprite.dispose();
         
     }
     
@@ -252,18 +247,17 @@ public class Game extends ApplicationAdapter implements InputProcessor
         List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
         towerAttackPixmap.setColor(Color.YELLOW);
-        for (int i = 0; i < towers.size(); i++) {
-            Troop tmpTroop = towers.get(i).getTarget();
-            Tower currentTower = towers.get(i);
+        for (Tower tower : towers) {
+            Troop tmpTroop = tower.getTarget();
+            if (tmpTroop != null) {
             
-            if (tmpTroop == null) return;
-            int troopX = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
-            int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
-            int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towerY = (int) Conversions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
-            towerAttackPixmap.drawLine(troopX, troopY, towerX, towerY);
-            
+                int troopX = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
+                int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
+                int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).x;
+                int towerY = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).y;
+                System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
+                towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
+            }
         }
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
