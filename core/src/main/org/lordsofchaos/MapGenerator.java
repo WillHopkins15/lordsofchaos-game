@@ -123,7 +123,7 @@ public class MapGenerator
                                                List<Coordinates> obstacles) {
         MatrixObject[][] map = new MatrixObject[width][height];
         
-        System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
+        //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
         // initialise array with empty tiles
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

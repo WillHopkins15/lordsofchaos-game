@@ -21,7 +21,7 @@ public class Defender extends Player
         super(Name);
         setCurrentMoney(50);
         setHealth(100);
-        System.out.println("TEST1");
+        //System.out.println("TEST1");
         /*
          * healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
          * healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));

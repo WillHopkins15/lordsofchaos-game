@@ -49,7 +49,7 @@ public class EventManager
     
     public static void resetEventManager() {
         unitBuildPlan = new int[troopTypes][pathCount];
-        towerBuilds = new ArrayList<SerializableTower>();
+        towerBuilds = new ArrayList<>();
     }
     
     public static void buildPlanChange(int unitType, int path, int change, boolean troopSpawned) {
@@ -80,10 +80,6 @@ public class EventManager
     
     private static int clamp(int value, int change, int min) {
         int newVal = value + change;
-        if (newVal < min) {
-            return min;
-        } else {
-            return newVal;
-        }
+        return Math.max(newVal, min);
     }
 }
