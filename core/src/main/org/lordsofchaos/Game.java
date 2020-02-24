@@ -82,7 +82,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     
     public static void main(String[] args) {
-        //setupClient();
+        setupClient();
     }
     
     private static boolean setupClient() {
