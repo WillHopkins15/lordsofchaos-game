@@ -223,7 +223,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     public RealWorldCoordinates snap(int x, int y) {
         Vector2 coords = new Vector2(x * 2, Gdx.graphics.getHeight() - (y * 2));
-        return roundToCentreTile(isometricToRealWorldCoordinate(coords));
+        RealWorldCoordinates rwc = isometricToRealWorldCoordinate(coords);
+        System.out.println(realWorldCoordinatesToScreenPosition(rwc));
+        return roundToCentreTile(rwc);
+    }
+
+    public Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
+        Vector2 screenPosition = new Vector2();
+        Vector2 isometric = realWorldCooridinateToIsometric(rwc);
+        screenPosition.x = isometric.x / 2;
+        screenPosition.y = (Gdx.graphics.getHeight() - isometric.y) / 2;
+        return screenPosition;
     }
 
     public void defenderTouchDown(int x, int y, int pointer, int button) {
