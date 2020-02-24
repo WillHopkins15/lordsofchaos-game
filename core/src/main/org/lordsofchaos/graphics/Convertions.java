@@ -9,8 +9,7 @@ abstract public class Convertions {
         Vector2 screenPosition = new Vector2();
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);
         screenPosition.x = isometric.x / 2;
-        screenPosition.y = (Gdx.graphics.getHeight() + isometric.y) / 2;
-        //screenPosition.y = (Gdx.graphics.getHeight() - isometric.y) / 2;
+        screenPosition.y = Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - isometric.y) / 2;
         return screenPosition;
     }
     public static Vector2 cartesianToIsometric(float x, float y) {
