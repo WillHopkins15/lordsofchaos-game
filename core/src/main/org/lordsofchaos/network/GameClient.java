@@ -1,6 +1,5 @@
 package org.lordsofchaos.network;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 import org.lordsofchaos.GameController;
@@ -17,7 +16,7 @@ import java.net.*;
  */
 public class GameClient extends UDPSocket
 {
-    private Pair<InetAddress, Integer> server;
+    private ConnectionPoint server;
     private byte[] buffer = new byte[256];
     private String playerType = "";
     
@@ -44,21 +43,34 @@ public class GameClient extends UDPSocket
             InetAddress address;
             try {
                 address = InetAddress.getByName(item);
-                packet = new DatagramPacket(buffer, buffer.length, address, GameServer.SERV_PORT);
+                packet = new DatagramPacket(buffer, buffer.length, address, 5148);
                 socket.send(packet);
                 socket.receive(packet);
-            } catch (SocketTimeoutException | UnknownHostException e) {
+            } catch (SocketTimeoutException e) {
                 System.out.printf("Host %s not available.\n", item);
                 continue;
+            } catch (UnknownHostException e) {
+                System.out.printf("Host %s not found.\n", item);
+                continue;
             }
-            
+            //
             System.out.println("Server found!");
             System.out.println("Looking for opponent...");
-            
-            connectToServerAndGetPlayerType();
+            socket.setSoTimeout(0); //Stop socket from timing out
+            socket.receive(packet);
             
             System.out.println("Found game.");
+            playerType = (String) getObjectFromBytes(packet.getData());
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
+            //port number of connected server thread
+            int port = packet.getPort();
+            server = new ConnectionPoint(address, port);
+            //
+
+//            connectToServerAndGetPlayerType();
+
+//            System.out.println("Found game.");
+//            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             
             return true;
         }
@@ -71,15 +83,15 @@ public class GameClient extends UDPSocket
         //Temporarily switch to TCP
         int port = socket.getLocalPort();
         socket.close();
-    
+        
         ServerSocket serv = new ServerSocket(port);
         serv.setSoTimeout(0);
         Socket tcpsock = serv.accept();
         DataInputStream in = new DataInputStream(new BufferedInputStream(tcpsock.getInputStream()));
         
-        server = new Pair<>(tcpsock.getInetAddress(), tcpsock.getPort());
+        server = new ConnectionPoint(tcpsock.getInetAddress(), tcpsock.getPort());
         playerType = in.readUTF();
-    
+        
         in.close();
         serv.close();
         tcpsock.close();
@@ -90,14 +102,14 @@ public class GameClient extends UDPSocket
     
     @SneakyThrows
     public void run() {
-        System.out.printf("Connected to %s on port %d\n", server.getKey(), server.getValue());
-        socket.setSoTimeout(1000);
+        System.out.printf("Connected to %s on port %d\n", server.getAddress(), server.getPort());
+        socket.setSoTimeout(500);
         createInputThread();
         createOutputThread();
         
         while (running) {
-//            this.gameState = GameController.getGameState();
-//            Thread.sleep(100);
+            this.gameState = GameController.getGameState();
+            Thread.sleep(100);
         }
     }
     
@@ -114,7 +126,7 @@ public class GameClient extends UDPSocket
     /**
      * @return InetAdress/Port number pair of connected server. Null if not connected
      */
-    public Pair<InetAddress, Integer> getServer() {
+    public ConnectionPoint getServer() {
         return server;
     }
     
@@ -154,14 +166,14 @@ public class GameClient extends UDPSocket
         return GameController.getWaveState().toString();
     }
     
-//    @Override
-//    protected void createInputThread() {
-//        new Thread(() -> {
-//            while (running) {
-//                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
-//                    receiveObject();
-//                }
-//            }
-//        }).start();
-//    }
+    @Override
+    protected void createInputThread() {
+        new Thread(() -> {
+            while (running) {
+                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
+                    receiveObject();
+                }
+            }
+        }).start();
+    }
 }

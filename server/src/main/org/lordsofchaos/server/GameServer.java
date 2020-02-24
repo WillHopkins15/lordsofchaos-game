@@ -1,7 +1,9 @@
-package org.lordsofchaos.network;
+package org.lordsofchaos.server;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
+import org.lordsofchaos.network.ConnectionPoint;
+import org.lordsofchaos.network.GameInstance;
+import org.lordsofchaos.network.HostManager;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.List;
 public class GameServer extends Thread
 {
     protected static final int SERV_PORT = 5148;
-    private static List<Pair<InetAddress, Integer>> connections = new ArrayList<>();
+    private static List<ConnectionPoint> connections = new ArrayList<>();
     private static ConnectionListener connectionListener;
     private boolean running = true;
     
@@ -27,8 +29,8 @@ public class GameServer extends Thread
     
     private static void pairPlayers() {
         if (getNumConnections() > 1) {
-            Pair<InetAddress, Integer> player1 = connections.get(0);
-            Pair<InetAddress, Integer> player2 = connections.get(1);
+            ConnectionPoint player1 = connections.get(0);
+            ConnectionPoint player2 = connections.get(1);
             
             new GameInstance(player1, player2).start();
             
@@ -40,7 +42,7 @@ public class GameServer extends Thread
     /**
      * @return List of current connections
      */
-    public static List<Pair<InetAddress, Integer>> getConnections() {
+    public static List<ConnectionPoint> getConnections() {
         return connections;
     }
     
@@ -52,7 +54,7 @@ public class GameServer extends Thread
     }
     
     protected static void addConnection(InetAddress address, int port) {
-        connections.add(new Pair<>(address, port));
+        connections.add(new ConnectionPoint(address, port));
     }
     
     public static void main(String[] args) {
@@ -67,7 +69,9 @@ public class GameServer extends Thread
     @SneakyThrows
     public void run() {
         String servAddress = InetAddress.getLocalHost().getHostName();
-        HostManager.addHost(servAddress);
+        if (!HostManager.hostRecognised(servAddress)) {
+            return;
+        }
         connectionListener = new ConnectionListener(SERV_PORT);
         connectionListener.start();
         System.out.printf("Server started on %s\n", servAddress);

@@ -1,4 +1,4 @@
-package org.lordsofchaos.network;
+package org.lordsofchaos.server;
 
 import lombok.SneakyThrows;
 

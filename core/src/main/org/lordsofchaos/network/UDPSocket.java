@@ -1,11 +1,13 @@
 package org.lordsofchaos.network;
 
-import javafx.util.Pair;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
 import java.io.*;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
  * Class that abstracts sending and receiving objects over a DatagramSocket.
@@ -14,10 +16,11 @@ import java.net.*;
  */
 public abstract class UDPSocket extends Thread
 {
-    protected boolean running = true;
+    protected volatile boolean running = true;
     protected DatagramSocket socket;
     protected BuildPhaseData gameState = null;
     private byte[] buffer = new byte[1024]; //Needs to be big enough to hold the game state object
+    private int timeoutCount = 0;
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -35,13 +38,13 @@ public abstract class UDPSocket extends Thread
      * @param contents  Object to serialize and send
      */
     @SneakyThrows
-    protected void sendObject(Pair<InetAddress, Integer> recipient, Object contents) {
+    protected void sendObject(ConnectionPoint recipient, Object contents) {
         if (!socket.isClosed()) {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             ObjectOutputStream oout = new ObjectOutputStream(bout);
             oout.writeObject(contents);
             byte[] bytes = bout.toByteArray();
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getKey(), recipient.getValue());
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(), recipient.getPort());
             socket.send(packet);
         } else {
             System.out.println("Packet not sent: Socket closed");
@@ -85,9 +88,15 @@ public abstract class UDPSocket extends Thread
             return;
         } catch (SocketTimeoutException e) {
             System.out.printf("[%d] Receive timed out.\n", socket.getLocalPort());
+            timeoutCount++;
+            if (timeoutCount >= 10) {
+                System.out.println("Connection dropped. Closing...");
+                this.close();
+            }
             return;
         }
         
+        timeoutCount = 0;
         Object received = getObjectFromBytes(packet.getData());
         if (received == null) {
             System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
@@ -97,6 +106,7 @@ public abstract class UDPSocket extends Thread
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
             setGameState(gameState);
+            System.out.println(gameState.toString());
         }
     }
     

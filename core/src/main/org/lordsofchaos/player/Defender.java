@@ -4,17 +4,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.player.Player;
 
-public class Defender extends Player {
-    protected int Health;
-    protected RealWorldCoordinates coordinates;
+public class Defender extends Player
+{
     protected static Texture healthBarTexture;
     protected static Texture healthTexture;
     protected static Sprite healthBarSprite;
     protected static Sprite healthSprite;
     protected static BitmapFont hpCounter;
-
+    protected int Health;
+    protected RealWorldCoordinates coordinates;
+    
     public Defender(String Name) {
         super(Name);
         setCurrentMoney(50);
@@ -29,45 +29,44 @@ public class Defender extends Player {
          * healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
          * hpCounter.getData().setScale(1.5f);
          */
-
+        
         // change this when the actual coordinate for the game is decided
-
+        
         RealWorldCoordinates coord = new RealWorldCoordinates(8, 4);
-
+        
         setCoordinates(coord);
         setMoneyBoost(50);
-
+        
     }
-
+    
     public void takeDamage(int damage) {
         int tmp = getHealth() - damage;
         if (tmp < 0)
             tmp = 0;
         setHealth(tmp);
     }
-
-    public void setHealth(int Health) {
-        this.Health = Health;
-    }
-
+    
     public int getHealth() {
         return Health;
     }
-
-    public void setCoordinates(RealWorldCoordinates coordinates) {
-        this.coordinates = coordinates;
+    
+    public void setHealth(int Health) {
+        this.Health = Health;
     }
-
+    
     public RealWorldCoordinates getCoordinates() {
         return coordinates;
     }
-
+    
+    public void setCoordinates(RealWorldCoordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+    
     public Sprite getHealthSprite() {
         return healthSprite;
     }
-
+    
     public Sprite getHealthBarSprite() {
         return healthBarSprite;
     }
-
 }

@@ -1,10 +1,11 @@
-package org.lordsofchaos.network;
+package org.lordsofchaos;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.lordsofchaos.BuildPhaseData;
 import org.lordsofchaos.gameobjects.towers.SerializableTower;
+import org.lordsofchaos.network.GameClient;
+import org.lordsofchaos.server.GameServer;
 
 import java.io.File;
 import java.util.ArrayList;
