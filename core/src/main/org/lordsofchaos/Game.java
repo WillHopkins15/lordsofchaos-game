@@ -1,7 +1,10 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
@@ -74,10 +77,12 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
+    private Sound soundTrack;
+    private Sound selectSound;
     
     
     public static void main(String[] args) {
-        setupClient();
+        //setupClient();
     }
     
     private static boolean setupClient() {
@@ -151,17 +156,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
             renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
                     w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
-           /* if (object instanceof  Troop){
-                Troop troop = (Troop) object;
-                unitHealthbar = new Pixmap(40,10, Pixmap.Format.RGBA8888);
-                unitHealthbar.setColor(Color.RED);
-                unitHealthbar.fill();
-                unitHealthbarTexture = new Texture(unitHealthbar);
-                //Sprite tmpSprite = new Sprite(unitHealthbarTexture);
-                //tmpSprite.setPosition((coordinates.x + 10) - 48 / 2,(coordinates.y - 10) - 48 / 6);
-                renderer.getBatch().draw(unitHealthbarTexture,(coordinates.x + 8) - 48 / 2,(coordinates.y + 45) - 48 / 6);
-                unitHealthbar.dispose();
-            }*/
         }
         if (player == 0) {
             // DEFENDER
@@ -202,26 +196,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         
     }
     
-    /*public void showUnitHealthbar(){
 
-        List<Troop> units = GameController.getTroops();
-        for(int i = 0; i < units.size(); i++){
-            Vector2 unitRWC = realWorldCoordinatesToScreenPosition(units.get(i).getRealWorldCoordinates());
-            unitHealthbar = new Pixmap(30,5, Pixmap.Format.RGBA8888);
-            unitHealthbar.setColor(Color.RED);
-            unitHealthbar.fill();
-            System.out.println("X: " + unitRWC.x + " Y: " + unitRWC.y+ " Size:" + units.size());
-            //unitHealthbar.drawRectangle(unitRWC.getX() + 10,unitRWC.getY() - 10, 30,5);
-            //unitHealthbarTexture.dispose();
-            unitHealthbarTexture = new Texture(unitHealthbar);
-            Sprite tmpSprite = new Sprite(unitHealthbarTexture);
-            tmpSprite.setPosition((unitRWC.x) - 15 ,unitRWC.y + 20);
-            tmpSprite.draw(batch);
-            unitHealthbar.dispose();
-            //tmpTexture.dispose();
-        }
-
-    }*/
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
         unitsSprite = new ArrayList<>();
@@ -292,6 +267,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
          * 0.5f); batch.draw(tmpSpriteTower, Gdx.input.getX() - 24,
          * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
          */
+        //fix this later
+        if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
         showHealth();
         
         showCoins(GameController.defender);
@@ -317,8 +294,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
         if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
             if (button == Input.Buttons.LEFT) {
                 if (unitButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
                     EventManager.buildPlanChange(0, 0, 1, false);
                 } else if (endTurnButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
                     GameController.endPhase();
                     changedTurn = true;
                     
@@ -326,6 +305,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             if (button == Buttons.RIGHT) {
                 if (unitButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
                     EventManager.buildPlanChange(0, 0, -1, false);
                 }
             }
@@ -347,20 +327,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void defenderTouchDown(int x, int y, int pointer, int button) {
         if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT) {
-                if (currentScreen == Screen.MAIN_MENU) {
-                    
-                    if (startButton.checkClick(x, y))
-                        currentScreen = Screen.GAME;
-                    else if (quitButton.checkClick(x, y)) {
-                        quitButton.dispose();
-                        startButton.dispose();
-                        Gdx.app.exit();
-                    }
-                }
                 if (buildMode) {
                     // Place tower
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
                     if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
+                        selectSound.play(0.75f);
                         EventManager.towerPlaced(TowerType.type1, rwc);
                         buildMode = false;
                     }
@@ -368,6 +339,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 }
                 if (towerButton.checkClick(x, y)) {
                     //System.out.println("Clicked towerButton");
+                    selectSound.play(0.75f);
                     if (!buildMode && GameController.canAffordTower(TowerType.type1)) {
                         buildMode = true;
                         // Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
@@ -375,6 +347,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                         // tmpCursor.dispose();
                     }
                 } else if (endTurnButton.checkClick(x, y) && !buildMode) {
+                    selectSound.play(0.75f);
                     GameController.endPhase();
                     changedTurn = true;
                     
@@ -400,7 +373,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void create() {
         
         batch = new SpriteBatch();
-        //unitHealthbarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
+        soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
+        soundTrack.loop(0.25f);
+        selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
         endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
         endTurnFont.getData().setScale(3f);
@@ -446,6 +421,13 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        /*long id = soundTrack.loop();
+        Timer.schedule(new Task(){
+            @Override
+            public void run(){
+                soundTrack.stop(id);
+            }
+        }, 5.0f);*/
         //batch.begin();
         if (currentScreen == Screen.MAIN_MENU) {
             batch.begin();
@@ -508,6 +490,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         defenderButton.dispose();
         attackerButton.dispose();
         multiplayerButton.dispose();
+        soundTrack.dispose();
     }
     
     @Override
@@ -539,12 +522,15 @@ public class Game extends ApplicationAdapter implements InputProcessor
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
                     currentScreen = Screen.CHOOSE_FACTION;
+                    selectSound.play(0.75f);
                 } else if (multiplayerButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
                     if (setupClient()) {
                         multiplayer = true;
                         currentScreen = Screen.CHOOSE_FACTION;
                     }
                 } else if (quitButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
                     quitButton.dispose();
                     startButton.dispose();
                     multiplayerButton.dispose();
@@ -554,20 +540,24 @@ public class Game extends ApplicationAdapter implements InputProcessor
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
                 if (multiplayer) {
                     if (defenderButton.checkClick(x, y) && client.isDefender()) {
+                        selectSound.play(0.75f);
                         GameController.setPlayerType(true);
                         player = 0;
                         currentScreen = Screen.GAME;
                     } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
+                        selectSound.play(0.75f);
                         GameController.setPlayerType(false);
                         player = 1;
                         currentScreen = Screen.GAME;
                     }
                 } else {
                     if (defenderButton.checkClick(x, y)) {
+                        selectSound.play(0.75f);
                         GameController.setPlayerType(true);
                         player = 0;
                         currentScreen = Screen.GAME;
                     } else if (attackerButton.checkClick(x, y)) {
+                        selectSound.play(0.75f);
                         GameController.setPlayerType(false);
                         player = 1;
                         currentScreen = Screen.GAME;
