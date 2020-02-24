@@ -1,7 +1,5 @@
 package org.lordsofchaos.gameobjects.towers;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
-
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.TowerType;
