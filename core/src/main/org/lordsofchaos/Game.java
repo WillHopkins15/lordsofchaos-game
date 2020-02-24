@@ -226,6 +226,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void showTowerAttack(){
         List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(1280,720,Pixmap.Format.RGBA8888);
+        towerAttackPixmap.setColor(Color.YELLOW);
         for(int i = 0; i < towers.size(); i++ ){
             Troop tmpTroop = towers.get(i).getTarget();
             Tower currentTower = towers.get(i);
@@ -233,13 +234,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             int troopX = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
             int troopY = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
             int towerX = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towery = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            towerAttackPixmap.drawLine((int)Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
-                    (int)Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
-                    (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x,
-                    (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y);
+            int towerY = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: ");
+            towerAttackPixmap.drawLine(towerX,towerY,troopX,troopY);
         }
-        towerAttackPixmap.fill();
+        //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
         towerAttackSprite.draw(batch);
