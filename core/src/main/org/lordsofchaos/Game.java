@@ -74,17 +74,19 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
-
-
+    
+    
     public static void main(String[] args) {
         setupClient();
     }
     
-    private static void setupClient() {
-        GameClient gc = new GameClient();
-        if (gc.makeConnection()) {
-            gc.start();
+    private static boolean setupClient() {
+        client = new GameClient();
+        if (client.makeConnection()) {
+            client.start();
+            return true;
         }
+        return false;
     }
     
     public static void newTurn() {
@@ -134,7 +136,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         Collections.sort(objectsToAdd);
         
         renderer.getBatch().begin();
-    
+        
         for (GameObject object : objectsToAdd) {
             Sprite sprite = object.getSprite();
             Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
@@ -145,7 +147,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
                 }
             }
-        
+            
             renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
                     w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
@@ -181,7 +183,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             
         }
-    
+        
         renderer.getBatch().end();
     }
     
@@ -250,7 +252,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         for (Tower tower : towers) {
             Troop tmpTroop = tower.getTarget();
             if (tmpTroop != null) {
-            
+                
                 int troopX = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
                 int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
                 int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).x;
@@ -538,8 +540,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 if (startButton.checkClick(x, y)) {
                     currentScreen = Screen.CHOOSE_FACTION;
                 } else if (multiplayerButton.checkClick(x, y)) {
-                    multiplayer = true;
-                    setupClient();
+                    if (setupClient()) {
+                        multiplayer = true;
+                        currentScreen = Screen.CHOOSE_FACTION;
+                    }
                 } else if (quitButton.checkClick(x, y)) {
                     quitButton.dispose();
                     startButton.dispose();
