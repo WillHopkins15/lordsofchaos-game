@@ -323,8 +323,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         Vector2 screenPosition = new Vector2();
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);
         screenPosition.x = isometric.x / 2;
-        screenPosition.y = (Gdx.graphics.getHeight() + isometric.y) / 2;
-        //screenPosition.y = (Gdx.graphics.getHeight() - isometric.y) / 2;
+        screenPosition.y = Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - isometric.y) / 2;
         return screenPosition;
     }
 
