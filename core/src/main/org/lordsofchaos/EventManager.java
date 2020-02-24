@@ -61,16 +61,19 @@ public class EventManager {
 
 		if (change == 1) {// if a troop has been added to the buildPlan
 			// check if can afford troop
-			if (GameController.canAffordTroop(unitType)) {
-				GameController.troopPurchases(unitType);
-			} else {
+			if (GameController.canAffordTroop(unitType))
+			{
+				GameController.troopPurchased(unitType);
+			}
+			else
+			{
 				System.out.print("Can't afford troop type " + unitType + "!");
 				return;
 			}
 		} else if (change == -1) {
 			// attacker should receive a refund if a troop has been cancelled
 			if (!troopSpawned) {
-				GameController.troopCancelled(unitType);
+				GameController.troopCancelled(unitType, path);
 			}
 		}
 

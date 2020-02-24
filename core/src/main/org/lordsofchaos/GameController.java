@@ -29,7 +29,7 @@ public class GameController {
 
     // timing
     private static float buildTimer = 0;
-    private static float buildTimeLimit = 5;
+    private static float buildTimeLimit = 30;
 
     private static float unitSpawnTimer = 0;
     private static float unitSpawnTimeLimit = 1;
@@ -53,7 +53,6 @@ public class GameController {
 
     // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
     protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
-
 
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
@@ -147,6 +146,7 @@ public class GameController {
     }
 
     public static void endPhase() {
+        Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
 
@@ -417,14 +417,17 @@ public class GameController {
     }
 
     // once a purchase has been verified and added to event manager, finally need to take money from attacker
-    public static void troopPurchases(int troopType)
+    public static void troopPurchased(int troopType)
     {
         attacker.addMoney(-getTroopTypeCost(troopType));
     }
 
-    public static void troopCancelled(int troopType)
+    public static void troopCancelled(int troopType, int path)
     {
-        attacker.addMoney(getTroopTypeCost(troopType));
+        // check if build plan is empty at that place, if so, don't give a refund
+        if (EventManager.getUnitBuildPlan()[troopType][path] > 0) {
+            attacker.addMoney(getTroopTypeCost(troopType));
+        }
     }
 
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {

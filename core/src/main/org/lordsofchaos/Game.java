@@ -1,22 +1,23 @@
 package org.lordsofchaos;
 
+import java.util.Arrays;
+import java.util.List;
+import java.lang.System;
+
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-
+import com.badlogic.gdx.Input.Buttons;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
@@ -43,34 +44,46 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static Button defenderButton;
     private static Button attackerButton;
     private static Button endTurnButton;
-    // move to player if possible
+    private static BitmapFont endTurnFont;
+    private static Button multiplayerButton;
     private static Texture healthBarTexture;
     private static Texture healthTexture;
     private static Sprite healthBarSprite;
     private static Sprite healthSprite;
     private static BitmapFont hpCounter;
     private static Texture coinTexture;
+    private Sprite coinSprite;
     private static BitmapFont coinCounter;
     private static GameClient client;
+    private  int lastTurnTime;
+    private static Texture towerUnderConstructionTexture;
     private static Texture towerType1Texture;
     final int height = 720;
     int width = 1280;
-    SpriteBatch batch;
+    private static SpriteBatch batch;
     OrthographicCamera camera;
     IsometricTiledMapRenderer renderer;
     TiledMap map;
-    private Sprite coinSprite;
-    private int currentHp = 50;
     private float hpSpriteW;
+    private static float timerChangeTurn;
     private BitmapFont unitNumber;
     private Screen currentScreen;
     private float elapsedTime;
+    private static boolean changedTurn = false;
+
+    
+//    public static void main(String[] args) {
+//        setupClient();
+//    }
 
     private static void setupClient() {
-        client = new GameClient();
-        if (client.makeConnection()) {
-            client.start();
+        GameClient gc = new GameClient();
+        if (gc.makeConnection()) {
+            gc.start();
         }
+    }
+    public static void newTurn(){
+        changedTurn = true;
     }
 
     public static void createButtons() {
@@ -84,7 +97,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         defenderButton = new Button("UI/defenderButton.png", 100, Gdx.graphics.getHeight() / 2);
         attackerButton = new Button("UI/attackerButton.png",
                 Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
-        endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200);
+        endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200  );
     }
 
     public void isometricPov() {
@@ -112,7 +125,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
         }
-
         if (player == 0) {
             // DEFENDER
             if (buildMode) {
@@ -139,8 +151,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         renderer.getBatch().end();
     }
 
-    public void healthPercentage() {
-        float result = currentHp / 100.0f;
+
+    public void healthPercentage(){
+        float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
 
@@ -148,9 +161,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         healthPercentage();
         healthBarSprite.draw(batch);
         healthSprite.draw(batch);
-        String nr = currentHp + "";
+        String nr = GameController.defender.getHealth() + "";
         hpCounter.getData().setScale(1.5f);
-        hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
+        hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
 
     }
 
@@ -164,8 +177,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public void defenderPOV() {
-        isometricPov();
-        batch.begin();
+
 
         towerButton.getSprite().draw(batch);
         /*
@@ -178,13 +190,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         showCoins(GameController.defender);
         endTurnButton.getSprite().draw(batch);
-        batch.end();
 
     }
 
     public void attackerPOV() {
-        isometricPov();
-        batch.begin();
+
         unitButton.getSprite().draw(batch);
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
@@ -195,17 +205,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         endTurnButton.getSprite().draw(batch);
         showHealth();
         showCoins(GameController.attacker);
-        batch.end();
-        isometricPov();
     }
 
     public void attackerTouchDown(int x, int y, int pointer, int button) {
-        if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
-            if (button == Buttons.LEFT) {
+        if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
+            if (button == Input.Buttons.LEFT) {
                 if (unitButton.checkClick(x, y)) {
-                    EventManager.buildPlanChange(0, 0, 1, false);
-                } else if (endTurnButton.checkClick(x, y)) {
+                    EventManager.buildPlanChange(0, 0, 1,false);
+                }
+                else if (endTurnButton.checkClick(x, y)) {
                     GameController.endPhase();
+                    changedTurn = true;
+
                 }
             }
             if (button == Buttons.RIGHT) {
@@ -236,8 +247,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         return screenPosition;
     }
 
+    public static void changeTurn(float targetTime, String currentPlayer){
+        timerChangeTurn += Gdx.graphics.getDeltaTime();
+        System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
+        if(timerChangeTurn < targetTime) {
+            endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
+            System.out.println("Printing text!");
+        }
+        else {
+            changedTurn = false;
+            timerChangeTurn = 0;
+        }
+    }
     public void defenderTouchDown(int x, int y, int pointer, int button) {
-        if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+        if(GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT) {
                 if (currentScreen == Screen.MAIN_MENU) {
 
@@ -268,6 +291,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     }
                 } else if (endTurnButton.checkClick(x, y) && !buildMode) {
                     GameController.endPhase();
+                    changedTurn = true;
+
                 }
             }
             if (button == Buttons.RIGHT) {
@@ -276,7 +301,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     // Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
                 } else {
                     RealWorldCoordinates tmpCoordinates = snap(Gdx.input.getX(), Gdx.input.getY());
-                    // removeTower(tmpCoordinates.getX,tmpCoordinates.getY)
 
                 }
 
@@ -288,7 +312,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void create() {
 
         batch = new SpriteBatch();
-
+        endTurnFont = new BitmapFont();
+        endTurnFont.setColor(255,255,255,1f);
+        endTurnFont.getData().setScale(3f);
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
         hpCounter = new BitmapFont();
@@ -317,9 +343,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
-        //
+        //endTurnTexture = new Texture(Gdx.files.internal("UI/"))
         towerType1Texture = new Texture(Gdx.files.internal("towers/TowerType1.png"), true);
-
         GameController.initialise();
         hpSpriteW = healthSprite.getWidth();
         currentScreen = Screen.MAIN_MENU;
@@ -334,6 +359,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        //batch.begin();
         if (currentScreen == Screen.MAIN_MENU) {
             batch.begin();
             startButton.getSprite().draw(batch);
@@ -347,10 +373,26 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
+            isometricPov();
+            batch.begin();
             if (player == 0)
                 defenderPOV();
             if (player == 1)
                 attackerPOV();
+            if(changedTurn){
+                switch(GameController.getWaveState()){
+                    case AttackerBuild:
+                        changeTurn(2,"Attacker' Turn");
+                        break;
+                    case DefenderBuild:
+                        changeTurn(2,"Defender's Turn");
+                        break;
+                    case Play:
+                        changeTurn(2,"      Play     ");
+                }
+            }
+            batch.end();
+
         }
 
     }
@@ -393,8 +435,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         Vector2 diff = cartesianToIsometric(1280, 1280);
         Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
+
         int x = (int) (v2.x + diff.x);
         int y = (int) (v2.y + diff.y);
+
         return new RealWorldCoordinates(y, x);
     }
 
@@ -435,7 +479,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
-                    // setupClient();
+                   // setupClient();
                     currentScreen = Screen.CHOOSE_FACTION;
                 } else if (quitButton.checkClick(x, y)) {
                     quitButton.dispose();
@@ -444,11 +488,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
+
                 if (defenderButton.checkClick(x, y) /* && client.isDefender() */) {
                     GameController.setPlayerType(true);
                     player = 0;
+                    //setupClient();
+
                     currentScreen = Screen.GAME;
-                } else if (attackerButton.checkClick(x, y)/* && client.isAttacker() */) {
+
+                }
+                else if (attackerButton.checkClick(x, y)/* && client.isAttacker() */) {
                     GameController.setPlayerType(false);
                     player = 1;
                     currentScreen = Screen.GAME;
