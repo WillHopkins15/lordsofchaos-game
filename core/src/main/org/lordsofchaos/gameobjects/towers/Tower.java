@@ -153,7 +153,7 @@ public class Tower extends InteractiveObject
         
     }
     
-    public int partition(Pair tiles[], int l, int h) {
+    public int partition(Pair[] tiles, int l, int h) {
         
         double pivot = (double) tiles[h].getValue();
         int i = (l - 1);
@@ -176,7 +176,7 @@ public class Tower extends InteractiveObject
         return i + 1;
     }
     
-    public void sort(Pair tiles[], int l, int h) {
+    public void sort(Pair[] tiles, int l, int h) {
         if (l < h) {
             
             int part = partition(tiles, l, h);

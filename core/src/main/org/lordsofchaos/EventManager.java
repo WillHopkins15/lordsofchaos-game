@@ -27,10 +27,8 @@ public class EventManager
     }
     
     public static void towerRemoved(SerializableTower tbp) {
-        if (towerBuilds.contains(tbp)) {
-            towerBuilds.remove(tbp);
-            // add function in gc to remove tower
-        }
+		// add function in gc to remove tower
+		towerBuilds.remove(tbp);
     }
     
     public static int[][] getUnitBuildPlan() {

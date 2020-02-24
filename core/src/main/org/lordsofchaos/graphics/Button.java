@@ -27,8 +27,7 @@ public class Button
     
     public boolean checkClick(int x, int y) {
         if (x > buttonX1 && x < buttonX2)
-            if (y > buttonY1 && y < buttonY2)
-                return true;
+            return y > buttonY1 && y < buttonY2;
         return false;
     }
     

@@ -245,6 +245,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void showTowerAttack() {
         List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(1280, 720, Pixmap.Format.RGBA8888);
+        towerAttackPixmap.setColor(Color.YELLOW);
         for (int i = 0; i < towers.size(); i++) {
             Troop tmpTroop = towers.get(i).getTarget();
             Tower currentTower = towers.get(i);
@@ -252,13 +253,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
             int troopX = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
             int troopY = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
             int towerX = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towery = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            towerAttackPixmap.drawLine((int) Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
-                    (int) Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
-                    (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x,
-                    (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y);
+            int towerY = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: ");
+            towerAttackPixmap.drawLine(towerX, towerY, troopX, troopY);
         }
-        towerAttackPixmap.fill();
+        //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
         towerAttackSprite.draw(batch);
@@ -300,7 +299,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         unitButton.getSprite().draw(batch);
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
-        String nr = new String("" + x);
+        String nr = "" + x;
         
         unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10,
                 unitButton.getY() + 25);
@@ -344,8 +343,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         Vector2 screenPosition = new Vector2();
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);
         screenPosition.x = isometric.x / 2;
-        screenPosition.y = (Gdx.graphics.getHeight() + isometric.y) / 2;
-        //screenPosition.y = (Gdx.graphics.getHeight() - isometric.y) / 2;
+        screenPosition.y = Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - isometric.y) / 2;
         return screenPosition;
     }
     
@@ -373,7 +371,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 }
                 if (towerButton.checkClick(x, y)) {
                     System.out.println("Clicked towerButton");
-                    if (!buildMode) {
+                    if (!buildMode && GameController.canAffordTower(TowerType.type1)) {
                         buildMode = true;
                         // Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
                         // Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));

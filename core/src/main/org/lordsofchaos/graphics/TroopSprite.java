@@ -32,7 +32,6 @@ public class TroopSprite
         healthBarPixmapBase = new Pixmap(30, 5, Pixmap.Format.RGBA8888);
         healthBarPixmapBase.setColor(Color.RED);
         healthBarPixmapBase.fill();
-        ;
         healthBarTextureBase = new Texture(healthBarPixmapBase);
         healthBarSpriteBase = new Sprite(healthBarTextureBase);
         healthBarSpriteBase.setPosition(x - 15, y + 20);
@@ -44,7 +43,6 @@ public class TroopSprite
         healthBarPixmapGreen = new Pixmap((int) (30.0f * healthPercentage), 5, Pixmap.Format.RGBA8888);
         healthBarPixmapGreen.setColor(Color.GREEN);
         healthBarPixmapGreen.fill();
-        ;
         healthBarTextureGreen = new Texture(healthBarPixmapGreen);
         healthBarSpriteGreen = new Sprite(healthBarTextureGreen);
         healthBarSpriteGreen.setPosition(x - 15, y + 20);

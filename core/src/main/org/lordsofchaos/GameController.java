@@ -361,17 +361,11 @@ public class GameController
     }
     
     public static boolean inBounds(MatrixCoordinates mc) {
-        if (mc.getX() < 0 || mc.getY() < 0 || mc.getX() >= width || mc.getY() >= height) {
-            return false;
-        }
-        return true;
+        return mc.getX() >= 0 && mc.getY() >= 0 && mc.getX() < width && mc.getY() < height;
     }
     
     public static boolean inBounds(int y, int x) {
-        if (x < 0 || y < 0 || x >= width || y >= height) {
-            return false;
-        }
-        return true;
+        return x >= 0 && y >= 0 && x < width && y < height;
     }
     
     // want to find the cost of a tower before it has been placed
@@ -395,7 +389,7 @@ public class GameController
         return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
     }
     
-    private static boolean canAffordTower(TowerType towerType) {
+    public static boolean canAffordTower(TowerType towerType) {
         return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
     
@@ -431,9 +425,7 @@ public class GameController
             return false; // cannot place towers on path
         } else if (mo instanceof Tile) {
             Tile tile = (Tile) mo;
-            if (tile.getTower() != null || !tile.getIsBuildable()) {
-                return false; // else it is a tile, but a tower exists here already
-            }
+            return tile.getTower() == null && tile.getIsBuildable(); // else it is a tile, but a tower exists here already
         }
         return true;
     }
