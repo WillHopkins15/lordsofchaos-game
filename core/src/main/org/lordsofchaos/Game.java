@@ -24,9 +24,12 @@ import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.graphics.Button;
+import org.lordsofchaos.graphics.Convertions;
 import org.lordsofchaos.graphics.Screen;
+import org.lordsofchaos.graphics.TroopSprite;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
+import org.lordsofchaos.gameobjects.troops.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +72,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private BitmapFont unitNumber;
     private Screen currentScreen;
     private float elapsedTime;
+    private Pixmap towerAttackPixmap;
+    private Texture towerAttackTexture;
+    private List<TroopSprite> unitsSprite = new ArrayList<>();
     private static boolean changedTurn = false;
 
     
@@ -121,9 +127,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
                 }
             }
+
             renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
                     w * sprite.getHeight() / sprite.getWidth());
             renderer.getBatch().setColor(Color.WHITE);
+           /* if (object instanceof  Troop){
+                Troop troop = (Troop) object;
+                unitHealthbar = new Pixmap(40,10, Pixmap.Format.RGBA8888);
+                unitHealthbar.setColor(Color.RED);
+                unitHealthbar.fill();
+                unitHealthbarTexture = new Texture(unitHealthbar);
+                //Sprite tmpSprite = new Sprite(unitHealthbarTexture);
+                //tmpSprite.setPosition((coordinates.x + 10) - 48 / 2,(coordinates.y - 10) - 48 / 6);
+                renderer.getBatch().draw(unitHealthbarTexture,(coordinates.x + 8) - 48 / 2,(coordinates.y + 45) - 48 / 6);
+                unitHealthbar.dispose();
+            }*/
         }
         if (player == 0) {
             // DEFENDER
@@ -166,7 +184,70 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         hpCounter.draw(batch,nr + " / 100",220 - (nr.length() - 1) * 5,Gdx.graphics.getHeight() - 54);
 
     }
+    /*public void showUnitHealthbar(){
 
+        List<Troop> units = GameController.getTroops();
+        for(int i = 0; i < units.size(); i++){
+            Vector2 unitRWC = realWorldCoordinatesToScreenPosition(units.get(i).getRealWorldCoordinates());
+            unitHealthbar = new Pixmap(30,5, Pixmap.Format.RGBA8888);
+            unitHealthbar.setColor(Color.RED);
+            unitHealthbar.fill();
+            System.out.println("X: " + unitRWC.x + " Y: " + unitRWC.y+ " Size:" + units.size());
+            //unitHealthbar.drawRectangle(unitRWC.getX() + 10,unitRWC.getY() - 10, 30,5);
+            //unitHealthbarTexture.dispose();
+            unitHealthbarTexture = new Texture(unitHealthbar);
+            Sprite tmpSprite = new Sprite(unitHealthbarTexture);
+            tmpSprite.setPosition((unitRWC.x) - 15 ,unitRWC.y + 20);
+            tmpSprite.draw(batch);
+            unitHealthbar.dispose();
+            //tmpTexture.dispose();
+        }
+
+    }*/
+    public void showUnitHealthBar(){
+        List<Troop> tmpUnits = GameController.getTroops();
+        if(tmpUnits.size() > 0) {
+            unitsSprite = new ArrayList<>();
+            for (int i = 0; i < tmpUnits.size(); i++)
+                unitsSprite.add(new TroopSprite(tmpUnits.get(i)));
+            System.out.println("X: " + unitsSprite.get(0).getX() + " Y: " + unitsSprite.get(0).getY() + " Size:" + unitsSprite.size());
+            for (int i = 0; i < unitsSprite.size(); i++) {
+                unitsSprite.get(i).getHealthBarSpriteBase().draw(batch);
+                unitsSprite.get(i).getHealthBarSpriteGreen().draw(batch);
+                System.out.println("Drawing Healthbar");
+            }
+        }
+    }
+    public void disposeUnitHealthBar(){
+        for(int i = 0; i< unitsSprite.size();i++)
+            unitsSprite.get(i).dispose();
+
+    }
+    public void showTowerAttack(){
+        List<Tower> towers = GameController.getTowers();
+        towerAttackPixmap = new Pixmap(1280,720,Pixmap.Format.RGBA8888);
+        for(int i = 0; i < towers.size(); i++ ){
+            Troop tmpTroop = towers.get(i).getTarget();
+            Tower currentTower = towers.get(i);
+            if(tmpTroop == null) return;
+            int troopX = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
+            int troopY = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
+            int towerX = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
+            int towery = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+            towerAttackPixmap.drawLine((int)Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
+                    (int)Convertions.realWorldCoordinatesToScreenPosition(towers.get(i).getRealWorldCoordinates()).x,
+                    (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x,
+                    (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y);
+        }
+        towerAttackPixmap.fill();
+        towerAttackTexture = new Texture(towerAttackPixmap);
+        Sprite towerAttackSprite = new Sprite(towerAttackTexture);
+        towerAttackSprite.draw(batch);
+    }
+    public void disposeAttacks(){
+        towerAttackTexture.dispose();
+        towerAttackPixmap.dispose();
+    }
     public void showCoins(Player player) {
         coinSprite.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 72);
         String tmpCoinCounter = player.getCurrentMoney() + "";
@@ -312,6 +393,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void create() {
 
         batch = new SpriteBatch();
+        //unitHealthbarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         endTurnFont = new BitmapFont();
         endTurnFont.setColor(255,255,255,1f);
         endTurnFont.getData().setScale(3f);
@@ -348,6 +430,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         GameController.initialise();
         hpSpriteW = healthSprite.getWidth();
         currentScreen = Screen.MAIN_MENU;
+
         Gdx.input.setInputProcessor(this);
 
     }
@@ -391,8 +474,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         changeTurn(2,"      Play     ");
                 }
             }
+            showUnitHealthBar();
+            showTowerAttack();
             batch.end();
-
+            disposeUnitHealthBar();
+            disposeAttacks();
         }
 
     }
