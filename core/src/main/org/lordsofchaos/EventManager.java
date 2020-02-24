@@ -43,7 +43,7 @@ public class EventManager {
 
 	public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
 		SerializableTower tbp = new SerializableTower(towerType, rwc);
-		if (!towerBuilds.contains(tbp) && GameController.verifyTowerPlacement(towerType, rwc)) {
+		if (!towerBuilds.contains(tbp)) {
 			towerBuilds.add(tbp);
 			GameController.createTower(tbp);
 		}
