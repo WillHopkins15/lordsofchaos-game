@@ -3,6 +3,8 @@ package org.lordsofchaos;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.SerializableTower;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.server.GameServer;
@@ -36,19 +38,15 @@ public class NetworkingTest
         //init game state
         int[][] units = new int[6][3];
         ArrayList<SerializableTower> tbp = new ArrayList<>();
-        BuildPhaseData gameState = new BuildPhaseData(units, tbp);
+        BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp);
         
-        //Connect both players to server and start
+        //Connect both players to server
         new Thread(() -> {
-            if (player1.makeConnection()) {
-                player1.start();
-            }
+            player1.makeConnection();
         }).start();
         
         new Thread(() -> {
-            if (player2.makeConnection()) {
-                player2.start();
-            }
+            player2.makeConnection();
         }).start();
         
         //Wait for game instance to be set up
@@ -61,8 +59,18 @@ public class NetworkingTest
         //kill central server to free up threads
         server.close();
         
+        //set player2 to empty game state
+        player2.setGameState(emptyGameState);
+        
+        //add things to player 1 game state
+        tbp.add(new SerializableTower(TowerType.type1, new RealWorldCoordinates(12, 34)));
+        BuildPhaseData gameState = new BuildPhaseData(units, tbp);
+        
         //update player1 game state
         player1.setGameState(gameState);
+        
+        //send game state to server
+        player1.send(gameState);
         
         //wait for clients to update
         Thread.sleep(1000);

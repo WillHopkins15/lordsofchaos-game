@@ -76,9 +76,10 @@ public class GameClient extends UDPSocket
 //            System.out.println("Found game.");
 //            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             connected = true;
+            return true;
         }
         System.out.println("No Servers Online.");
-        return connected;
+        return false;
     }
     
     @SneakyThrows
@@ -122,7 +123,7 @@ public class GameClient extends UDPSocket
      * @param contents Object to send
      */
     @Override
-    protected void send(Object contents) {
+    public void send(Object contents) {
         sendObject(server, contents);
     }
     
