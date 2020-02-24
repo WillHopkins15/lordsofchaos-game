@@ -19,6 +19,7 @@ public class GameClient extends UDPSocket
     private ConnectionPoint server;
     private byte[] buffer = new byte[256];
     private String playerType = "";
+    private boolean connected = false;
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -37,6 +38,9 @@ public class GameClient extends UDPSocket
      */
     @SneakyThrows
     public boolean makeConnection() {
+        if (connected) {
+            return false;
+        }
         socket.setSoTimeout(5000);
         DatagramPacket packet;
         for (String item : HostManager.getHosts()) {
@@ -71,11 +75,10 @@ public class GameClient extends UDPSocket
 
 //            System.out.println("Found game.");
 //            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
-            
-            return true;
+            connected = true;
         }
         System.out.println("No Servers Online.");
-        return false;
+        return connected;
     }
     
     @SneakyThrows
