@@ -363,7 +363,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 if (towerButton.checkClick(x, y)) {
                     System.out.println("Clicked towerButton");
-                    if (!buildMode) {
+                    if (!buildMode && GameController.canAffordTower(TowerType.type1)) {
                         buildMode = true;
                         // Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
                         // Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));

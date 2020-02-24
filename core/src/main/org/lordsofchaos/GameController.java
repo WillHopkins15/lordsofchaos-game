@@ -411,7 +411,7 @@ public class GameController {
         return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
     }
 
-    private static boolean canAffordTower(TowerType towerType)
+    public static boolean canAffordTower(TowerType towerType)
     {
         return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
