@@ -59,6 +59,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static SpriteBatch batch;
     private static float timerChangeTurn;
     private static boolean changedTurn = false;
+    private static boolean multiplayer = false;
     final int height = 720;
     int width = 1280;
     OrthographicCamera camera;
@@ -583,30 +584,40 @@ public class Game extends ApplicationAdapter implements InputProcessor
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
-                    // setupClient();
                     currentScreen = Screen.CHOOSE_FACTION;
+                } else if (multiplayerButton.checkClick(x, y)) {
+                    multiplayer = true;
+                    setupClient();
                 } else if (quitButton.checkClick(x, y)) {
                     quitButton.dispose();
                     startButton.dispose();
+                    multiplayerButton.dispose();
                     Gdx.app.exit();
                 }
                 System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
-                
-                if (defenderButton.checkClick(x, y) /* && client.isDefender() */) {
-                    GameController.setPlayerType(true);
-                    player = 0;
-                    //setupClient();
-                    
-                    currentScreen = Screen.GAME;
-                    
-                } else if (attackerButton.checkClick(x, y)/* && client.isAttacker() */) {
-                    GameController.setPlayerType(false);
-                    player = 1;
-                    currentScreen = Screen.GAME;
+                if (multiplayer) {
+                    if (defenderButton.checkClick(x, y) && client.isDefender()) {
+                        GameController.setPlayerType(true);
+                        player = 0;
+                        currentScreen = Screen.GAME;
+                    } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
+                        GameController.setPlayerType(false);
+                        player = 1;
+                        currentScreen = Screen.GAME;
+                    }
+                } else {
+                    if (defenderButton.checkClick(x, y)) {
+                        GameController.setPlayerType(true);
+                        player = 0;
+                        currentScreen = Screen.GAME;
+                    } else if (attackerButton.checkClick(x, y)) {
+                        GameController.setPlayerType(false);
+                        player = 1;
+                        currentScreen = Screen.GAME;
+                    }
                 }
             }
-            
         }
         if (player == 1)
             attackerTouchDown(x, y, pointer, button);
