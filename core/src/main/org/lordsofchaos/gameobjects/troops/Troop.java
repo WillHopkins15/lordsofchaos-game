@@ -122,6 +122,7 @@ public class Troop extends InteractiveObject
         // move along set path
         
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
+
         
         Path foundPath = (Path) GameController.getMatrixObject(currentco.getY(), currentco.getX());
         
@@ -195,6 +196,7 @@ public class Troop extends InteractiveObject
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
+                System.out.println("Troop co is : " + currentco);
                 previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);

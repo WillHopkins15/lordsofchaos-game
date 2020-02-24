@@ -3,6 +3,8 @@ package org.lordsofchaos.player;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import org.lordsofchaos.GameController;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
 public class Defender extends Player
@@ -31,10 +33,17 @@ public class Defender extends Player
          */
         
         // change this when the actual coordinate for the game is decided
-        
-        RealWorldCoordinates coord = new RealWorldCoordinates(8, 4);
-        
+        MatrixCoordinates temp = new MatrixCoordinates(18,18);
+        //System.out.println(temp);
+        int sf = GameController.getScaleFactor();
+
+        // int y = (GameController.getMap().length - mc.getY()) * sf;
+        int y = temp.getY() * sf;
+        int x = temp.getX() * sf;
+        RealWorldCoordinates coord = new RealWorldCoordinates(y + (sf / 2), x + (sf / 2));
+        //System.out.println("defenders coords are :" + coord.getY() + "," + coord.getX());
         setCoordinates(coord);
+        //System.out.println(getCoordinates());
         setMoneyBoost(50);
         
     }

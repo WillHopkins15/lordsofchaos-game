@@ -110,10 +110,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     public static void changeTurn(float targetTime, String currentPlayer) {
         timerChangeTurn += Gdx.graphics.getDeltaTime();
-        System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
+        //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
             endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
-            System.out.println("Printing text!");
+            //System.out.println("Printing text!");
         } else {
             changedTurn = false;
             timerChangeTurn = 0;
@@ -227,11 +227,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
         unitsSprite = new ArrayList<>();
         if (tmpUnits.size() > 0) {
             for (Troop tmpUnit : tmpUnits) unitsSprite.add(new TroopSprite(tmpUnit));
-            System.out.println("X: " + unitsSprite.get(0).getX() + " Y: " + unitsSprite.get(0).getY() + " Size:" + unitsSprite.size());
+            //System.out.println("X: " + unitsSprite.get(0).getX() + " Y: " + unitsSprite.get(0).getY() + " Size:" + unitsSprite.size());
             for (TroopSprite troopSprite : unitsSprite) {
                 troopSprite.getHealthBarSpriteBase().draw(batch);
                 troopSprite.getHealthBarSpriteGreen().draw(batch);
-                System.out.println("Drawing Healthbar");
+                //System.out.println("Drawing Healthbar");
             }
         }
     }
@@ -257,7 +257,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
                 int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).x;
                 int towerY = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).y;
-                System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
+                //System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
                 towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
             }
         }
@@ -340,7 +340,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public RealWorldCoordinates snap(int x, int y) {
         Vector2 coords = new Vector2(x * 2, Gdx.graphics.getHeight() - (y * 2));
         RealWorldCoordinates rwc = Conversions.isometricToRealWorldCoordinate(coords);
-        System.out.println(Conversions.realWorldCoordinatesToScreenPosition(rwc));
+        //System.out.println(Conversions.realWorldCoordinatesToScreenPosition(rwc));
         return roundToCentreTile(rwc);
     }
     
@@ -367,7 +367,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     
                 }
                 if (towerButton.checkClick(x, y)) {
-                    System.out.println("Clicked towerButton");
+                    //System.out.println("Clicked towerButton");
                     if (!buildMode && GameController.canAffordTower(TowerType.type1)) {
                         buildMode = true;
                         // Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
@@ -481,7 +481,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             showUnitHealthBar();
             showTowerAttack();
-            System.out.println("Size:" + unitsSprite.size());
+            //System.out.println("Size:" + unitsSprite.size());
             batch.end();
             disposeUnitHealthBar();
             disposeAttacks();
@@ -534,7 +534,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         int x = screenX;
         int y = Gdx.graphics.getHeight() - screenY;
-        System.out.println("Clicked at x = " + x + " y = " + y);
+        //System.out.println("Clicked at x = " + x + " y = " + y);
         if (button == Buttons.LEFT) {
             if (currentScreen == Screen.MAIN_MENU) {
                 if (startButton.checkClick(x, y)) {
@@ -550,7 +550,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     multiplayerButton.dispose();
                     Gdx.app.exit();
                 }
-                System.out.println(currentScreen);
+                //System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
                 if (multiplayer) {
                     if (defenderButton.checkClick(x, y) && client.isDefender()) {
