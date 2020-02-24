@@ -20,8 +20,8 @@ public class TroopSprite
     private float healthPercentage;
     
     public TroopSprite(Troop unit) {
-        x = Convertions.realWorldCoordinatesToScreenPosition(unit.getRealWorldCoordinates()).x;
-        y = Convertions.realWorldCoordinatesToScreenPosition(unit.getRealWorldCoordinates()).y;
+        x = Conversions.realWorldCoordinatesToScreenPosition(unit.getRealWorldCoordinates()).x;
+        y = Conversions.realWorldCoordinatesToScreenPosition(unit.getRealWorldCoordinates()).y;
         healthPercentage = (float) unit.getCurrentHealth() / (float) unit.getMaxHealth();
         redHealthBar();
         greenHealthBar();

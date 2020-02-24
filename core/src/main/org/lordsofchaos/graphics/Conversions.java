@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
-abstract public class Convertions
+abstract public class Conversions
 {
     public static Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
         Vector2 screenPosition = new Vector2();

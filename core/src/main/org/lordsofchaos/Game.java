@@ -20,7 +20,7 @@ import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Tower;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.Button;
-import org.lordsofchaos.graphics.Convertions;
+import org.lordsofchaos.graphics.Conversions;
 import org.lordsofchaos.graphics.Screen;
 import org.lordsofchaos.graphics.TroopSprite;
 import org.lordsofchaos.network.GameClient;
@@ -76,9 +76,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private List<TroopSprite> unitsSprite = new ArrayList<>();
 
 
-//    public static void main(String[] args) {
-//        setupClient();
-//    }
+    public static void main(String[] args) {
+        setupClient();
+    }
     
     private static void setupClient() {
         GameClient gc = new GameClient();
@@ -103,7 +103,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         attackerButton = new Button("UI/attackerButton.png",
                 Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
         endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200);
-        multiplayerButton = new Button("UI/button.png",Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 8);
+        multiplayerButton = new Button("UI/button.png", Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 8);
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -128,7 +128,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void isometricPov() {
         renderer.render();
         
-        List<GameObject> objectsToAdd = new ArrayList<GameObject>();
+        List<GameObject> objectsToAdd = new ArrayList<>();
         objectsToAdd.addAll(GameController.getTowers());
         objectsToAdd.addAll(GameController.getTroops());
         Collections.sort(objectsToAdd);
@@ -138,7 +138,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         for (int i = 0; i < objectsToAdd.size(); i++) {
             GameObject object = objectsToAdd.get(i);
             Sprite sprite = object.getSprite();
-            Vector2 coordinates = realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
+            Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
             int w = 48;
             if (object instanceof Tower) {
                 Tower tower = (Tower) object;
@@ -175,7 +175,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     renderer.getBatch().setColor(1, 0, 0, 0.5f);
                 }
                 
-                Vector2 coords = realWorldCooridinateToIsometric(rwc);
+                Vector2 coords = Conversions.realWorldCooridinateToIsometric(rwc);
                 renderer.getBatch().draw(tmpSpriteTower, coords.x - horizontalSpriteOffset,
                         coords.y - verticalSpriteOffset, 48, 94);
                 renderer.getBatch().setColor(Color.WHITE);
@@ -245,7 +245,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         }
         for (int i = 0; i < unitsSprite.size(); i++)
             unitsSprite.get(i).dispose();
-
+        
     }
     
     public void showTowerAttack() {
@@ -255,20 +255,20 @@ public class Game extends ApplicationAdapter implements InputProcessor
         for (int i = 0; i < towers.size(); i++) {
             Troop tmpTroop = towers.get(i).getTarget();
             Tower currentTower = towers.get(i);
-
-            if(tmpTroop == null) return;
-            int troopX = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
-            int troopY = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
-            int towerX = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towerY = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: "+ troopY);
-            towerAttackPixmap.drawLine(troopX,troopY,towerX,towerY);
-
+            
+            if (tmpTroop == null) return;
+            int troopX = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
+            int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
+            int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
+            int towerY = (int) Conversions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
+            towerAttackPixmap.drawLine(troopX, troopY, towerX, towerY);
+            
         }
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
-        towerAttackSprite.setPosition(0,0);
+        towerAttackSprite.setPosition(0, 0);
         towerAttackSprite.draw(batch);
     }
     
@@ -343,17 +343,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     public RealWorldCoordinates snap(int x, int y) {
         Vector2 coords = new Vector2(x * 2, Gdx.graphics.getHeight() - (y * 2));
-        RealWorldCoordinates rwc = isometricToRealWorldCoordinate(coords);
-        System.out.println(realWorldCoordinatesToScreenPosition(rwc));
+        RealWorldCoordinates rwc = Conversions.isometricToRealWorldCoordinate(coords);
+        System.out.println(Conversions.realWorldCoordinatesToScreenPosition(rwc));
         return roundToCentreTile(rwc);
-    }
-    
-    public Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
-        Vector2 screenPosition = new Vector2();
-        Vector2 isometric = realWorldCooridinateToIsometric(rwc);
-        screenPosition.x = isometric.x / 2;
-        screenPosition.y = Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - isometric.y) / 2;
-        return screenPosition;
     }
     
     public void defenderTouchDown(int x, int y, int pointer, int button) {
@@ -520,40 +512,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
         defenderButton.dispose();
         attackerButton.dispose();
         multiplayerButton.dispose();
-    }
-    
-    public Vector2 cartesianToIsometric(float x, float y) {
-        Vector2 isometric = new Vector2();
-        isometric.x = x - y;
-        isometric.y = (x + y) * 0.5f;
-        return isometric;
-    }
-    
-    public Vector2 isometricToCartesian(float x, float y) {
-        Vector2 cartesian = new Vector2();
-        cartesian.x = (2.0f * y + x) * 0.5f;
-        cartesian.y = (2.0f * y - x) * 0.5f;
-        return cartesian;
-    }
-    
-    public RealWorldCoordinates isometricToRealWorldCoordinate(Vector2 vector) {
-        
-        Vector2 diff = cartesianToIsometric(1280, 1280);
-        Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
-        
-        int x = (int) (v2.x + diff.x);
-        int y = (int) (v2.y + diff.y);
-        
-        return new RealWorldCoordinates(y, x);
-    }
-    
-    public Vector2 realWorldCooridinateToIsometric(RealWorldCoordinates rwc) {
-        Vector2 diff = cartesianToIsometric(1280, 1280);
-        float x = rwc.getX() - diff.x;
-        float y = rwc.getY() - diff.y;
-        Vector2 v2 = cartesianToIsometric(x, y);
-        v2.y += 38;
-        return v2;
     }
     
     @Override
