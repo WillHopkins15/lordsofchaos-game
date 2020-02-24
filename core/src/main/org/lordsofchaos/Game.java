@@ -102,6 +102,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         attackerButton = new Button("UI/attackerButton.png",
                 Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
         endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200);
+        multiplayerButton = new Button("UI/button.png",Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 8);
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -237,29 +238,36 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public void disposeUnitHealthBar() {
+        List<Troop> tmpUnits = GameController.getTroops();
+        if (tmpUnits.size() > 0) {
+            unitsSprite = new ArrayList<>();
+        }
         for (int i = 0; i < unitsSprite.size(); i++)
             unitsSprite.get(i).dispose();
-        
+
     }
     
     public void showTowerAttack() {
         List<Tower> towers = GameController.getTowers();
-        towerAttackPixmap = new Pixmap(1280, 720, Pixmap.Format.RGBA8888);
+        towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
         towerAttackPixmap.setColor(Color.YELLOW);
         for (int i = 0; i < towers.size(); i++) {
             Troop tmpTroop = towers.get(i).getTarget();
             Tower currentTower = towers.get(i);
-            if (tmpTroop == null) return;
-            int troopX = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
-            int troopY = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
-            int towerX = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towerY = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: ");
-            towerAttackPixmap.drawLine(towerX, towerY, troopX, troopY);
+
+            if(tmpTroop == null) return;
+            int troopX = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
+            int troopY = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
+            int towerX = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
+            int towerY = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: "+ troopY);
+            towerAttackPixmap.drawLine(troopX,troopY,towerX,towerY);
+
         }
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
+        towerAttackSprite.setPosition(0,0);
         towerAttackSprite.draw(batch);
     }
     
@@ -454,6 +462,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             batch.begin();
             startButton.getSprite().draw(batch);
             quitButton.getSprite().draw(batch);
+            multiplayerButton.getSprite().draw(batch);
             batch.end();
         } else if (currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
@@ -483,6 +492,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             showUnitHealthBar();
             showTowerAttack();
+            System.out.println("Size:" + unitsSprite.size());
             batch.end();
             disposeUnitHealthBar();
             disposeAttacks();
@@ -508,6 +518,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         unitNumber.dispose();
         defenderButton.dispose();
         attackerButton.dispose();
+        multiplayerButton.dispose();
     }
     
     public Vector2 cartesianToIsometric(float x, float y) {
