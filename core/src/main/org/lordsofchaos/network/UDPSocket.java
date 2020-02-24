@@ -89,7 +89,7 @@ public abstract class UDPSocket extends Thread
         } catch (SocketTimeoutException e) {
             System.out.printf("[%d] Receive timed out.\n", socket.getLocalPort());
             timeoutCount++;
-            if (timeoutCount >= 10) {
+            if (timeoutCount >= 20) {
                 System.out.println("Connection dropped. Closing...");
                 this.close();
             }
@@ -106,7 +106,6 @@ public abstract class UDPSocket extends Thread
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
             setGameState(gameState);
-            System.out.println(gameState.toString());
         }
     }
     

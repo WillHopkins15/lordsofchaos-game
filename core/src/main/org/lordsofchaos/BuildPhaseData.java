@@ -2,6 +2,9 @@ package org.lordsofchaos;
 
 import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -29,5 +32,13 @@ public class BuildPhaseData implements Serializable
         String units = Arrays.deepToString(unitBuildPlan);
         String towers = towerBuildPlan.toString();
         return "Units: " + units + " Towers: " + towers;
+    }
+    
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        aInputStream.defaultReadObject();
+    }
+    
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+        aOutputStream.defaultWriteObject();
     }
 }

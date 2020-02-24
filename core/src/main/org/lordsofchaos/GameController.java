@@ -103,12 +103,13 @@ public class GameController
         obstacles = MapGenerator.getObstacles();
         map = MapGenerator.generateMap(width, height, paths, obstacles);
         EventManager.initialise(6, getPaths().size());
-        debugVisualiseMap();
+        //debugVisualiseMap();
     }
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
+        //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
         // then clear data ready for next turn
     }
@@ -283,7 +284,6 @@ public class GameController
     
     private static void debugVisualiseMap() {
         for (int y = height - 1; y > -1; y--) {
-            System.out.println();
             for (int x = 0; x < width; x++) {
                 if (map[y][x].getClass() == Tile.class) {
                     Tile t = (Tile) map[y][x];
