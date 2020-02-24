@@ -123,6 +123,7 @@ public class GameClient extends UDPSocket
      */
     @Override
     protected void send(Object contents) {
+        System.out.println("Sending: " + contents);
         sendObject(server, contents);
     }
     

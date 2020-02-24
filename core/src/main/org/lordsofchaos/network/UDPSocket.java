@@ -18,7 +18,7 @@ public abstract class UDPSocket extends Thread
 {
     protected volatile boolean running = true;
     protected DatagramSocket socket;
-    protected BuildPhaseData gameState = null;
+    protected volatile BuildPhaseData gameState = null;
     private byte[] buffer = new byte[1024]; //Needs to be big enough to hold the game state object
     private int timeoutCount = 0;
     
