@@ -224,8 +224,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }*/
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
+        unitsSprite = new ArrayList<>();
         if (tmpUnits.size() > 0) {
-            unitsSprite = new ArrayList<>();
             for (int i = 0; i < tmpUnits.size(); i++)
                 unitsSprite.add(new TroopSprite(tmpUnits.get(i)));
             System.out.println("X: " + unitsSprite.get(0).getX() + " Y: " + unitsSprite.get(0).getY() + " Size:" + unitsSprite.size());
@@ -254,15 +254,15 @@ public class Game extends ApplicationAdapter implements InputProcessor
         for (int i = 0; i < towers.size(); i++) {
             Troop tmpTroop = towers.get(i).getTarget();
             Tower currentTower = towers.get(i);
+            if(tmpTroop != null) {
 
-            if(tmpTroop == null) return;
-            int troopX = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
-            int troopY = (int)Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
-            int towerX = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
-            int towerY = (int)Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
-            System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: "+ troopY);
-            towerAttackPixmap.drawLine(troopX,troopY,towerX,towerY);
-
+                int troopX = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
+                int troopY = (int) Convertions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
+                int towerX = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).x;
+                int towerY = (int) Convertions.realWorldCoordinatesToScreenPosition(currentTower.getRealWorldCoordinates()).y;
+                System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
+                towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
+            }
         }
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
