@@ -3,6 +3,8 @@ package org.lordsofchaos;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.Input;
@@ -47,7 +49,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static Button defenderButton;
     private static Button attackerButton;
     private static Button endTurnButton;
-    private static BitmapFont endTurnFont;
+    //private static BitmapFont endTurnFont;
     private static Button multiplayerButton;
     private static Texture healthBarTexture;
     private static Texture healthTexture;
@@ -79,7 +81,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private List<TroopSprite> unitsSprite = new ArrayList<>();
     private Sound soundTrack;
     private Sound selectSound;
-    
+    private static FreeTypeFontParameter fontParameter;
+    private static FreeTypeFontGenerator fontGenerator;
+    private static BitmapFont font;
+
     
     public static void main(String[] args) {
         setupClient();
@@ -117,7 +122,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
         timerChangeTurn += Gdx.graphics.getDeltaTime();
         //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
-            endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
+            fontParameter.size = 40;
+            font = fontGenerator.generateFont(fontParameter);
+            font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
+            //endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
             //System.out.println("Printing text!");
         } else {
             changedTurn = false;
@@ -368,17 +376,27 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     // float x = 0;
     // float y = 0;
-    
+    public void disposeTMP(){
+        disposeUnitHealthBar();
+        disposeAttacks();
+        if(font != null) {
+            font.dispose();
+            font = null;
+        }
+    }
     @Override
     public void create() {
         
         batch = new SpriteBatch();
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/Boxy-Bold.ttf"));
+        fontParameter = new FreeTypeFontParameter();
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
-        endTurnFont = new BitmapFont();
+       /* endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
         endTurnFont.getData().setScale(3f);
+        */
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
         hpCounter = new BitmapFont();
@@ -452,21 +470,27 @@ public class Game extends ApplicationAdapter implements InputProcessor
             if (changedTurn) {
                 switch (GameController.getWaveState()) {
                     case AttackerBuild:
-                        changeTurn(2, "Attacker' Turn");
+                        changeTurn(2, "Attacker's Turn");
                         break;
                     case DefenderBuild:
                         changeTurn(2, "Defender's Turn");
                         break;
                     case Play:
-                        changeTurn(2, "      Play     ");
+                        changeTurn(2, "           Play     ");
                 }
             }
             showUnitHealthBar();
             showTowerAttack();
-            //System.out.println("Size:" + unitsSprite.size());
+            if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
+                        GameController.getWaveState() == GameController.WaveState.DefenderBuild){
+                String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
+                System.out.println(timerTmp);
+                fontParameter.size  = 30;
+                font = fontGenerator.generateFont(fontParameter);
+                font.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+            }
             batch.end();
-            disposeUnitHealthBar();
-            disposeAttacks();
+            disposeTMP();
         }
         
     }
@@ -491,6 +515,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         attackerButton.dispose();
         multiplayerButton.dispose();
         soundTrack.dispose();
+        fontGenerator.dispose();
     }
     
     @Override
