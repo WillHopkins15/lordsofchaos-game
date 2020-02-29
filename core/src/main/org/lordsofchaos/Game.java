@@ -84,7 +84,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static FreeTypeFontParameter fontParameter;
     private static FreeTypeFontGenerator fontGenerator;
     private static BitmapFont font;
-
+    private static BitmapFont timerFont;
     
     public static void main(String[] args) {
         setupClient();
@@ -122,8 +122,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
         timerChangeTurn += Gdx.graphics.getDeltaTime();
         //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
-            fontParameter.size = 40;
-            font = fontGenerator.generateFont(fontParameter);
             font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
             //endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
             //System.out.println("Printing text!");
@@ -193,7 +191,12 @@ public class Game extends ApplicationAdapter implements InputProcessor
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
-    
+    public void generateFont(){
+        fontParameter.size  = 30;
+        timerFont = fontGenerator.generateFont(fontParameter);
+        fontParameter.size = 40;
+        font = fontGenerator.generateFont(fontParameter);
+    }
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -304,7 +307,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 if (unitButton.checkClick(x, y)) {
                     selectSound.play(0.75f);
                     EventManager.buildPlanChange(0, 0, 1, false);
-                } else if (endTurnButton.checkClick(x, y)) {
+                } else if (endTurnButton.checkClick(x, y) && !changedTurn) {
                     selectSound.play(0.75f);
                     GameController.endPhase();
                     changedTurn = true;
@@ -354,7 +357,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                         // Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
                         // tmpCursor.dispose();
                     }
-                } else if (endTurnButton.checkClick(x, y) && !buildMode) {
+                } else if (endTurnButton.checkClick(x, y) && !buildMode && !changedTurn) {
                     selectSound.play(0.75f);
                     GameController.endPhase();
                     changedTurn = true;
@@ -379,17 +382,18 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void disposeTMP(){
         disposeUnitHealthBar();
         disposeAttacks();
-        if(font != null) {
+        /*if(font != null) {
             font.dispose();
             font = null;
-        }
+        }*/
     }
     @Override
     public void create() {
-        
+
         batch = new SpriteBatch();
-        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/Boxy-Bold.ttf"));
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
+        font=fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -397,6 +401,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         endTurnFont.setColor(255, 255, 255, 1f);
         endTurnFont.getData().setScale(3f);
         */
+        generateFont();
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
         hpCounter = new BitmapFont();
@@ -485,9 +490,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                         GameController.getWaveState() == GameController.WaveState.DefenderBuild){
                 String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
                 System.out.println(timerTmp);
-                fontParameter.size  = 30;
-                font = fontGenerator.generateFont(fontParameter);
-                font.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
             batch.end();
             disposeTMP();
@@ -516,6 +519,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
         multiplayerButton.dispose();
         soundTrack.dispose();
         fontGenerator.dispose();
+        timerFont.dispose();
+        font.dispose();
     }
     
     @Override
