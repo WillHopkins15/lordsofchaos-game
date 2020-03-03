@@ -4,9 +4,7 @@ import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
-import org.lordsofchaos.gameobjects.towers.SerializableTower;
-import org.lordsofchaos.gameobjects.towers.Tower;
-import org.lordsofchaos.gameobjects.towers.TowerType1;
+import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.matrixobjects.MatrixObject;
@@ -116,6 +114,15 @@ public class GameController
     
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
+
+        // place towers that were placed by defender in the build phase
+        if (clientPlayerType.equals(attacker)) {
+            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
+                towersPlacedThisTurn.get(i).setIsCompleted();
+            }
+            towersPlacedThisTurn.clear();
+        }
     }
     
     private static void resetBuildTimer() {
@@ -135,7 +142,7 @@ public class GameController
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
             
-            // create all towers
+            // mark all placed towers as complete
             for (int i = 0; i < towersPlacedThisTurn.size(); i++) {
                 towersPlacedThisTurn.get(i).setIsCompleted();
             }
@@ -337,7 +344,7 @@ public class GameController
             troopDies(troop);
         }
     }
-    
+
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
         
@@ -349,7 +356,12 @@ public class GameController
         if (tbp.getTowerType() == TowerType.type1) {
             tower = new TowerType1(tbp.getRealWorldCoordinates());
         }
-        // other if's to be added when new towers are added
+        else if (tbp.getTowerType() == TowerType.type2) {
+            tower = new TowerType2(tbp.getRealWorldCoordinates());
+        }
+        else if (tbp.getTowerType() == TowerType.type3) {
+            tower = new TowerType3(tbp.getRealWorldCoordinates());
+        }
         
         towers.add(tower);
         towersPlacedThisTurn.add(tower);
@@ -358,6 +370,15 @@ public class GameController
         // we have already checked if the defender can afford this tower, so now take away money
         defender.addMoney(-tower.getCost());
         return tower;
+    }
+
+    public static void removeTower(Tower tower) {
+        towers.remove(tower);
+        towersPlacedThisTurn.remove(tower);
+        Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
+        tile.setTower(null);
+        defender.addMoney(tower.getCost());
+        System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
     }
     
     public static boolean inBounds(MatrixCoordinates mc) {

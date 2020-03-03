@@ -3,6 +3,7 @@ package org.lordsofchaos;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.SerializableTower;
+import org.lordsofchaos.gameobjects.towers.Tower;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +27,10 @@ public class EventManager
         resetEventManager();
     }
     
-    public static void towerRemoved(SerializableTower tbp) {
+    public static void towerRemoved(Tower tower) {
 		// add function in gc to remove tower
-		towerBuilds.remove(tbp);
+		//towerBuilds.remove(tbp); - need to find from list
+        GameController.removeTower(tower);
     }
     
     public static int[][] getUnitBuildPlan() {
