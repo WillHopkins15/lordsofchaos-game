@@ -24,6 +24,7 @@ public class GameController
     
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
+    private static final int scaleFactor = 64;
     public static Attacker attacker = new Attacker(ATTACKERNAME);
     public static Defender defender = new Defender(DEFENDERNAME);
     // this records if the player on the client machine is an attacker or a defender
@@ -45,7 +46,6 @@ public class GameController
     private static float unitSpawnTimeLimit = 1;
     private static float addMoneyTimer = 0;
     private static float addMoneyTimeLimit = 1;
-    private static final int scaleFactor = 64;
     // Height and Width of the map
     private static int height;
     private static int width;

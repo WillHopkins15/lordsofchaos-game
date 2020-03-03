@@ -17,8 +17,8 @@ import java.net.SocketTimeoutException;
 public abstract class UDPSocket extends Thread
 {
     protected volatile boolean running = true;
-    protected DatagramSocket socket;
     protected volatile BuildPhaseData gameState = null;
+    protected DatagramSocket socket;
     private byte[] buffer = new byte[1024]; //Needs to be big enough to hold the game state object
     private int timeoutCount = 0;
     
