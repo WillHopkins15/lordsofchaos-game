@@ -9,7 +9,6 @@ import org.lordsofchaos.gameobjects.towers.SerializableTower;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.server.GameServer;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
@@ -25,7 +24,6 @@ public class NetworkingTest
     @Before
     public void setup() throws InterruptedException {
         System.out.println("Initiating Setup...");
-        System.setProperty("user.dir", new File(System.getProperty("user.dir")).getParentFile().getAbsolutePath());
         server = new GameServer();
         server.start();
         player1 = new GameClient();

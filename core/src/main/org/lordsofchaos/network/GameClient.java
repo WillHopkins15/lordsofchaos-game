@@ -82,6 +82,10 @@ public class GameClient extends UDPSocket
         return false;
     }
     
+    /**
+     * Temporarily switch to TCP in order to guarantee a connection with the server, and that
+     * this players type will get set correctly.
+     */
     @SneakyThrows
     private void connectToServerAndGetPlayerType() {
         //Temporarily switch to TCP
@@ -158,23 +162,32 @@ public class GameClient extends UDPSocket
         return this.playerType;
     }
     
+    /**
+     * @return Whether this player type is an attacker.
+     */
     public boolean isAttacker() {
         return this.getPlayerType().equals("Attacker");
     }
     
+    /**
+     * @return Whether this player type is a defender.
+     */
     public boolean isDefender() {
         return this.getPlayerType().equals("Defender");
     }
     
-    public String getCurrentWave() {
-        return GameController.getWaveState().toString();
+    /**
+     * @return Whether it is this players turn.
+     */
+    public boolean isMyTurn() {
+        return GameController.getWaveState().toString().equals(getPlayerType() + "Build");
     }
     
     @Override
     protected void createInputThread() {
         new Thread(() -> {
             while (running) {
-                if (!getCurrentWave().equals(getPlayerType() + "Build")) {
+                if (!isMyTurn()) {
                     receiveObject();
                 }
             }
