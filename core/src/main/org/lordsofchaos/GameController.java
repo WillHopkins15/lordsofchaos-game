@@ -19,7 +19,7 @@ import java.util.List;
 
 public class GameController
 {
-    
+    public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
     private static final int scaleFactor = 64;
@@ -113,15 +113,29 @@ public class GameController
     }
     
     public static void setGameState(BuildPhaseData bpd) {
+        if (waveState == WaveState.Play)
+            return;
         EventManager.recieveBuildPhaseData(bpd);
+
+        if (clientPlayerType == null)
+            return;
 
         // place towers that were placed by defender in the build phase
         if (clientPlayerType.equals(attacker)) {
             for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
-                towersPlacedThisTurn.get(i).setIsCompleted();
+                boolean alreadyExists = false;
+                // check if tower has not already benn added
+                for (int j = 0; j < towersPlacedThisTurn.size(); j++)
+                {
+                    if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
+                    {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+                if (!alreadyExists)
+                    towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
             }
-            towersPlacedThisTurn.clear();
         }
     }
     

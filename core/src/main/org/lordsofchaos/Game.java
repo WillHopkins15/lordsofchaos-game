@@ -489,7 +489,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                         GameController.getWaveState() == GameController.WaveState.DefenderBuild){
                 String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
-                System.out.println(timerTmp);
+                //System.out.println(timerTmp);
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
             batch.end();
