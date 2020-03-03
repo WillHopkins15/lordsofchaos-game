@@ -113,8 +113,6 @@ public class GameController
     }
     
     public static void setGameState(BuildPhaseData bpd) {
-        if (waveState == WaveState.Play)
-            return;
         EventManager.recieveBuildPhaseData(bpd);
 
         if (clientPlayerType == null)
