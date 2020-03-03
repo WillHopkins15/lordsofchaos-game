@@ -100,4 +100,9 @@ public class GameInstance extends UDPSocket
     protected void setGameState(BuildPhaseData gameState) {
         this.gameState = gameState;
     }
+    
+    @Override
+    protected void phaseChange() {
+        send("Change Phase");
+    }
 }

@@ -2,6 +2,7 @@ package org.lordsofchaos.network;
 
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
+import org.lordsofchaos.GameController;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -102,6 +103,9 @@ public abstract class UDPSocket extends Thread
             System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
         } else if (received.getClass() == String.class) {
             System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(), received);
+            if (received.equals("Change Phase")) {
+                phaseChange();
+            }
         } else if (received.getClass() == BuildPhaseData.class) {
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             gameState = (BuildPhaseData) received;
@@ -141,6 +145,8 @@ public abstract class UDPSocket extends Thread
     protected abstract void send(Object contents);
     
     protected abstract void setGameState(BuildPhaseData gameState);
+    
+    protected abstract void phaseChange();
     
     /**
      * Closes the socket if open and kills any open threads.

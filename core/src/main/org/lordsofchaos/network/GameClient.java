@@ -121,6 +121,11 @@ public class GameClient extends UDPSocket
         }
     }
     
+    @Override
+    protected void phaseChange() {
+        GameController.endPhase();
+    }
+    
     /**
      * Sends an object to the server
      *
@@ -177,10 +182,16 @@ public class GameClient extends UDPSocket
     }
     
     /**
+     * @return Current wave state
+     */
+    public String getCurrentWave() {
+        return GameController.getWaveState().toString();
+    }
+    /**
      * @return Whether it is this players turn.
      */
     public boolean isMyTurn() {
-        return GameController.getWaveState().toString().equals(getPlayerType() + "Build");
+        return getCurrentWave().equals(getPlayerType() + "Build");
     }
     
     @Override
@@ -189,6 +200,23 @@ public class GameClient extends UDPSocket
             while (running) {
                 if (!isMyTurn()) {
                     receiveObject();
+                }
+            }
+        }).start();
+    }
+    
+    @Override
+    protected void createOutputThread() {
+        new Thread(() -> {
+            while (running) {
+                if (!getCurrentWave().equals("Play"))
+                    send(gameState);
+                else
+                    send("Keep Alive");
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    running = false;
                 }
             }
         }).start();

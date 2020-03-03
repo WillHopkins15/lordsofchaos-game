@@ -309,9 +309,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     EventManager.buildPlanChange(0, 0, 1, false);
                 } else if (endTurnButton.checkClick(x, y) && !changedTurn) {
                     selectSound.play(0.75f);
-                    GameController.endPhase();
+                    client.send("Change Phase");
                     changedTurn = true;
-                    
                 }
             }
             if (button == Buttons.RIGHT) {
@@ -359,9 +358,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     }
                 } else if (endTurnButton.checkClick(x, y) && !buildMode && !changedTurn) {
                     selectSound.play(0.75f);
-                    GameController.endPhase();
+                    client.send("Change Phase");
                     changedTurn = true;
-                    
                 }
             }
             if (button == Buttons.RIGHT) {
