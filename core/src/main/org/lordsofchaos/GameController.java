@@ -369,11 +369,16 @@ public class GameController
     }
     
     public static void shootTroop(Tower tower, Troop troop) {
-        // will have to call sound and graphics for shooting at troop
         int temp;
-        temp = troop.getCurrentHealth() - tower.getDamage();
+        if (tower.getDamageType().equals(troop.getArmourType())) {
+            temp = troop.getCurrentHealth() - (tower.getDamage() + 5 );
+        } else {
+            temp = troop.getCurrentHealth() - tower.getDamage();
+
+        }
+
         troop.setCurrentHealth(temp);
-        
+
         if (troop.getCurrentHealth() <= 0) {
             troopDies(troop);
         }
@@ -486,7 +491,7 @@ public class GameController
     }
 
     public static void upgradeTroops(){
-        if ((troopsMade % 25) == 0) {
+        if (((troopsMade % 25) == 0) && (upgradeNo <= 4)) {
             upgradeNo = upgradeNo + 1;
             int type = upgradeNo % 3;
 
