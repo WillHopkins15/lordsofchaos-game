@@ -50,6 +50,12 @@ public class GameController {
     // list of all towers in matrix
     protected static List<Tower> towers = new ArrayList<Tower>();
 
+    private static int troopsMade = 0;
+    private static int upgradeNo = 0;
+    private static int healthUpgrade = 0;
+    private static int speedUpgrade = 0;
+    private static int damageUpgrade = 0;
+
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
 
@@ -235,9 +241,21 @@ public class GameController {
             for (int path = 0; path < getPaths().size(); path++) {
                 // using only troop type 0 for prototype
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
+                    //calls upgrade troop function
+                    upgradeTroops();
+                    //creates new troop
+                    Troop newTroop = new TroopType1(getPaths().get(path));
+                    //checks if upgrades have happened
+                    //if so newTroop is upgraded
+                    if (upgradeNo != 0) {
+                        newTroop.setCurrentHealth(newTroop.getCurrentHealth() + healthUpgrade);
+                        newTroop.setMovementSpeed(newTroop.getMovementSpeed() + speedUpgrade);
+                        newTroop.setDamage(newTroop.getDamage() + damageUpgrade);
+                    }
                     // add troop to on screen troops
-                    GameController.troops.add(new TroopType1(getPaths().get(path)));
-
+                    GameController.troops.add(newTroop);
+                    //updates number of troops made
+                    troopsMade++;
                     // remove from build plan
                     EventManager.buildPlanChange(0, path, -1);
                 }
@@ -370,4 +388,46 @@ public class GameController {
         }
         return true;
     }
+
+    public static void upgradeTroops(){
+        if ((troopsMade % 25) == 0) {
+            upgradeNo = upgradeNo + 1;
+            int type = upgradeNo % 3;
+
+            switch (type) {
+                //upgrades health
+                case 1:
+                    healthUpgrade = healthUpgrade + 5;
+                    break;
+                //upgrades speed
+                case 2:
+                    speedUpgrade = speedUpgrade + 2;
+                    break;
+                //upgrades damage
+                case 3:
+                    damageUpgrade = damageUpgrade + 3;
+                    break;
+            }
+
+            if (!troops.isEmpty()) {
+                for (int i = 0; i < troops.size(); i++) {
+                    switch (type) {
+                        //upgrades health
+                        case 1:
+                            troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
+                            break;
+                        //upgrades speed
+                        case 2:
+                            troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
+                            break;
+                        //upgrades damage
+                        case 3:
+                            troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
 }
