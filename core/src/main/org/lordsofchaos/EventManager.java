@@ -15,10 +15,21 @@ public class EventManager
     
     private static int[][] unitBuildPlan;
     private static List<SerializableTower> towerBuilds;
+    private static int defenderUpgradesThisTurn;
+
+    public static void defenderUpgrade()
+    {
+        if(GameController.tryDefenderUpgrade())
+        {
+            // if upgrade is successful, need to record this so attacker can upgrade their defender too
+            defenderUpgradesThisTurn++;
+        }
+    }
     
     public static void recieveBuildPhaseData(BuildPhaseData bpd) {
         unitBuildPlan = bpd.getUnitBuildPlan();
         towerBuilds = bpd.getTowerBuildPlan();
+        defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
     }
     
     public static void initialise(int givenTroopsTypes, int givenPathCount) {
@@ -40,6 +51,8 @@ public class EventManager
     public static List<SerializableTower> getTowerBuilds() {
         return towerBuilds;
     }
+
+    public static int getDefenderUpgradesThisTurn() { return defenderUpgradesThisTurn; }
     
     public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
         SerializableTower tbp = new SerializableTower(towerType, rwc);
@@ -52,6 +65,7 @@ public class EventManager
     public static void resetEventManager() {
         unitBuildPlan = new int[troopTypes][pathCount];
         towerBuilds = new ArrayList<>();
+        defenderUpgradesThisTurn = 0;
     }
     
     public static void buildPlanChange(int unitType, int path, int change, boolean troopSpawned) {

@@ -14,10 +14,12 @@ public class BuildPhaseData implements Serializable
     private static final long serialVersionUID = 5084L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
+    private int defenderUpgradesThisTurn;
     
-    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan) {
+    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, int defenderUpgradesThisTurn) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
+        this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
     }
     
     public int[][] getUnitBuildPlan() {
@@ -27,6 +29,8 @@ public class BuildPhaseData implements Serializable
     public List<SerializableTower> getTowerBuildPlan() {
         return towerBuildPlan;
     }
+
+    public int getDefenderUpgradesThisTurn() { return defenderUpgradesThisTurn; }
     
     public String toString() {
         String units = Arrays.deepToString(unitBuildPlan);

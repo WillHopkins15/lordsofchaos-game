@@ -17,6 +17,9 @@ import java.util.List;
 
 public class Tower extends InteractiveObject
 {
+    private static int globalDamageMultiplier = 1;
+    private static float globalSpeedMultiplier = 1;
+
     protected float shootTimer = 0;
     protected float shootTimerLimit = 0.5f;
     protected int range;
@@ -33,6 +36,16 @@ public class Tower extends InteractiveObject
         this.sprite = new Sprite(Game.getTowerTexture(type));
         isCompleted = false;
         this.type = type;
+    }
+
+    // increases damage for ALL towers
+    public static void upgradeTowerDamage() { globalDamageMultiplier++; }
+
+    // decrease cooldown for ALL towers
+    public static void upgradeTowerSpeed() { globalSpeedMultiplier*=1.2; }
+
+    public int getDamage() {
+        return damage * globalDamageMultiplier;
     }
     
     public Boolean getIsCompleted() {
@@ -234,7 +247,7 @@ public class Tower extends InteractiveObject
     
     public void shoot(float deltaTime) {
         shootTimer += deltaTime;
-        if (shootTimer > shootTimerLimit) {
+        if (shootTimer > shootTimerLimit/globalSpeedMultiplier) {
             target = findNearestTroop();
             // if target is null, no troops are in range
             if (target != null) {

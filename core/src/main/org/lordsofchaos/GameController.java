@@ -48,6 +48,10 @@ public class GameController
     private static int height;
     private static int width;
 
+    private static final int defenderUpgradeBaseCost = 100;
+    private static int defenderUpgradeLevel = 0;
+    private static int defenderMaxUpgradeLevel = 4;
+
     @SuppressWarnings("unused")
 
     private static int troopsMade = 0;
@@ -110,13 +114,13 @@ public class GameController
         paths = MapGenerator.generatePaths();
         obstacles = MapGenerator.getObstacles();
         map = MapGenerator.generateMap(width, height, paths, obstacles);
-        EventManager.initialise(6, getPaths().size());
+        EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn());
         //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
         // then clear data ready for next turn
@@ -128,22 +132,42 @@ public class GameController
         if (clientPlayerType == null)
             return;
 
-        // place towers that were placed by defender in the build phase
         if (clientPlayerType.equals(attacker)) {
-            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                boolean alreadyExists = false;
-                // check if tower has not already benn added
-                for (int j = 0; j < towersPlacedThisTurn.size(); j++)
+            attackerNetworkUpdates();
+        }
+    }
+
+    private static void attackerNetworkUpdates()
+    {
+        attackerPlaceTowers();
+        attackerUpdgradeDefender();
+    }
+
+    private static void attackerPlaceTowers()
+    {
+        for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+            boolean alreadyExists = false;
+            // check if tower has not already benn added
+            for (int j = 0; j < towersPlacedThisTurn.size(); j++)
+            {
+                if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
                 {
-                    if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
-                    {
-                        alreadyExists = true;
-                        break;
-                    }
+                    alreadyExists = true;
+                    break;
                 }
-                if (!alreadyExists)
-                    towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
             }
+            if (!alreadyExists)
+                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
+        }
+    }
+
+    private static void attackerUpdgradeDefender()
+    {
+        // when defender attempts to upgrade, the event manager only increments this value if upgrade
+        // is successful, so no more checks are needed and we can immediately upgrade the defender
+        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++)
+        {
+            defenderUpgrade();
         }
     }
     
@@ -190,7 +214,7 @@ public class GameController
                 }
             }
             
-            // make sure to reset all tower build plans and unit build plans
+            // make sure to reset all tower build plans, unit build plans and player upgrade counts
             EventManager.resetEventManager();
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
@@ -526,6 +550,38 @@ public class GameController
         }
     }
 
+    // attacker needs to recieve updates about defender upgrade level but not worry about money,
+    // so attacker only uses defenderUpgrade()
+    public static boolean tryDefenderUpgrade()
+    {
+        if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
+        {
+            System.out.print("Max level");
+            return false;
+        }
+        int cost = defenderUpgradeBaseCost*defenderUpgradeLevel;
+        // check if can afford
+        if (defender.getCurrentMoney() >= cost)
+        {
+            defender.addMoney(-cost);
+            defenderUpgrade();
+            return true;
+        }
+        else
+        {
+            System.out.println("Can't afford upgrade");
+            return false;
+        }
+    }
+
+    public static void defenderUpgrade() {
+        defenderUpgradeLevel++;
+        if (defenderUpgradeLevel == 1 || defenderUpgradeLevel == 3) {
+            Tower.upgradeTowerDamage();
+        } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
+            Tower.upgradeTowerSpeed();
+        }
+    }
     
     public enum WaveState
     {
