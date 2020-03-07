@@ -20,6 +20,9 @@ public class Tower extends InteractiveObject
     private static int globalDamageMultiplier = 1;
     private static float globalSpeedMultiplier = 1;
 
+    private static final int damageUpgrade = 1;
+    private static final float speedUpgrade = 1.2f;
+
     protected float shootTimer = 0;
     protected float shootTimerLimit = 0.5f;
     protected int range;
@@ -40,10 +43,10 @@ public class Tower extends InteractiveObject
     }
 
     // increases damage for ALL towers
-    public static void upgradeTowerDamage() { globalDamageMultiplier++; }
+    public static void upgradeTowerDamage() { globalDamageMultiplier+=damageUpgrade; }
 
     // decrease cooldown for ALL towers
-    public static void upgradeTowerSpeed() { globalSpeedMultiplier*=1.2; }
+    public static void upgradeTowerSpeed() { globalSpeedMultiplier*=speedUpgrade; }
 
     public int getDamage() {
         return damage * globalDamageMultiplier;
