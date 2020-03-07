@@ -106,6 +106,10 @@ public class Troop extends InteractiveObject
     public void setAtEnd(boolean atEnd) {
         this.atEnd = atEnd;
     }
+
+    public DamageType getArmourType() {
+        return armourType;
+    }
     
     private void resetTimer() {
         moveTimer = 0;

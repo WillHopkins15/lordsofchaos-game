@@ -28,6 +28,7 @@ public class Tower extends InteractiveObject
     protected List<Path> inRange;
     protected Boolean isCompleted;
     protected TowerType type;
+    protected int bonusDamage = 5;
     
     public Tower(String spriteName, RealWorldCoordinates rwc, int cost, int damage, int range, DamageType damageType, TowerType type) {
         super(spriteName, rwc, cost, damage);
