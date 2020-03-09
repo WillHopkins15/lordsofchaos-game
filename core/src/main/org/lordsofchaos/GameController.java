@@ -479,7 +479,14 @@ public class GameController
     private static int getTroopTypeCost(int troopType) {
         if (troopType == 0) {
             return 10;
-        } else return 0;
+        }
+        else if (troopType == 1) {
+            return 10;
+        }
+        if (troopType == 2) {
+            return 10;
+        }
+        else return 0;
         // add elses for other troops here
     }
     
