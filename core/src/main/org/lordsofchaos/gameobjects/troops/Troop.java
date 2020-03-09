@@ -163,16 +163,16 @@ public class Troop extends InteractiveObject
             if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
                 switch (previousdir) {
                     case "north":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int)movementSpeed);
                         break;
                     case "east":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() + 1);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int)movementSpeed);
                         break;
                     case "south":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() + 1);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int)movementSpeed);
                         break;
                     case "west":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int)movementSpeed);
                         break;
                     
                 }
@@ -182,16 +182,16 @@ public class Troop extends InteractiveObject
             
             switch (direction) {
                 case "north":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() - 1);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int)movementSpeed);
                     break;
                 case "east":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() + 1);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int)movementSpeed);
                     break;
                 case "south":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() + 1);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int)movementSpeed);
                     break;
                 case "west":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() - 1);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int)movementSpeed);
                     break;
                 
             }
@@ -200,7 +200,7 @@ public class Troop extends InteractiveObject
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
-                System.out.println("Troop co is : " + currentco);
+               // System.out.println("Troop co is : " + currentco);
                 previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
