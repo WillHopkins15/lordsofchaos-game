@@ -8,6 +8,7 @@ import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.player.Attacker;
@@ -49,7 +50,7 @@ public class GameController
     private static int width;
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
-    private static List<Coordinates> obstacles = new ArrayList<Coordinates>();
+    private static List<Obstacle> obstacles = new ArrayList<Obstacle>();
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
     
@@ -307,19 +308,11 @@ public class GameController
                 if (map[y][x].getClass() == Tile.class) {
                     Tile t = (Tile) map[y][x];
                     if (t.getIsBuildable()) {
-                        if (t.getTower() != null) {
-                            System.out.println("T ");
-                        } else {
-                            System.out.print("- ");
-                        }
-                    } else {
-                        System.out.print("X ");
-                    }
-                } else if (map[y][x].getClass() == Path.class) {
-                    System.out.print("@ ");
-                } else {
-                    System.out.print("!");
-                }
+                        if (t.getTower() != null) System.out.println("T ");
+                        else System.out.print("- ");
+                    } else System.out.print("X ");
+                } else if (map[y][x].getClass() == Path.class) System.out.print("@ ");
+                else System.out.print("!");
             }
         }
     }

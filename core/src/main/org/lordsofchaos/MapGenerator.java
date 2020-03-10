@@ -2,9 +2,7 @@ package org.lordsofchaos;
 
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
-import org.lordsofchaos.matrixobjects.MatrixObject;
-import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.matrixobjects.Tile;
+import org.lordsofchaos.matrixobjects.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,44 +48,47 @@ public class MapGenerator
             new MatrixCoordinates(18, 10), new MatrixCoordinates(18, 11), new MatrixCoordinates(18, 12),
             new MatrixCoordinates(18, 13), new MatrixCoordinates(18, 14), new MatrixCoordinates(18, 15),
             new MatrixCoordinates(18, 16), new MatrixCoordinates(18, 17), new MatrixCoordinates(18, 18)));
-    
-    private static ArrayList<Coordinates> obstacles = new ArrayList<Coordinates>(
+
+    private static ArrayList<Obstacle> baseObstacles = new ArrayList<Obstacle>(
+            Arrays.asList(
+                    new Obstacle(19, 17, ObstacleType.BASE), new Obstacle(19, 18, ObstacleType.BASE), new Obstacle(19, 19, ObstacleType.BASE),
+                    new Obstacle(18, 17, ObstacleType.BASE), new Obstacle(18, 18, ObstacleType.BASE), new Obstacle(18, 19, ObstacleType.BASE),
+                    new Obstacle(17, 17, ObstacleType.BASE), new Obstacle(17, 18, ObstacleType.BASE), new Obstacle(17, 19, ObstacleType.BASE)
+            )
+    );
+
+    private static ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>(
             Arrays.asList(
                     // River vvv
-                    new MatrixCoordinates(3, 19), new MatrixCoordinates(3, 18), new MatrixCoordinates(3, 17),
-                    new MatrixCoordinates(3, 16), new MatrixCoordinates(3, 14), new MatrixCoordinates(3, 13),
-                    new MatrixCoordinates(3, 12), new MatrixCoordinates(3, 11), new MatrixCoordinates(3, 10),
-                    new MatrixCoordinates(4, 10), new MatrixCoordinates(5, 10), new MatrixCoordinates(6, 10),
-                    new MatrixCoordinates(6, 9), new MatrixCoordinates(6, 8), new MatrixCoordinates(6, 7),
-                    new MatrixCoordinates(7, 7), new MatrixCoordinates(9, 7), new MatrixCoordinates(10, 7),
-                    new MatrixCoordinates(11, 7), new MatrixCoordinates(12, 7), new MatrixCoordinates(13, 7),
-                    new MatrixCoordinates(13, 8), new MatrixCoordinates(13, 10), new MatrixCoordinates(13, 11),
-                    new MatrixCoordinates(13, 12), new MatrixCoordinates(14, 12), new MatrixCoordinates(16, 12),
-                    new MatrixCoordinates(17, 12), new MatrixCoordinates(18, 12), new MatrixCoordinates(19, 12),
+                    new Obstacle(3, 19, ObstacleType.RIVER), new Obstacle(3, 18, ObstacleType.RIVER), new Obstacle(3, 17, ObstacleType.RIVER),
+                    new Obstacle(3, 16, ObstacleType.RIVER), new Obstacle(3, 14, ObstacleType.RIVER), new Obstacle(3, 13, ObstacleType.RIVER),
+                    new Obstacle(3, 12, ObstacleType.RIVER), new Obstacle(3, 11, ObstacleType.RIVER), new Obstacle(3, 10, ObstacleType.RIVER),
+                    new Obstacle(4, 10, ObstacleType.RIVER), new Obstacle(5, 10, ObstacleType.RIVER), new Obstacle(6, 10, ObstacleType.RIVER),
+                    new Obstacle(6, 9, ObstacleType.RIVER), new Obstacle(6, 8, ObstacleType.RIVER), new Obstacle(6, 7, ObstacleType.RIVER),
+                    new Obstacle(7, 7, ObstacleType.RIVER), new Obstacle(9, 7, ObstacleType.RIVER), new Obstacle(10, 7, ObstacleType.RIVER),
+                    new Obstacle(11, 7, ObstacleType.RIVER), new Obstacle(12, 7, ObstacleType.RIVER), new Obstacle(13, 7, ObstacleType.RIVER),
+                    new Obstacle(13, 8, ObstacleType.RIVER), new Obstacle(13, 10, ObstacleType.RIVER), new Obstacle(13, 11, ObstacleType.RIVER),
+                    new Obstacle(13, 12, ObstacleType.RIVER), new Obstacle(14, 12, ObstacleType.RIVER), new Obstacle(16, 12, ObstacleType.RIVER),
+                    new Obstacle(17, 12, ObstacleType.RIVER), new Obstacle(18, 12, ObstacleType.RIVER), new Obstacle(19, 12, ObstacleType.RIVER),
                     // Trees Top-Left vvv
-                    new MatrixCoordinates(19, 0), new MatrixCoordinates(18, 0), new MatrixCoordinates(17, 0),
-                    new MatrixCoordinates(16, 0), new MatrixCoordinates(15, 0), new MatrixCoordinates(14, 0),
-                    new MatrixCoordinates(13, 0), new MatrixCoordinates(12, 0), new MatrixCoordinates(19, 1),
-                    new MatrixCoordinates(18, 1), new MatrixCoordinates(17, 1), new MatrixCoordinates(16, 1),
-                    new MatrixCoordinates(15, 1), new MatrixCoordinates(14, 1), new MatrixCoordinates(13, 1),
-                    new MatrixCoordinates(19, 2), new MatrixCoordinates(18, 2), new MatrixCoordinates(17, 2),
-                    new MatrixCoordinates(16, 2), new MatrixCoordinates(15, 2), new MatrixCoordinates(14, 2),
-                    new MatrixCoordinates(13, 2), new MatrixCoordinates(19, 3), new MatrixCoordinates(18, 3),
-                    new MatrixCoordinates(17, 3), new MatrixCoordinates(16, 3), new MatrixCoordinates(19, 4),
-                    new MatrixCoordinates(18, 4), new MatrixCoordinates(17, 4), new MatrixCoordinates(19, 5),
-                    new MatrixCoordinates(18, 5), new MatrixCoordinates(19, 6),
+                    new Obstacle(19, 0, ObstacleType.TREE), new Obstacle(18, 0, ObstacleType.TREE), new Obstacle(17, 0, ObstacleType.TREE),
+                    new Obstacle(16, 0, ObstacleType.TREE), new Obstacle(15, 0, ObstacleType.TREE), new Obstacle(14, 0, ObstacleType.TREE),
+                    new Obstacle(13, 0, ObstacleType.TREE), new Obstacle(12, 0, ObstacleType.TREE), new Obstacle(19, 1, ObstacleType.TREE),
+                    new Obstacle(18, 1, ObstacleType.TREE), new Obstacle(17, 1, ObstacleType.TREE), new Obstacle(16, 1, ObstacleType.TREE),
+                    new Obstacle(15, 1, ObstacleType.TREE), new Obstacle(14, 1, ObstacleType.TREE), new Obstacle(13, 1, ObstacleType.TREE),
+                    new Obstacle(19, 2, ObstacleType.TREE), new Obstacle(18, 2, ObstacleType.TREE), new Obstacle(17, 2, ObstacleType.TREE),
+                    new Obstacle(16, 2, ObstacleType.TREE), new Obstacle(15, 2, ObstacleType.TREE), new Obstacle(14, 2, ObstacleType.ROCK),
+                    new Obstacle(13, 2, ObstacleType.ROCK), new Obstacle(19, 3, ObstacleType.TREE), new Obstacle(18, 3, ObstacleType.TREE),
+                    new Obstacle(17, 3, ObstacleType.TREE), new Obstacle(16, 3, ObstacleType.ROCK), new Obstacle(19, 4, ObstacleType.TREE),
+                    new Obstacle(18, 4, ObstacleType.TREE), new Obstacle(17, 4, ObstacleType.TREE), new Obstacle(19, 5, ObstacleType.TREE),
+                    new Obstacle(18, 5, ObstacleType.ROCK), new Obstacle(19, 6, ObstacleType.ROCK),
                     // Trees Bottom
-                    new MatrixCoordinates(0, 8), new MatrixCoordinates(0, 9), new MatrixCoordinates(0, 10),
-                    new MatrixCoordinates(0, 11), new MatrixCoordinates(0, 12), new MatrixCoordinates(1, 8),
-                    new MatrixCoordinates(1, 9), new MatrixCoordinates(1, 10), new MatrixCoordinates(1, 11),
-                    new MatrixCoordinates(1, 12), new MatrixCoordinates(2, 8), new MatrixCoordinates(2, 9),
-                    new MatrixCoordinates(2, 10), new MatrixCoordinates(2, 11), new MatrixCoordinates(2, 12),
-                    new MatrixCoordinates(3, 8), new MatrixCoordinates(3, 9), new MatrixCoordinates(4, 9),
-                    // Defender's Base
-                    new MatrixCoordinates(19, 17), new MatrixCoordinates(19, 18), new MatrixCoordinates(19, 19),
-                    new MatrixCoordinates(18, 17), new MatrixCoordinates(18, 18), new MatrixCoordinates(18, 19),
-                    new MatrixCoordinates(17, 17), new MatrixCoordinates(17, 18), new MatrixCoordinates(17, 19)
-            
+                    new Obstacle(0, 8, ObstacleType.ROCK), new Obstacle(0, 9, ObstacleType.TREE), new Obstacle(0, 10, ObstacleType.TREE),
+                    new Obstacle(0, 11, ObstacleType.TREE), new Obstacle(0, 12, ObstacleType.ROCK), new Obstacle(1, 8, ObstacleType.TREE),
+                    new Obstacle(1, 9, ObstacleType.TREE), new Obstacle(1, 10, ObstacleType.TREE), new Obstacle(1, 11, ObstacleType.TREE),
+                    new Obstacle(1, 12, ObstacleType.ROCK), new Obstacle(2, 8, ObstacleType.TREE), new Obstacle(2, 9, ObstacleType.TREE),
+                    new Obstacle(2, 10, ObstacleType.TREE), new Obstacle(2, 11, ObstacleType.TREE), new Obstacle(2, 12, ObstacleType.ROCK),
+                    new Obstacle(3, 8, ObstacleType.ROCK), new Obstacle(3, 9, ObstacleType.TREE), new Obstacle(4, 9, ObstacleType.TREE)
             ));
     
     public static List<List<Path>> generatePaths() {
@@ -120,32 +121,44 @@ public class MapGenerator
     }
     
     public static MatrixObject[][] generateMap(int width, int height, List<List<Path>> paths,
-                                               List<Coordinates> obstacles) {
+                                               List<Obstacle> obstacles) {
         MatrixObject[][] map = new MatrixObject[width][height];
         
         //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
         // initialise array with empty tiles
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                map[y][x] = new Tile(y, x, null, !obstacles.contains(new MatrixCoordinates(y, x)));
+                map[y][x] = new Tile(y, x, null);
             }
         }
+
+        if (obstacles != null) {
+            obstacles.forEach(o -> {
+                map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
+            });
+        }
+
+        baseObstacles.forEach(o -> {
+            map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
+        });
         
         // loop through the given list of paths and set the corresponding matrix element
         // to a path
-        for (int path = 0; path < paths.size(); path++) {
-            List<Path> currentPath = paths.get(path);
-            for (int element = 0; element < currentPath.size(); element++) {
-                Path pathTile = currentPath.get(element);
-                Coordinates coords = pathTile.getMatrixPosition();
-                map[coords.getY()][coords.getX()] = pathTile;
+        if (paths != null) {
+            for (int path = 0; path < paths.size(); path++) {
+                List<Path> currentPath = paths.get(path);
+                for (int element = 0; element < currentPath.size(); element++) {
+                    Path pathTile = currentPath.get(element);
+                    Coordinates coords = pathTile.getMatrixPosition();
+                    map[coords.getY()][coords.getX()] = pathTile;
+                }
             }
         }
         
         return map;
     }
     
-    public static List<Coordinates> getObstacles() {
+    public static List<Obstacle> getObstacles() {
         return obstacles;
     }
     

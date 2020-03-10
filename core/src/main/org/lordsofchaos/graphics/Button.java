@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Button
-{
+public class Button {
     protected Texture texture;
     protected Sprite sprite;
     protected float buttonX1;

@@ -1,7 +1,6 @@
 package org.lordsofchaos;
 
-public class Pair
-{
+public class Pair {
     private Object left;
     private Object right;
     

@@ -2,15 +2,13 @@ package org.lordsofchaos.matrixobjects;
 
 import org.lordsofchaos.gameobjects.towers.Tower;
 
-public class Tile extends MatrixObject
-{
+public class Tile extends MatrixObject  {
     private Tower tower;
     private boolean isBuildable;
     
-    public Tile(int y, int x, Tower tower, boolean isBuildable) {
+    public Tile(int y, int x, Tower tower) {
         super(y, x);
-        setTower(tower);
-        setIsBuildable(isBuildable);
+        setTower(tower);;
     }
     
     public Tower getTower() {

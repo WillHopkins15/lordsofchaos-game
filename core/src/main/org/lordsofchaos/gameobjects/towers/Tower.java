@@ -95,7 +95,6 @@ public class Tower extends InteractiveObject
                 if (GameController.inBounds(a, b)) {
                     //System.out.println("the inRange coords: " + a + "," + b);
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
-                        System.out.println("the path coords: " + a + "," + b);
                         count++;
                     }
                 }
@@ -118,6 +117,7 @@ public class Tower extends InteractiveObject
             // loop to add the coordinates of the tiles to that are paths to a pair
             // the key of the pair is the coordinates and the value is the distance from the
             // defenders base to the tiles
+
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
                     
@@ -128,7 +128,7 @@ public class Tower extends InteractiveObject
                             
                             ydistance = defenderbase.getY() - tempco.getY();
                             xdistance = defenderbase.getX() - tempco.getX();
-                            
+                            System.out.println("the path coords: " + a + "," + b);
                             distancetemp = Math.sqrt((ydistance * ydistance) + (xdistance * xdistance));
                             
                             temp[count] = new Pair(tempco, distancetemp);

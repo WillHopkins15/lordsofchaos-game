@@ -35,8 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Game extends ApplicationAdapter implements InputProcessor
-{
+public class Game extends ApplicationAdapter implements InputProcessor {
     
     private static float verticalSpriteOffset = 8;
     private static float horizontalSpriteOffset = 24;
@@ -51,6 +50,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static Button endTurnButton;
     //private static BitmapFont endTurnFont;
     private static Button multiplayerButton;
+    private static Button levelEditorButton;
     private static Texture healthBarTexture;
     private static Texture healthTexture;
     private static Sprite healthBarSprite;
@@ -81,6 +81,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private List<TroopSprite> unitsSprite = new ArrayList<>();
     private Sound soundTrack;
     private Sound selectSound;
+    private LevelEditor levelEditor;
     private static FreeTypeFontParameter fontParameter;
     private static FreeTypeFontGenerator fontGenerator;
     private static BitmapFont font;
@@ -116,6 +117,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 Gdx.graphics.getWidth() - defenderButton.getSprite().getWidth() - 100, Gdx.graphics.getHeight() / 2);
         endTurnButton = new Button("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200);
         multiplayerButton = new Button("UI/button.png", Gdx.graphics.getWidth() / 2 - towerButton.getSprite().getWidth() / 2, Gdx.graphics.getHeight() / 8);
+        levelEditorButton = new Button("UI/button.png", 100, Gdx.graphics.getHeight() / 8);
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -135,6 +137,12 @@ public class Game extends ApplicationAdapter implements InputProcessor
         switch (type) {
             default:
                 return towerType1Texture;
+        }
+    }
+
+    public void levelEditor() {
+        if (levelEditor != null) {
+            levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
         }
     }
     
@@ -166,7 +174,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         if (player == 0) {
             // DEFENDER
             if (buildMode) {
-                Texture tmpTower = new Texture(Gdx.files.internal("towers/TowerType1.png"));
+                Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/TowerType1.png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
                 
@@ -178,7 +186,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 
                 Vector2 coords = Conversions.realWorldCooridinateToIsometric(rwc);
                 renderer.getBatch().draw(tmpSpriteTower, coords.x - horizontalSpriteOffset,
-                        coords.y - verticalSpriteOffset, 48, 94);
+                        coords.y - verticalSpriteOffset, 48, 48 * tmpSpriteTower.getHeight() / tmpSpriteTower.getWidth());
                 renderer.getBatch().setColor(Color.WHITE);
             }
             
@@ -406,16 +414,13 @@ public class Game extends ApplicationAdapter implements InputProcessor
         hpCounter.setColor(Color.WHITE);
         coinCounter = new BitmapFont();
         coinCounter.setColor(Color.WHITE);
-        map = new TmxMapLoader().load("maps/Isometric.tmx");
+        map = new TmxMapLoader().load("maps/MainMap.tmx");
         renderer = new IsometricTiledMapRenderer(map);
         camera = new OrthographicCamera(width * 2, height * 2);
         camera.position.set(width, 0, 10);
         camera.update();
-        //camera.setToOrtho(false, 1280, 720);
-        //renderer.getBatch().enableBlending();
         renderer.setView(camera);
         createButtons();
-        // move to player
         healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         healthBarSprite = new Sprite(healthBarTexture);
         healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
@@ -429,7 +434,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
         //endTurnTexture = new Texture(Gdx.files.internal("UI/"))
-        towerType1Texture = new Texture(Gdx.files.internal("towers/TowerType1.png"), true);
+        towerType1Texture = new Texture(Gdx.files.internal("towers/sprites/TowerType1.png"), true);
         GameController.initialise();
         hpSpriteW = healthSprite.getWidth();
         currentScreen = Screen.MAIN_MENU;
@@ -455,12 +460,15 @@ public class Game extends ApplicationAdapter implements InputProcessor
             startButton.getSprite().draw(batch);
             quitButton.getSprite().draw(batch);
             multiplayerButton.getSprite().draw(batch);
+            levelEditorButton.getSprite().draw(batch);
             batch.end();
         } else if (currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
             defenderButton.getSprite().draw(batch);
             attackerButton.getSprite().draw(batch);
             batch.end();
+        } else if (currentScreen == Screen.LEVEL_EDITOR) {
+            levelEditor();
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
@@ -523,11 +531,15 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     @Override
     public boolean keyDown(int keycode) {
-        // TODO Auto-generated method stub
         if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.GAME)
             currentScreen = Screen.CHOOSE_FACTION;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
             currentScreen = Screen.MAIN_MENU;
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
+            currentScreen = Screen.MAIN_MENU;
+            levelEditor = null;
+            renderer.setMap(map);
+        }
         return false;
     }
     
@@ -563,6 +575,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     startButton.dispose();
                     multiplayerButton.dispose();
                     Gdx.app.exit();
+                } else if (levelEditorButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
+                    levelEditor = new LevelEditor(renderer);
+                    currentScreen = Screen.LEVEL_EDITOR;
                 }
                 //System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
@@ -591,12 +607,18 @@ public class Game extends ApplicationAdapter implements InputProcessor
                         currentScreen = Screen.GAME;
                     }
                 }
+            } else if (currentScreen == Screen.LEVEL_EDITOR) {
+                if (levelEditor != null) {
+                    levelEditor.setPlaced(true);
+                }
             }
         }
-        if (player == 1)
-            attackerTouchDown(x, y, pointer, button);
-        if (player == 0)
-            defenderTouchDown(x, y, pointer, button);
+        if (currentScreen == Screen.GAME) {
+            if (player == 1)
+                attackerTouchDown(x, y, pointer, button);
+            if (player == 0)
+                defenderTouchDown(x, y, pointer, button);
+        }
         return false;
     }
     
@@ -613,6 +635,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if (currentScreen == Screen.LEVEL_EDITOR) {
+            if (levelEditor != null) {
+                levelEditor.setPlaced(true);
+            }
+        }
         return false;
     }
     

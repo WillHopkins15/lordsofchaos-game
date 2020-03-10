@@ -4,5 +4,6 @@ public enum Screen
 {
     MAIN_MENU,
     CHOOSE_FACTION,
-    GAME
+    GAME,
+    LEVEL_EDITOR
 }
