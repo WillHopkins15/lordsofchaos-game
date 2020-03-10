@@ -7,6 +7,8 @@ import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.gameobjects.troops.TroopType1;
+import org.lordsofchaos.gameobjects.troops.TroopType2;
+import org.lordsofchaos.gameobjects.troops.TroopType3;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
@@ -29,7 +31,7 @@ public class GameController
     // this records if the player on the client machine is an attacker or a defender
     public static Player clientPlayerType;
     @SuppressWarnings("unused")
-    protected static int wave = 1;
+    protected static int wave;
     // list of all troops currently on screen
     protected static List<Troop> troops = new ArrayList<Troop>();
     // list of all towers in matrix
@@ -48,6 +50,21 @@ public class GameController
     // Height and Width of the map
     private static int height;
     private static int width;
+
+    private static final int defenderUpgradeBaseCost = 100;
+    private static int defenderUpgradeLevel = 0;
+    private static int defenderMaxUpgradeLevel = 4;
+
+    @SuppressWarnings("unused")
+
+    private static int troopUpgradeThreshold = 25;
+    private static int troopsMade = 0;
+    private static int upgradeNo = 0;
+    private static int healthUpgrade = 0;
+    private static float speedUpgrade = 0;
+    private static int damageUpgrade = 0;
+
+
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
     private static List<Obstacle> obstacles = new ArrayList<Obstacle>();
@@ -97,17 +114,17 @@ public class GameController
         waveState = WaveState.DefenderBuild;
         height = 20;
         width = 20;
-        wave = 0;
+        wave = 1;
         paths = MapGenerator.generatePaths();
         obstacles = MapGenerator.getObstacles();
         map = MapGenerator.generateMap(width, height, paths, obstacles);
-        EventManager.initialise(6, getPaths().size());
+        EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds());
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn());
         //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
         // then clear data ready for next turn
@@ -119,22 +136,42 @@ public class GameController
         if (clientPlayerType == null)
             return;
 
-        // place towers that were placed by defender in the build phase
         if (clientPlayerType.equals(attacker)) {
-            for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-                boolean alreadyExists = false;
-                // check if tower has not already benn added
-                for (int j = 0; j < towersPlacedThisTurn.size(); j++)
+            attackerNetworkUpdates();
+        }
+    }
+
+    private static void attackerNetworkUpdates()
+    {
+        attackerPlaceTowers();
+        attackerUpdgradeDefender();
+    }
+
+    private static void attackerPlaceTowers()
+    {
+        for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+            boolean alreadyExists = false;
+            // check if tower has not already benn added
+            for (int j = 0; j < towersPlacedThisTurn.size(); j++)
+            {
+                if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
                 {
-                    if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
-                    {
-                        alreadyExists = true;
-                        break;
-                    }
+                    alreadyExists = true;
+                    break;
                 }
-                if (!alreadyExists)
-                    towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
             }
+            if (!alreadyExists)
+                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
+        }
+    }
+
+    private static void attackerUpdgradeDefender()
+    {
+        // when defender attempts to upgrade, the event manager only increments this value if upgrade
+        // is successful, so no more checks are needed and we can immediately upgrade the defender
+        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++)
+        {
+            defenderUpgrade();
         }
     }
     
@@ -181,7 +218,7 @@ public class GameController
                 }
             }
             
-            // make sure to reset all tower build plans and unit build plans
+            // make sure to reset all tower build plans, unit build plans and player upgrade counts
             EventManager.resetEventManager();
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
@@ -254,14 +291,38 @@ public class GameController
         if (unitSpawnTimer > unitSpawnTimeLimit) {
             // loop through each path and spawn a troop into each
             for (int path = 0; path < getPaths().size(); path++) {
-                // using only troop type 0 for prototype
+                int troop;
+                Troop newTroop = null;
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
-                    // add troop to on screen troops
-                    GameController.troops.add(new TroopType1(getPaths().get(path)));
-                    
-                    // remove from build plan
-                    EventManager.buildPlanChange(0, path, -1, true);
+                    troop = 0;
+                    newTroop = new TroopType1(getPaths().get(path));
+                } else if (EventManager.getUnitBuildPlan()[1][path] > 0) {
+                    troop = 1;
+                    newTroop = new TroopType2(getPaths().get(path));
+                } else if (EventManager.getUnitBuildPlan()[2][path] > 0) {
+                    troop = 2;
+                    newTroop = new TroopType3(getPaths().get(path));
+                } else {
+                    break;
                 }
+                //calls upgrade troop function
+                upgradeTroops();
+                //creates new troop
+
+                //checks if upgrades have happened
+                //if so newTroop is upgraded
+                if (upgradeNo != 0) {
+                    newTroop.setCurrentHealth(newTroop.getCurrentHealth() + healthUpgrade);
+                    newTroop.setMovementSpeed(newTroop.getMovementSpeed() + speedUpgrade);
+                    newTroop.setDamage(newTroop.getDamage() + damageUpgrade);
+                }
+                // add troop to on screen troops
+                GameController.troops.add(newTroop);
+                //updates number of troops made
+                troopsMade++;
+                // remove from build plan
+                EventManager.buildPlanChange(troop, path, -1, true);
+
             }
             // spawn troop into each path
             resetUnitSpawnTimer();
@@ -340,11 +401,16 @@ public class GameController
     }
     
     public static void shootTroop(Tower tower, Troop troop) {
-        // will have to call sound and graphics for shooting at troop
         int temp;
-        temp = troop.getCurrentHealth() - tower.getDamage();
+        if (tower.getDamageType().equals(troop.getArmourType())) {
+            temp = troop.getCurrentHealth() - (tower.getDamage() + 5 );
+        } else {
+            temp = troop.getCurrentHealth() - tower.getDamage();
+
+        }
+
         troop.setCurrentHealth(temp);
-        
+
         if (troop.getCurrentHealth() <= 0) {
             troopDies(troop);
         }
@@ -406,7 +472,14 @@ public class GameController
     private static int getTroopTypeCost(int troopType) {
         if (troopType == 0) {
             return 10;
-        } else return 0;
+        }
+        else if (troopType == 1) {
+            return 10;
+        }
+        if (troopType == 2) {
+            return 10;
+        }
+        else return 0;
         // add elses for other troops here
     }
     
@@ -454,6 +527,80 @@ public class GameController
             return tile.getTower() == null && tile.getIsBuildable(); // else it is a tile, but a tower exists here already
         }
         return true;
+    }
+
+    public static void upgradeTroops(){
+        if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
+            upgradeNo = upgradeNo + 1;
+            int type = upgradeNo % 3;
+
+            switch (type) {
+                //upgrades health
+                case 1:
+                    healthUpgrade = healthUpgrade + 5;
+                    break;
+                //upgrades speed
+                case 2:
+                    speedUpgrade = speedUpgrade + 0.5f;
+                    break;
+                //upgrades damage
+                case 3:
+                    damageUpgrade = damageUpgrade + 3;
+                    break;
+            }
+
+            if (!troops.isEmpty()) {
+                for (int i = 0; i < troops.size(); i++) {
+                    switch (type) {
+                        //upgrades health
+                        case 1:
+                            troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
+                            break;
+                        //upgrades speed
+                        case 2:
+                            troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
+                            break;
+                        //upgrades damage
+                        case 3:
+                            troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    // attacker needs to recieve updates about defender upgrade level but not worry about money,
+    // so attacker only uses defenderUpgrade()
+    public static boolean tryDefenderUpgrade()
+    {
+        if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
+        {
+            System.out.print("Max level");
+            return false;
+        }
+        int cost = defenderUpgradeBaseCost*defenderUpgradeLevel;
+        // check if can afford
+        if (defender.getCurrentMoney() >= cost)
+        {
+            defender.addMoney(-cost);
+            defenderUpgrade();
+            return true;
+        }
+        else
+        {
+            System.out.println("Can't afford upgrade");
+            return false;
+        }
+    }
+
+    public static void defenderUpgrade() {
+        defenderUpgradeLevel++;
+        if (defenderUpgradeLevel == 1 || defenderUpgradeLevel == 3) {
+            Tower.upgradeTowerDamage();
+        } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
+            Tower.upgradeTowerSpeed();
+        }
     }
     
     public enum WaveState
