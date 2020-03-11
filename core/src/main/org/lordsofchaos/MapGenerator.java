@@ -33,7 +33,7 @@ public class MapGenerator
             new MatrixCoordinates(13, 5), new MatrixCoordinates(14, 5), new MatrixCoordinates(15, 5),
             new MatrixCoordinates(15, 6), new MatrixCoordinates(15, 7), new MatrixCoordinates(15, 8),
             new MatrixCoordinates(15, 9), new MatrixCoordinates(15, 10), new MatrixCoordinates(15, 11),
-            new MatrixCoordinates(15, 12), new MatrixCoordinates(15, 12), new MatrixCoordinates(15, 14),
+            new MatrixCoordinates(15, 12), new MatrixCoordinates(15, 13), new MatrixCoordinates(15, 14),
             new MatrixCoordinates(14, 14), new MatrixCoordinates(14, 15), new MatrixCoordinates(14, 16),
             new MatrixCoordinates(14, 17), new MatrixCoordinates(14, 18), new MatrixCoordinates(15, 18),
             new MatrixCoordinates(16, 18), new MatrixCoordinates(17, 18), new MatrixCoordinates(18, 18)));
