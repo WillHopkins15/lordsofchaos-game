@@ -7,19 +7,19 @@ import java.sql.Date;
 
 public class DatabaseCommunication {
 
-    private static String localDB = "lordsofchaos";
-    private static String localURL = "jdbc:mysql://localhost:3306/lordsofchaos?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=root&password=asbnu*(2p,;g)!OP0X";
+    /*
+    Database information:
+    dbname= vUx0GmhOrL, username=vUx0GmhOrL, pw= uKKJhxJLlm, server= remotemysql.com, port 3306
+     */
 
-    private static String onlineDB = "vUx0GmhOrL";
-    private static String onlineURL = "jdbc:mysql://remotemysql.com:3306/vUx0GmhOrL?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=vUx0GmhOrL&password=uKKJhxJLlm";
+    private static String dbName = "vUx0GmhOrL";
+    private static String dbURL = "jdbc:mysql://remotemysql.com:3306/vUx0GmhOrL?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=vUx0GmhOrL&password=uKKJhxJLlm";
 
-    private static String dbName = onlineDB;
-    private static String dbURL = onlineURL;
-
-    public static List<LeaderboardRow> getRows(int count) throws SQLException, ClassNotFoundException {
+    // count is the number of rows you want to fetch, if all is true, all rows are returned
+    public static List<LeaderboardRow> getRows(int count, boolean all) throws SQLException, ClassNotFoundException {
         ResultSet rs = executeQuery(connectToDB(), "select * from "+dbName+".leaderboard;");
         List<LeaderboardRow> rows = new ArrayList<>();
-        while (rs.next() && count > 0)
+        while (rs.next() && (count > 0 || all))
         {
             int id = rs.getInt(1);
             String name = rs.getString(2);
@@ -27,7 +27,8 @@ public class DatabaseCommunication {
             Date date = rs.getDate(4);
             LeaderboardRow row = new LeaderboardRow(id, name, waves, date);
             rows.add(row);
-            count--;
+            if (!all)
+                count--;
         }
         return  rows;
     }
@@ -64,11 +65,15 @@ public class DatabaseCommunication {
         return conn.prepareStatement(query).executeQuery();
     }
 
-    public static void main (String[] args) throws SQLException, ClassNotFoundException {
-        List<LeaderboardRow> rows = getRows(10);
+    private static void printOutTable() throws SQLException, ClassNotFoundException {
+        List<LeaderboardRow> rows = getRows(0, true);
         for (int i = 0; i < rows.size(); i++)
         {
-            System.out.println(rows.get(i).getName());
+            System.out.println(rows.get(i).ToString());
         }
+    }
+
+    public static void main (String[] args) throws SQLException, ClassNotFoundException {
+        printOutTable();
     }
 }

@@ -1,5 +1,4 @@
 package org.lordsofchaos.database;
-import java.text.SimpleDateFormat;
 import java.sql.Date;
 
 public class LeaderboardRow {
@@ -59,6 +58,11 @@ public class LeaderboardRow {
     public Date getDateTime()
     {
         return date;
+    }
+
+    public String ToString()
+    {
+        return "id: " + getID() + ", name: " + getName() + ", waves: " + getWaves() + ", date: " + getDateTime();
     }
 
 }
