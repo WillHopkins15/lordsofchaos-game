@@ -519,9 +519,13 @@ public class GameController
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
             return 10;
-        } else {
-            return 0;
+        } else if (towerType == TowerType.type2) {
+            return 20;
         }
+        else if (towerType == TowerType.type2) {
+            return 30;
+        }
+        return 0;
     }
     
     private static int getTroopTypeCost(int troopType) {
