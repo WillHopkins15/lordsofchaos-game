@@ -292,8 +292,12 @@ public class GameController
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
                 System.out.println("Defender loses");
-                Leaderboard.addWinner(defender,wave);
+                Leaderboard.addWinner(attacker,wave);
 
+            }
+            else if(defenderUpgradeLevel == 4){
+                System.out.println("Defender Wins");
+                Leaderboard.addWinner(defender,wave);
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
