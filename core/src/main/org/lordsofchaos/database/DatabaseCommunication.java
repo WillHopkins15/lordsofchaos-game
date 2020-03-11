@@ -1,6 +1,5 @@
 package org.lordsofchaos.database;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +7,17 @@ import java.sql.Date;
 
 public class DatabaseCommunication {
 
-    private static String dbURL = "jdbc:mysql://localhost:3306/lordsofchaos?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=root&password=asbnu*(2p,;g)!OP0X";
+    private static String localDB = "lordsofchaos";
+    private static String localURL = "jdbc:mysql://localhost:3306/lordsofchaos?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=root&password=asbnu*(2p,;g)!OP0X";
+
+    private static String onlineDB = "vUx0GmhOrL";
+    private static String onlineURL = "jdbc:mysql://remotemysql.com:3306/vUx0GmhOrL?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=vUx0GmhOrL&password=uKKJhxJLlm";
+
+    private static String dbName = onlineDB;
+    private static String dbURL = onlineURL;
 
     public static List<LeaderboardRow> getRows(int count) throws SQLException, ClassNotFoundException {
-        ResultSet rs = executeQuery(connectToDB(), "select * from lordsofchaos.leaderboard;");
+        ResultSet rs = executeQuery(connectToDB(), "select * from "+dbName+".leaderboard;");
         List<LeaderboardRow> rows = new ArrayList<>();
         while (rs.next() && count > 0)
         {
@@ -30,11 +36,11 @@ public class DatabaseCommunication {
         String query;
         if (row.getID() == -1) { // no id specified so auto-inc
             String values = "('" + row.getName() + "', " + row.getWaves() + ", '" + row.getDateTime() + "')";
-            query = "INSERT INTO lordsofchaos.leaderboard (name, waves, date) VALUES " + values;
+            query = "INSERT INTO "+dbName+".leaderboard (name, waves, date) VALUES " + values;
         }
         else {
             String values = "(" +  row.getID() + ", '" + row.getName() + "', " + row.getWaves() + ", '" + row.getDateTime() + "')";
-            query = "INSERT INTO lordsofchaos.leaderboard (id, name, waves, date) VALUES " + values;
+            query = "INSERT INTO "+dbName+".leaderboard (id, name, waves, date) VALUES " + values;
         }
         Connection conn = connectToDB();
         Statement myStmt = conn.createStatement();
@@ -42,7 +48,7 @@ public class DatabaseCommunication {
     }
 
     public static void deleteRow(int id) throws SQLException, ClassNotFoundException {
-        String query = "DELETE FROM lordsofchaos.leaderboard WHERE id = " + id;
+        String query = "DELETE FROM "+dbName+".leaderboard WHERE id = " + id;
         Connection conn = connectToDB();
         Statement myStmt = conn.createStatement();
         myStmt.execute(query);
@@ -56,5 +62,13 @@ public class DatabaseCommunication {
 
     private static ResultSet executeQuery(Connection conn, String query) throws SQLException {
         return conn.prepareStatement(query).executeQuery();
+    }
+
+    public static void main (String[] args) throws SQLException, ClassNotFoundException {
+        List<LeaderboardRow> rows = getRows(10);
+        for (int i = 0; i < rows.size(); i++)
+        {
+            System.out.println(rows.get(i).getName());
+        }
     }
 }
