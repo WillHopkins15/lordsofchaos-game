@@ -63,6 +63,8 @@ public class GameController
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
 
+    private static List<Integer> blockedPaths;
+    private static final int unblockPathCost = 10;
 
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
@@ -117,13 +119,22 @@ public class GameController
         paths = MapGenerator.generatePaths();
         obstacles = MapGenerator.getObstacles();
         map = MapGenerator.generateMap(width, height, paths, obstacles);
+
+        blockedPaths = new ArrayList<>();
+        for (int i = 0; i < paths.size(); i++)
+        {
+            blockedPaths.add(i);
+        }
+        unblockPath(0); // unblock the first path
+
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn());
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn(),
+                EventManager.getPathsUnblockedThisTurn());
         //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
         // then clear data ready for next turn
@@ -137,6 +148,43 @@ public class GameController
 
         if (clientPlayerType.equals(attacker)) {
             attackerNetworkUpdates();
+        }
+        else if (clientPlayerType.equals(defender)) {
+            defenderNetworkUpdates();
+        }
+    }
+
+    public static List<Integer> getBlockedPaths()
+    {
+        return blockedPaths;
+    }
+
+    private static void defenderNetworkUpdates() {
+        for(int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
+            unblockPath(i);
+        }
+    }
+
+
+    public static void unblockPath(int index) {
+        if (blockedPaths.contains(new Integer(index)))
+        {
+            blockedPaths.remove(new Integer(index));
+        }
+    }
+
+    public static boolean canAttackerUnblockPath(int index)
+    {
+        // if path already unblocked return false;
+        if (attacker.getCurrentMoney() >= unblockPathCost)
+        {
+            attacker.addMoney(-unblockPathCost);
+            return true;
+        }
+        else
+        {
+            System.out.println("Can't afford path unblock");
+            return false;
         }
     }
 
@@ -579,7 +627,7 @@ public class GameController
 
     // attacker needs to recieve updates about defender upgrade level but not worry about money,
     // so attacker only uses defenderUpgrade()
-    public static boolean tryDefenderUpgrade()
+    public static boolean canDefenderCanUpgrade()
     {
         if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
         {
@@ -591,7 +639,6 @@ public class GameController
         if (defender.getCurrentMoney() >= cost)
         {
             defender.addMoney(-cost);
-            defenderUpgrade();
             return true;
         }
         else

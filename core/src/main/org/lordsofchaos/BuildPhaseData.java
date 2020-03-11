@@ -15,11 +15,14 @@ public class BuildPhaseData implements Serializable
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
     private int defenderUpgradesThisTurn;
+    private List<Integer> pathsUnblockedThisTurn;
     
-    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, int defenderUpgradesThisTurn) {
+    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, int defenderUpgradesThisTurn,
+                          List<Integer> pathsUnblockedThisTurn) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
         this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
+        this.pathsUnblockedThisTurn = pathsUnblockedThisTurn;
     }
     
     public int[][] getUnitBuildPlan() {
@@ -29,6 +32,8 @@ public class BuildPhaseData implements Serializable
     public List<SerializableTower> getTowerBuildPlan() {
         return towerBuildPlan;
     }
+
+    public List<Integer> getPathsUnblockedThisTurn() { return pathsUnblockedThisTurn; }
 
     public int getDefenderUpgradesThisTurn() { return defenderUpgradesThisTurn; }
     
