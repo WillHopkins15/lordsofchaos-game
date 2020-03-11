@@ -13,7 +13,9 @@ import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 import org.lordsofchaos.player.Player;
+import org.lordsofchaos.database.Leaderboard;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -198,7 +200,7 @@ public class GameController
     }
     
     // called by renderer every frame/ whatever
-    public static void update(float deltaTime) {
+    public static void update(float deltaTime) throws SQLException, ClassNotFoundException {
         if (waveState == WaveState.DefenderBuild) {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
@@ -215,6 +217,8 @@ public class GameController
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
                 System.out.println("Defender loses");
+                Leaderboard.addWinner(defender,wave);
+
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
