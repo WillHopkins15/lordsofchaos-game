@@ -15,9 +15,8 @@ public class DatabaseCommunication {
     private static String dbName = "vUx0GmhOrL";
     private static String dbURL = "jdbc:mysql://remotemysql.com:3306/vUx0GmhOrL?useSSL=false&useUnicode=true&characterEncoding=UTF-8&user=vUx0GmhOrL&password=uKKJhxJLlm";
 
-    // count is the number of rows you want to fetch, if all is true, all rows are returned
-    public static List<LeaderboardRow> getRows(int count, boolean all) throws SQLException, ClassNotFoundException {
-        ResultSet rs = executeQuery(connectToDB(), "select * from "+dbName+".leaderboard;");
+    // pass in result set- set 'all' to true if you want all rows from the result set, otherwise set to false and specify count
+    private static List<LeaderboardRow> resultSetToRows(ResultSet rs, boolean all, int count) throws SQLException {
         List<LeaderboardRow> rows = new ArrayList<>();
         while (rs.next() && (count > 0 || all))
         {
@@ -31,6 +30,18 @@ public class DatabaseCommunication {
                 count--;
         }
         return  rows;
+    }
+
+    // count is the number of rows you want to fetch, if all is true, all rows are returned
+    public static List<LeaderboardRow> getRows(int count, boolean all) throws SQLException, ClassNotFoundException {
+        ResultSet rs = executeQuery(connectToDB(), "select * from "+dbName+".leaderboard");
+        return resultSetToRows(rs, all, count);
+    }
+
+    // return n rows with lowest wave number
+    public static List<LeaderboardRow> getHighScores(int count) throws SQLException, ClassNotFoundException {
+        ResultSet rs = executeQuery(connectToDB(), "select * from "+dbName+".leaderboard order by waves asc limit "+count);
+        return resultSetToRows(rs, true, 0);
     }
 
     public static void addRow(LeaderboardRow row) throws SQLException, ClassNotFoundException {
@@ -65,14 +76,16 @@ public class DatabaseCommunication {
         return conn.prepareStatement(query).executeQuery();
     }
 
+    // only used for debugging
     private static void printOutTable() throws SQLException, ClassNotFoundException {
-        List<LeaderboardRow> rows = getRows(0, true);
+        List<LeaderboardRow> rows = getHighScores(3);//getRows(0, true);
         for (int i = 0; i < rows.size(); i++)
         {
             System.out.println(rows.get(i).ToString());
         }
     }
 
+    // only used for debugging
     public static void main (String[] args) throws SQLException, ClassNotFoundException {
         printOutTable();
     }

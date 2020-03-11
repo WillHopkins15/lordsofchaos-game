@@ -8,35 +8,51 @@ public class LeaderboardRow {
     private int waves;
     private Date date;
 
+    private void verifyWaves(int waves)
+    {
+        if (waves > 0)
+            this.waves = waves;
+        else
+            this.waves = 100;
+    }
+
+    private void verifyName(String name)
+    {
+        if (name.length() > 0)
+            this.name = name;
+        else
+            this.name = "Invalid name";
+    }
+
     public LeaderboardRow(int id, String name, int waves, Date dateTime)
     {
         this.id = id;
-        this.name = name;
-        this.waves = waves;
+        verifyName(name);
+        verifyWaves(waves);
         this.date = dateTime;
     }
 
     public LeaderboardRow(int id, String name, int waves)
     {
         this.id = id;
-        this.name = name;
-        this.waves = waves;
+        verifyName(name);
+        verifyWaves(waves);
         this.date = Date.valueOf(java.time.LocalDate.now());
     }
 
     public LeaderboardRow(String name, int waves, Date dateTime)
     {
         id = -1;
-        this.name = name;
-        this.waves = waves;
+        verifyName(name);
+        verifyWaves(waves);
         this.date = dateTime;
     }
 
     public LeaderboardRow(String name, int waves)
     {
         id = -1;
-        this.name = name;
-        this.waves = waves;
+        verifyName(name);
+        verifyWaves(waves);
         this.date = Date.valueOf(java.time.LocalDate.now());
     }
 
