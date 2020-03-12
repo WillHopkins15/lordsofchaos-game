@@ -236,7 +236,7 @@ public class GameController
         addMoneyTimer = 0;
     }
     
-    public static void endPhase() {
+    public static void endPhase() throws SQLException, ClassNotFoundException {
         Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
@@ -259,6 +259,12 @@ public class GameController
             waveState = WaveState.DefenderBuild;
             
             System.out.println("Defender build phase begins");
+
+            // check here rather than in update, because defender only wins if they survive a round at max level
+            if(defenderUpgradeLevel == 4) {
+                System.out.println("Defender Wins");
+                Leaderboard.addWinner(defender,wave);
+            }
             
             // reset all tower cooldowns
             if (!GameController.towers.isEmpty()) {
@@ -294,10 +300,6 @@ public class GameController
                 System.out.println("Defender loses");
                 Leaderboard.addWinner(attacker,wave);
 
-            }
-            else if(defenderUpgradeLevel == 4){
-                System.out.println("Defender Wins");
-                Leaderboard.addWinner(defender,wave);
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
