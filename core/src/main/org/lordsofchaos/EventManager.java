@@ -15,6 +15,7 @@ public class EventManager
     
     private static int[][] unitBuildPlan;
     private static List<SerializableTower> towerBuilds;
+    private static List<SerializableTower> removedTowers;
     private static int defenderUpgradesThisTurn;
     private static List<Integer> pathsUnblockedThisTurn;
 
@@ -22,7 +23,7 @@ public class EventManager
     {
         if(GameController.canDefenderCanUpgrade())
         {
-            defenderUpgrade();
+            GameController.defenderUpgrade();
             // if upgrade is successful, need to record this so attacker can upgrade their defender too
             defenderUpgradesThisTurn++;
         }
@@ -33,6 +34,7 @@ public class EventManager
         towerBuilds = bpd.getTowerBuildPlan();
         defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
         pathsUnblockedThisTurn = bpd.getPathsUnblockedThisTurn();
+        removedTowers = bpd.getRemovedTowers();
     }
     
     public static void initialise(int givenTroopsTypes, int givenPathCount) {
@@ -40,11 +42,29 @@ public class EventManager
         pathCount = givenPathCount;
         resetEventManager();
     }
-    
+
+    // should be called when right clicking on tower
     public static void towerRemoved(Tower tower) {
-		// add function in gc to remove tower
-		//towerBuilds.remove(tbp); - need to find from list
-        GameController.removeTower(tower);
+        SerializableTower serTower = findSerializeableTower(tower, towerBuilds);
+       if (GameController.removeTower(serTower)) {
+           removedTowers.add(serTower);
+       }
+       else
+       {
+           System.out.println("Couldn't find tower to remove in gc");
+       }
+    }
+
+    public static SerializableTower findSerializeableTower(Tower tower, List<SerializableTower> serializableTowers)
+    {
+        SerializableTower serTower = null;
+        for (int i = 0; i < serializableTowers.size(); i++) {
+            if (serializableTowers.get(i).getRealWorldCoordinates().equals(tower.getRealWorldCoordinates())) {
+                serTower = serializableTowers.get(i);
+                break;
+            }
+        }
+        return serTower;
     }
     
     public static int[][] getUnitBuildPlan() {
@@ -54,6 +74,11 @@ public class EventManager
     public static List<SerializableTower> getTowerBuilds() {
         return towerBuilds;
     }
+
+    public static List<SerializableTower> getRemovedTowers() {
+        return removedTowers;
+    }
+
 
     public static int getDefenderUpgradesThisTurn() { return defenderUpgradesThisTurn; }
 
@@ -79,6 +104,7 @@ public class EventManager
     public static void resetEventManager() {
         unitBuildPlan = new int[troopTypes][pathCount];
         towerBuilds = new ArrayList<>();
+        removedTowers = new ArrayList<>();
         defenderUpgradesThisTurn = 0;
         pathsUnblockedThisTurn = new ArrayList<>();
     }

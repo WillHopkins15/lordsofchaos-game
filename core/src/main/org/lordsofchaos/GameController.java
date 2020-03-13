@@ -135,7 +135,7 @@ public class GameController
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn(),
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
                 EventManager.getPathsUnblockedThisTurn());
         //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
@@ -193,7 +193,14 @@ public class GameController
     private static void attackerNetworkUpdates()
     {
         attackerPlaceTowers();
+        attackerRemoveTowers();
         attackerUpdgradeDefender();
+    }
+
+    private static void attackerRemoveTowers() {
+        for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
+            removeTower(EventManager.getRemovedTowers().get(i));
+        }
     }
 
     private static void attackerPlaceTowers()
@@ -236,7 +243,7 @@ public class GameController
         addMoneyTimer = 0;
     }
     
-    public static void endPhase() throws SQLException, ClassNotFoundException {
+    public static void endPhase() {
         Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
@@ -263,7 +270,13 @@ public class GameController
             // check here rather than in update, because defender only wins if they survive a round at max level
             if(defenderUpgradeLevel == 4) {
                 System.out.println("Defender Wins");
-                Leaderboard.addWinner(defender,wave);
+                try {
+                    Leaderboard.addWinner(defender,wave);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
             
             // reset all tower cooldowns
@@ -281,7 +294,7 @@ public class GameController
     }
     
     // called by renderer every frame/ whatever
-    public static void update(float deltaTime) throws SQLException, ClassNotFoundException {
+    public static void update(float deltaTime) {
         if (waveState == WaveState.DefenderBuild) {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
@@ -298,7 +311,13 @@ public class GameController
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
                 System.out.println("Defender loses");
-                Leaderboard.addWinner(attacker,wave);
+                try {
+                    Leaderboard.addWinner(attacker,wave);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
 
             }
             // if no troops on screen and none in the spawn queue
@@ -508,13 +527,30 @@ public class GameController
         return tower;
     }
 
-    public static void removeTower(Tower tower) {
-        towers.remove(tower);
-        towersPlacedThisTurn.remove(tower);
-        Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
-        tile.setTower(null);
-        defender.addMoney(tower.getCost());
-        System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
+    public static Tower serializeableTowerToTower(SerializableTower serTower, List<Tower> towers)
+    {
+        Tower foundTower = null;
+        for (int i = 0; i < towers.size(); i++) {
+            if (towers.get(i).getRealWorldCoordinates().equals(serTower.getRealWorldCoordinates())) {
+                foundTower = towers.get(i);
+                break;
+            }
+        }
+        return foundTower;
+    }
+
+    public static boolean removeTower(SerializableTower serTower) {
+        Tower tower = serializeableTowerToTower(serTower, towersPlacedThisTurn);
+        if (towers.contains(tower) && towersPlacedThisTurn.contains(tower)) {
+            towers.remove(tower);
+            towersPlacedThisTurn.remove(tower);
+            Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
+            tile.setTower(null);
+            defender.addMoney(tower.getCost());
+            System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
+            return true;
+        }
+        return false;
     }
     
     public static boolean inBounds(MatrixCoordinates mc) {
