@@ -1,9 +1,10 @@
-package org.lordsofchaos.graphics;
+package org.lordsofchaos.graphics.buttons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import org.lordsofchaos.graphics.Screen;
 
 abstract public class Button
 {

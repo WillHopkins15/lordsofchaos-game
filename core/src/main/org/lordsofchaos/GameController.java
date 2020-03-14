@@ -22,8 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameController
-{
+public class GameController {
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
@@ -440,7 +439,7 @@ public class GameController
         }
     }
     
-    private static void debugVisualiseMap() {
+    public static void debugVisualiseMap() {
         for (int y = height - 1; y > -1; y--) {
             for (int x = 0; x < width; x++) {
                 if (map[y][x] instanceof Tile) {

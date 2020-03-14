@@ -111,11 +111,8 @@ public class MapGenerator
             
             // within each list, loop through each pair of coordinates and create a new Path
             // object
-            for (int element = 0; element < currentList.size(); element++) {
-                Coordinates coords = currentList.get(element);
-                Path pathElement = new Path(coords.getY(), coords.getX());
-                path.add(pathElement);
-            }
+            for (Coordinates coords : currentList)
+                path.add(new Path(coords.getY(), coords.getX()));
         }
         return paths;
     }
@@ -126,35 +123,24 @@ public class MapGenerator
         
         //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
         // initialise array with empty tiles
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
                 map[y][x] = new Tile(y, x, null);
-            }
-        }
 
-        if (obstacles != null) {
-            obstacles.forEach(o -> {
-                map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
-            });
-        }
+        if (obstacles != null)
+            obstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
 
-        baseObstacles.forEach(o -> {
-            map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
-        });
-        
         // loop through the given list of paths and set the corresponding matrix element
         // to a path
-        if (paths != null) {
-            for (int path = 0; path < paths.size(); path++) {
-                List<Path> currentPath = paths.get(path);
-                for (int element = 0; element < currentPath.size(); element++) {
-                    Path pathTile = currentPath.get(element);
+        if (paths != null)
+            for (List<Path> currentPath : paths)
+                for (Path pathTile : currentPath) {
                     Coordinates coords = pathTile.getMatrixPosition();
                     map[coords.getY()][coords.getX()] = pathTile;
                 }
-            }
-        }
-        
+
+        baseObstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
+
         return map;
     }
     

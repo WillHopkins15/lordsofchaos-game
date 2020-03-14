@@ -1,10 +1,7 @@
 package org.lordsofchaos.graphics;
 
 import org.lordsofchaos.EventManager;
-import org.lordsofchaos.gameobjects.troops.Troop;
-import org.lordsofchaos.gameobjects.troops.TroopType1;
-import org.lordsofchaos.gameobjects.troops.TroopType2;
-import org.lordsofchaos.gameobjects.troops.TroopType3;
+import org.lordsofchaos.graphics.buttons.Button;
 
 public class UnitButton extends Button {
     private int unitPath;
