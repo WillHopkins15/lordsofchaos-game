@@ -113,23 +113,23 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public GameClient getClient(){return client;}
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
-        buttonList.add(new TowerButton("UI/towerButton.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
-        buttonList.add(new TowerButton("UI/towerButton.png", 156, 50,Screen.DEFENDER_SCREEN,TowerType.type2));
-        buttonList.add(new TowerButton("UI/towerButton.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
-        buttonList.add( new MenuButton("UI/startButton.png",
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 156, 50,Screen.DEFENDER_SCREEN,TowerType.type2));
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
+        buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
-        buttonList.add(new MenuButton("UI/quitButton.png",
+        buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
                 Gdx.graphics.getHeight() / 2 - 84 * 2,Screen.MAIN_MENU,null));
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
         buttonList.add(new UnitButton("UI/ufoButton.png", 156, 50,Screen.ATTACKER_SCREEN, currentPath,1));
         buttonList.add(new UnitButton("UI/ufoButton.png", 262, 50,Screen.ATTACKER_SCREEN, currentPath,2));
-        buttonList.add(new PlayerButton("UI/defenderButton.png", 100, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.DEFENDER_SCREEN,0));
-        buttonList.add(new PlayerButton("UI/attackerButton.png",
+        buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.DEFENDER_SCREEN,0));
+        buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png",
                 Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.ATTACKER_SCREEN,1));
-        buttonList.add(new EndTurnButton("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.ATTACKER_SCREEN));
-        buttonList.add(new EndTurnButton("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.DEFENDER_SCREEN));
-        buttonList.add(new MultiplayerButton("UI/button.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.ATTACKER_SCREEN));
+        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.DEFENDER_SCREEN));
+        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
