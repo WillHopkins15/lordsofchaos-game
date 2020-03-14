@@ -5,5 +5,7 @@ public enum Screen
     MAIN_MENU,
     CHOOSE_FACTION,
     GAME,
-    LEVEL_EDITOR
+    DEFENDER_SCREEN,
+    ATTACKER_SCREEN,
+	LEVEL_EDITOR
 }

@@ -16,7 +16,9 @@ import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 import org.lordsofchaos.player.Player;
+import org.lordsofchaos.database.Leaderboard;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +66,8 @@ public class GameController
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
 
+    private static List<Integer> blockedPaths;
+    private static final int unblockPathCost = 10;
 
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
@@ -118,13 +122,22 @@ public class GameController
         paths = MapGenerator.generatePaths();
         obstacles = MapGenerator.getObstacles();
         map = MapGenerator.generateMap(width, height, paths, obstacles);
+
+        blockedPaths = new ArrayList<>();
+        for (int i = 0; i < paths.size(); i++)
+        {
+            blockedPaths.add(i);
+        }
+        unblockPath(0); // unblock the first path
+
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
     
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getDefenderUpgradesThisTurn());
+        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
+                EventManager.getPathsUnblockedThisTurn());
         //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
         // then clear data ready for next turn
@@ -139,12 +152,56 @@ public class GameController
         if (clientPlayerType.equals(attacker)) {
             attackerNetworkUpdates();
         }
+        else if (clientPlayerType.equals(defender)) {
+            defenderNetworkUpdates();
+        }
+    }
+
+    public static List<Integer> getBlockedPaths()
+    {
+        return blockedPaths;
+    }
+
+    private static void defenderNetworkUpdates() {
+        for(int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
+            unblockPath(i);
+        }
+    }
+
+
+    public static void unblockPath(int index) {
+        if (blockedPaths.contains(new Integer(index)))
+        {
+            blockedPaths.remove(new Integer(index));
+        }
+    }
+
+    public static boolean canAttackerUnblockPath(int index)
+    {
+        // if path already unblocked return false;
+        if (attacker.getCurrentMoney() >= unblockPathCost)
+        {
+            attacker.addMoney(-unblockPathCost);
+            return true;
+        }
+        else
+        {
+            System.out.println("Can't afford path unblock");
+            return false;
+        }
     }
 
     private static void attackerNetworkUpdates()
     {
         attackerPlaceTowers();
+        attackerRemoveTowers();
         attackerUpdgradeDefender();
+    }
+
+    private static void attackerRemoveTowers() {
+        for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
+            removeTower(EventManager.getRemovedTowers().get(i));
+        }
     }
 
     private static void attackerPlaceTowers()
@@ -210,6 +267,18 @@ public class GameController
             waveState = WaveState.DefenderBuild;
             
             System.out.println("Defender build phase begins");
+
+            // check here rather than in update, because defender only wins if they survive a round at max level
+            if(defenderUpgradeLevel == 4) {
+                System.out.println("Defender Wins");
+                try {
+                    Leaderboard.addWinner(defender,wave);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
             
             // reset all tower cooldowns
             if (!GameController.towers.isEmpty()) {
@@ -243,6 +312,14 @@ public class GameController
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
                 System.out.println("Defender loses");
+                try {
+                    Leaderboard.addWinner(attacker,wave);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
@@ -442,13 +519,30 @@ public class GameController
         return tower;
     }
 
-    public static void removeTower(Tower tower) {
-        towers.remove(tower);
-        towersPlacedThisTurn.remove(tower);
-        Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
-        tile.setTower(null);
-        defender.addMoney(tower.getCost());
-        System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
+    public static Tower serializeableTowerToTower(SerializableTower serTower, List<Tower> towers)
+    {
+        Tower foundTower = null;
+        for (int i = 0; i < towers.size(); i++) {
+            if (towers.get(i).getRealWorldCoordinates().equals(serTower.getRealWorldCoordinates())) {
+                foundTower = towers.get(i);
+                break;
+            }
+        }
+        return foundTower;
+    }
+
+    public static boolean removeTower(SerializableTower serTower) {
+        Tower tower = serializeableTowerToTower(serTower, towersPlacedThisTurn);
+        if (towers.contains(tower) && towersPlacedThisTurn.contains(tower)) {
+            towers.remove(tower);
+            towersPlacedThisTurn.remove(tower);
+            Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
+            tile.setTower(null);
+            defender.addMoney(tower.getCost());
+            System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
+            return true;
+        }
+        return false;
     }
     
     public static boolean inBounds(MatrixCoordinates mc) {
@@ -463,9 +557,13 @@ public class GameController
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
             return 10;
-        } else {
-            return 0;
+        } else if (towerType == TowerType.type2) {
+            return 20;
         }
+        else if (towerType == TowerType.type2) {
+            return 30;
+        }
+        return 0;
     }
     
     private static int getTroopTypeCost(int troopType) {
@@ -571,7 +669,7 @@ public class GameController
 
     // attacker needs to recieve updates about defender upgrade level but not worry about money,
     // so attacker only uses defenderUpgrade()
-    public static boolean tryDefenderUpgrade()
+    public static boolean canDefenderCanUpgrade()
     {
         if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
         {
@@ -583,7 +681,6 @@ public class GameController
         if (defender.getCurrentMoney() >= cost)
         {
             defender.addMoney(-cost);
-            defenderUpgrade();
             return true;
         }
         else

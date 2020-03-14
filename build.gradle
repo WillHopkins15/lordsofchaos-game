@@ -59,6 +59,7 @@ project(":core") {
         testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
         compileOnly 'org.projectlombok:lombok:1.18.10'
         annotationProcessor 'org.projectlombok:lombok:1.18.10'
+        implementation "mysql:mysql-connector-java:8.0.12"
     }
 }
 
