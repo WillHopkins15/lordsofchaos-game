@@ -182,6 +182,12 @@ public class GameClient extends UDPSocket
     }
     
     /**
+     * @return if the client has been connected to a server
+     */
+    public boolean isConnected() {
+        return connected;
+    }
+    /**
      * @return Current wave state
      */
     public String getCurrentWave() {
