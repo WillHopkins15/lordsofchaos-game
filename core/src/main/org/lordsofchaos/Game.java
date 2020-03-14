@@ -446,7 +446,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public void create(){
 
         instance = this;
-        currentPath = 1;
+        currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
@@ -510,7 +510,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
         }, 5.0f);*/
         //batch.begin();
-        System.out.println("" + buildMode);
+        //System.out.println("" + buildMode);
         if(currentScreen == null){
             // quitButton.dispose();
             // startButton.dispose();

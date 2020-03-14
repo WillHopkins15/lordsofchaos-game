@@ -16,6 +16,7 @@ public class UnitButton extends Button {
     }
 
     public void leftButtonAction() {
+        System.out.println(unitPath + ", " + troopType);
         selectSound.play(0.75f);
         EventManager.buildPlanChange(troopType, unitPath, 1, false);
 
