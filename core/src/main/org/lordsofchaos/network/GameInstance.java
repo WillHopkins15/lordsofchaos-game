@@ -4,9 +4,11 @@ import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
 import java.io.DataOutputStream;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.time.LocalDateTime;
 
 /**
  * Thread for running an instance of the game over UDP.
@@ -15,6 +17,8 @@ public class GameInstance extends UDPSocket
 {
     private ConnectionPoint attacker;
     private ConnectionPoint defender;
+    private LocalDateTime lastAttPacketTime = null;
+    private LocalDateTime lastDefPacketTime = null;
     
     /**
      * Opens a new DatagramSocket on an available port for communication with the two players.
@@ -97,12 +101,59 @@ public class GameInstance extends UDPSocket
     }
     
     @Override
-    protected void setGameState(BuildPhaseData gameState) {
-        this.gameState = gameState;
+    protected void parsePacket(DatagramPacket packet) {
+        int senderPort = packet.getPort();
+        NumberedPacket received = (NumberedPacket) getObjectFromBytes(packet.getData());
+        Object data = received.getData();
+        if (data == null) {
+            System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), senderPort);
+        } else if (data.getClass() == String.class) {
+            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), senderPort, data);
+            if (data.equals("Change Phase")) {
+                System.out.printf("[%d] Sending Phase Change\n", socket.getLocalPort());
+                send("Change Phase");
+            }
+        } else if (data.getClass() == BuildPhaseData.class) {
+            if (!validatePacket(received, senderPort)) return;
+            System.out.printf("[%d] Received game state\n", socket.getLocalPort());
+            if (((BuildPhaseData) data).getCurrentWave().equals("AttackerBuild")
+                    && senderPort == defender.getPort()) {
+                return;
+            } else if (((BuildPhaseData) data).getCurrentWave().equals("DefenderBuild")
+                    && senderPort == attacker.getPort()) {
+                return;
+            }
+            setGameState((BuildPhaseData) data);
+        }
     }
     
-    @Override
-    protected void phaseChange() {
-        send("Change Phase");
+    private boolean validatePacket(NumberedPacket packetData, int sender) {
+        if (sender == attacker.getPort()) {
+            LocalDateTime newTime = LocalDateTime.parse(packetData.getTime());
+            if (lastAttPacketTime == null) {
+                lastAttPacketTime = newTime;
+                return true;
+            }
+            if (newTime.isAfter(lastAttPacketTime)) {
+                lastAttPacketTime = newTime;
+                return true;
+            }
+        } else if (sender == defender.getPort()) {
+            LocalDateTime newTime = LocalDateTime.parse(packetData.getTime());
+            if (lastDefPacketTime == null) {
+                lastDefPacketTime = newTime;
+                return true;
+            }
+            if (newTime.isAfter(lastDefPacketTime)) {
+                lastDefPacketTime = newTime;
+                return true;
+            }
+        }
+        System.out.printf("[%d] Game state expired.", socket.getLocalPort());
+        return false;
+    }
+    
+    protected void setGameState(BuildPhaseData gameState) {
+        this.gameState = gameState;
     }
 }

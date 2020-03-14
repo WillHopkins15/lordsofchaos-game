@@ -1,19 +1,17 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
@@ -64,7 +62,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static SpriteBatch batch;
     private static float timerChangeTurn;
     private static boolean changedTurn = false;
-    private static boolean multiplayer = false;
     final int height = 720;
     int width = 1280;
     OrthographicCamera camera;
@@ -191,12 +188,14 @@ public class Game extends ApplicationAdapter implements InputProcessor
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
-    public void generateFont(){
-        fontParameter.size  = 30;
+    
+    public void generateFont() {
+        fontParameter.size = 30;
         timerFont = fontGenerator.generateFont(fontParameter);
         fontParameter.size = 40;
         font = fontGenerator.generateFont(fontParameter);
     }
+    
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -207,7 +206,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         
     }
     
-
+    
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
         unitsSprite = new ArrayList<>();
@@ -279,7 +278,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
          * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
          */
         //fix this later
-        if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
+        if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
         showHealth();
         
         showCoins(GameController.defender);
@@ -385,7 +384,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     // float x = 0;
     // float y = 0;
-    public void disposeTMP(){
+    public void disposeTMP() {
         disposeUnitHealthBar();
         disposeAttacks();
         /*if(font != null) {
@@ -393,13 +392,14 @@ public class Game extends ApplicationAdapter implements InputProcessor
             font = null;
         }*/
     }
+    
     @Override
     public void create() {
-
+        
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
-        font=fontGenerator.generateFont(fontParameter);
+        font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -492,9 +492,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             showUnitHealthBar();
             showTowerAttack();
-            if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
-                        GameController.getWaveState() == GameController.WaveState.DefenderBuild){
-                String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
+            if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
+                    GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+                String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                 //System.out.println(timerTmp);
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
@@ -562,8 +562,16 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 } else if (multiplayerButton.checkClick(x, y)) {
                     selectSound.play(0.75f);
                     if (setupClient()) {
-                        multiplayer = true;
                         currentScreen = Screen.CHOOSE_FACTION;
+                        if (client.isDefender()) {
+                            GameController.setPlayerType(true);
+                            player = 0;
+                            currentScreen = Screen.GAME;
+                        } else if (client.isAttacker()) {
+                            GameController.setPlayerType(false);
+                            player = 1;
+                            currentScreen = Screen.GAME;
+                        }
                     }
                 } else if (quitButton.checkClick(x, y)) {
                     selectSound.play(0.75f);
@@ -574,30 +582,16 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 }
                 //System.out.println(currentScreen);
             } else if (currentScreen == Screen.CHOOSE_FACTION) {
-                if (multiplayer) {
-                    if (defenderButton.checkClick(x, y) && client.isDefender()) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(true);
-                        player = 0;
-                        currentScreen = Screen.GAME;
-                    } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(false);
-                        player = 1;
-                        currentScreen = Screen.GAME;
-                    }
-                } else {
-                    if (defenderButton.checkClick(x, y)) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(true);
-                        player = 0;
-                        currentScreen = Screen.GAME;
-                    } else if (attackerButton.checkClick(x, y)) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(false);
-                        player = 1;
-                        currentScreen = Screen.GAME;
-                    }
+                if (defenderButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
+                    GameController.setPlayerType(true);
+                    player = 0;
+                    currentScreen = Screen.GAME;
+                } else if (attackerButton.checkClick(x, y)) {
+                    selectSound.play(0.75f);
+                    GameController.setPlayerType(false);
+                    player = 1;
+                    currentScreen = Screen.GAME;
                 }
             }
         }

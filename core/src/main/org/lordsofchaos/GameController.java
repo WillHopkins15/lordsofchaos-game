@@ -14,6 +14,7 @@ import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 import org.lordsofchaos.player.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -463,7 +464,7 @@ public class GameController
         return true;
     }
     
-    public enum WaveState
+    public enum WaveState implements Serializable
     {
         DefenderBuild, AttackerBuild, Play
     }

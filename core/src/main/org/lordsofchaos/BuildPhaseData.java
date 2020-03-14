@@ -11,13 +11,15 @@ import java.util.List;
 
 public class BuildPhaseData implements Serializable
 {
-    private static final long serialVersionUID = 5084L;
+    private static final long serialVersionUID = 1846519348569L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
+    private String currentWave;
     
     public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
+        this.currentWave = GameController.getWaveState().toString();
     }
     
     public int[][] getUnitBuildPlan() {
@@ -26,6 +28,10 @@ public class BuildPhaseData implements Serializable
     
     public List<SerializableTower> getTowerBuildPlan() {
         return towerBuildPlan;
+    }
+    
+    public String getCurrentWave() {
+        return currentWave;
     }
     
     public String toString() {

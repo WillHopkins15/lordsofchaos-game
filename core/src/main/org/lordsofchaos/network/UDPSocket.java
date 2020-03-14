@@ -73,10 +73,8 @@ public abstract class UDPSocket extends Thread
     }
     
     /**
-     * Listens on the open socket for a packet containing serialized object data.
-     * If the object received is a String, then it logs the message to the console.
-     * If the object is a game state, then this method updates the clients stored
-     * game state data.
+     * Listens on the open socket for a packet containing serialized object data, and
+     * parses the object depending on which object was received.
      */
     @SneakyThrows
     protected void receiveObject() {
@@ -88,9 +86,8 @@ public abstract class UDPSocket extends Thread
             System.out.println("Socket closed, ending...");
             return;
         } catch (SocketTimeoutException e) {
-            System.out.printf("[%d] Receive timed out.\n", socket.getLocalPort());
-            timeoutCount++;
-            if (timeoutCount >= 20) {
+            System.out.println("Receive timed out.");
+            if (++timeoutCount >= 10) {
                 System.out.println("Connection dropped. Closing...");
                 this.close();
             }
@@ -98,19 +95,7 @@ public abstract class UDPSocket extends Thread
         }
         
         timeoutCount = 0;
-        Object received = getObjectFromBytes(packet.getData());
-        if (received == null) {
-            System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
-        } else if (received.getClass() == String.class) {
-            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(), received);
-            if (received.equals("Change Phase")) {
-                phaseChange();
-            }
-        } else if (received.getClass() == BuildPhaseData.class) {
-            System.out.printf("[%d] Received game state\n", socket.getLocalPort());
-            gameState = (BuildPhaseData) received;
-            setGameState(gameState);
-        }
+        parsePacket(packet);
     }
     
     /**
@@ -144,9 +129,13 @@ public abstract class UDPSocket extends Thread
     
     protected abstract void send(Object contents);
     
-    protected abstract void setGameState(BuildPhaseData gameState);
-    
-    protected abstract void phaseChange();
+    /**
+     * If the object received is a String, then it logs the message to the console.
+     * If the object is a game state, then this method updates the clients stored
+     * game state data.
+     * @param packet UDP packet containing the object
+     */
+    protected abstract void parsePacket(DatagramPacket packet);
     
     /**
      * Closes the socket if open and kills any open threads.
