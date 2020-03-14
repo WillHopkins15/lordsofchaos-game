@@ -131,6 +131,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new EndTurnButton("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.ATTACKER_SCREEN));
         buttonList.add(new EndTurnButton("UI/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.DEFENDER_SCREEN));
         buttonList.add(new MultiplayerButton("UI/button.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new LevelEditorButton("UI/button.png", 100, Gdx.graphics.getHeight() / 8, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -506,55 +507,30 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        /*long id = soundTrack.loop();
-        Timer.schedule(new Task(){
-            @Override
-            public void run(){
-                soundTrack.stop(id);
-            }
-        }, 5.0f);*/
-        //batch.begin();
-        //System.out.println("" + buildMode);
-        if(currentScreen == null){
-            // quitButton.dispose();
-            // startButton.dispose();
-           //  multiplayerButton.dispose();
-            Gdx.app.exit();
-        }
-        if(currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
+        if (currentScreen == null) Gdx.app.exit();
+        else if(currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
-            /*startButton.getSprite().draw(batch);
-            quitButton.getSprite().draw(batch);
-            multiplayerButton.getSprite().draw(batch);
-            */
-            for (int i = 0; i < buttonList.size(); i++) {
-                //System.out.println(currentScreen + " " + buttonList.get(i).getScreenLocation() + "");
-                if (buttonList.get(i).getScreenLocation() == currentScreen) {
-                    buttonList.get(i).getSprite().draw(batch);
-                }
-            }
-            System.out.println();
+            for (Button button : buttonList)
+                if (button.getScreenLocation() == currentScreen)
+                    button.getSprite().draw(batch);
             batch.end();
-        }
-       else {
+        } else if (currentScreen == Screen.LEVEL_EDITOR) {
+            if (levelEditor == null) levelEditor = new LevelEditor(renderer);
+            levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
+        } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
             isometricPov();
             batch.begin();
-            if (player == 0)
-                defenderPOV();
-            if (player == 1)
-                attackerPOV();
+            if (player == 0) defenderPOV();
+            else if (player == 1) attackerPOV();
             if (changedTurn) {
                 switch (GameController.getWaveState()) {
-                    case AttackerBuild:
-                        changeTurn(2, "Attacker's Turn");
+                    case AttackerBuild: changeTurn(2, "Attacker's Turn");
                         break;
-                    case DefenderBuild:
-                        changeTurn(2, "Defender's Turn");
+                    case DefenderBuild: changeTurn(2, "Defender's Turn");
                         break;
-                    case Play:
-                        changeTurn(2, "           Play     ");
+                    case Play: changeTurn(2, "           Play     ");
                 }
             }
             showUnitHealthBar();
@@ -562,7 +538,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                         GameController.getWaveState() == GameController.WaveState.DefenderBuild){
                 String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
-                //System.out.println(timerTmp);
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
             batch.end();
@@ -570,26 +545,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         
     }
-    
-    @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        // camera.viewportWidth = width;
-        // camera.viewportHeight = height;
-        camera.update();
-    }
-    
+
     @Override
     public void dispose() {
         batch.dispose();
         renderer.dispose();
         map.dispose();
-        towerButton.dispose();
+        /*towerButton.dispose();
         unitButton.dispose();
         unitNumber.dispose();
         defenderButton.dispose();
         attackerButton.dispose();
-        multiplayerButton.dispose();
+        multiplayerButton.dispose();*/
         soundTrack.dispose();
         fontGenerator.dispose();
         timerFont.dispose();
@@ -598,7 +565,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     
     @Override
     public boolean keyDown(int keycode) {
-        // TODO Auto-generated method stub
         if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) )
             currentScreen = Screen.CHOOSE_FACTION;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
@@ -623,105 +589,41 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        int x = screenX;
         int y = Gdx.graphics.getHeight() - screenY;
-        //System.out.println("Clicked at x = " + x + " y = " + y);
         if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION)) {
-            /*if (currentScreen == Screen.MAIN_MENU) {
-                if (startButton.checkClick(x, y)) {
-                    currentScreen = Screen.CHOOSE_FACTION;
-                    selectSound.play(0.75f);
-                } else if (multiplayerButton.checkClick(x, y)) {
-                    selectSound.play(0.75f);
-                    if (setupClient()) {
-                        multiplayer = true;
-                        currentScreen = Screen.CHOOSE_FACTION;
-                    }
-                } else if (quitButton.checkClick(x, y)) {
-                    selectSound.play(0.75f);
-                    /*quitButton.dispose();
-                    startButton.dispose();
-                    multiplayerButton.dispose();*/
-                    //Gdx.app.exit();
-                //}
-                //System.out.println(currentScreen);
-            /*} else if (currentScreen == Screen.CHOOSE_FACTION) {
-                if (multiplayer) {
-                    if (defenderButton.checkClick(x, y) && client.isDefender()) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(true);
-                        player = 0;
-                        currentScreen = Screen.GAME;
-                    } else if (attackerButton.checkClick(x, y) && client.isAttacker()) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(false);
-                        player = 1;
-                        currentScreen = Screen.GAME;
-                    }
-                } else {
-                    if (defenderButton.checkClick(x, y)) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(true);
-                        player = 0;
-                        currentScreen = Screen.GAME;
-                    } else if (attackerButton.checkClick(x, y)) {
-                        selectSound.play(0.75f);
-                        GameController.setPlayerType(false);
-                        player = 1;
-                        currentScreen = Screen.GAME;
-                    }
-                }
-            }*/
-            for (int i = 0; i < buttonList.size(); i++) {
-                if (buttonList.get(i).checkClick(x, y) && buttonList.get(i).getScreenLocation() == currentScreen) {
-                    buttonList.get(i).leftButtonAction();
-                }
-            }
-			if (currentScreen == Screen.LEVEL_EDITOR) {
-                if (levelEditor != null) {
-                    levelEditor.setPlaced(true);
-                }
-            }
+            for (Button value : buttonList)
+                if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen)
+                    value.leftButtonAction();
         }
         if (currentScreen == Screen.GAME) {
-            if (player == 1)
-                attackerTouchDown(x, y, pointer, button);
-            if (player == 0)
-                defenderTouchDown(x, y, pointer, button);
-        }
+            if (player == 1) attackerTouchDown(screenX, y, pointer, button);
+            else if (player == 0) defenderTouchDown(screenX, y, pointer, button);
+        } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null)
+                levelEditor.setPlaced(true);
         return false;
     }
-    
+
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        int x = screenX;
-        int y = Gdx.graphics.getHeight() - screenY;
-        //mouseClicked = false;
-        /*
-         * if(button == Buttons.LEFT) { if(startButton.checkClick(x, y)) { currentScreen
-         * = Screen.MAIN_MENU; startButton.setPressedStatus(false); } }
-         */
         return false;
     }
-    
+
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (currentScreen == Screen.LEVEL_EDITOR) {
-            if (levelEditor != null) {
-                levelEditor.setPlaced(true);
-            }
+        if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
+            levelEditor.setPlaced(true);
         }
         return false;
     }
-    
+
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
-    
+
     @Override
     public boolean scrolled(int amount) {
         return false;
     }
-    
+
 }
