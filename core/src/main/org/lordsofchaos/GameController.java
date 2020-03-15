@@ -20,6 +20,7 @@ import org.lordsofchaos.database.Leaderboard;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GameController {
@@ -34,9 +35,22 @@ public class GameController {
     @SuppressWarnings("unused")
     protected static int wave;
     // list of all troops currently on screen
-    protected static List<Troop> troops = new ArrayList<Troop>();
+    protected static List<Troop> troops = new ArrayList<>();
     // list of all towers in matrix
-    protected static List<Tower> towers = new ArrayList<Tower>();
+    protected static List<Tower> towers = new ArrayList<>();
+    protected static List<DefenderTower> defenderTowers = new ArrayList<>(
+            Arrays.asList(
+                    new DefenderTower(17, 19, true, false),
+                    new DefenderTower(17, 18, false, false),
+                    new DefenderTower(19, 17, true, false),
+                    new DefenderTower(18, 17, false, false),
+                    new DefenderTower(17, 17, true, false),
+                    new DefenderTower(18, 18, false, true),
+                    new DefenderTower(18, 19, false, false),
+                    new DefenderTower(19, 18, false, false),
+                    new DefenderTower(19, 19, true, false)
+            )
+    );
     //
     // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
     protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
@@ -69,8 +83,8 @@ public class GameController {
     private static final int unblockPathCost = 10;
 
     // A list containing different lists that are have the co-ordinates of a paths
-    private static List<List<Path>> paths = new ArrayList<List<Path>>();
-    private static List<Obstacle> obstacles = new ArrayList<Obstacle>();
+    private static List<List<Path>> paths = new ArrayList<>();
+    private static List<Obstacle> obstacles = new ArrayList<>();
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
     
@@ -85,7 +99,9 @@ public class GameController {
     public static List<Tower> getTowers() {
         return towers;
     }
-    
+
+    public static List<DefenderTower> getDefenderTowers() { return defenderTowers; }
+
     public static MatrixObject[][] getMap() {
         return map;
     }
@@ -103,11 +119,7 @@ public class GameController {
     }
     
     public static void setPlayerType(Boolean type) {
-        if (type) {
-            clientPlayerType = defender;
-        } else {
-            clientPlayerType = attacker;
-        }
+        clientPlayerType = type ? defender : attacker;
     }
     
     public static void initialise() {
@@ -123,8 +135,7 @@ public class GameController {
         map = MapGenerator.generateMap(width, height, paths, obstacles);
 
         blockedPaths = new ArrayList<>();
-        for (int i = 0; i < paths.size(); i++)
-        {
+        for (int i = 0; i < paths.size(); i++) {
             blockedPaths.add(i);
         }
         unblockPath(0); // unblock the first path
@@ -145,15 +156,9 @@ public class GameController {
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
 
-        if (clientPlayerType == null)
-            return;
-
-        if (clientPlayerType.equals(attacker)) {
-            attackerNetworkUpdates();
-        }
-        else if (clientPlayerType.equals(defender)) {
-            defenderNetworkUpdates();
-        }
+        if (clientPlayerType == null) return;
+        if (clientPlayerType.equals(attacker)) attackerNetworkUpdates();
+        else if (clientPlayerType.equals(defender)) defenderNetworkUpdates();
     }
 
     public static List<Integer> getBlockedPaths()
@@ -162,36 +167,27 @@ public class GameController {
     }
 
     private static void defenderNetworkUpdates() {
-        for(int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
+        for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(i);
         }
     }
 
-
     public static void unblockPath(int index) {
-        if (blockedPaths.contains(new Integer(index)))
-        {
-            blockedPaths.remove(new Integer(index));
-        }
+        blockedPaths.remove(index);
     }
 
-    public static boolean canAttackerUnblockPath(int index)
-    {
+    public static boolean canAttackerUnblockPath(int index) {
         // if path already unblocked return false;
-        if (attacker.getCurrentMoney() >= unblockPathCost)
-        {
+        if (attacker.getCurrentMoney() >= unblockPathCost) {
             attacker.addMoney(-unblockPathCost);
             return true;
-        }
-        else
-        {
+        } else {
             System.out.println("Can't afford path unblock");
             return false;
         }
     }
 
-    private static void attackerNetworkUpdates()
-    {
+    private static void attackerNetworkUpdates() {
         attackerPlaceTowers();
         attackerRemoveTowers();
         attackerUpdgradeDefender();
@@ -203,15 +199,12 @@ public class GameController {
         }
     }
 
-    private static void attackerPlaceTowers()
-    {
+    private static void attackerPlaceTowers() {
         for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
             boolean alreadyExists = false;
             // check if tower has not already benn added
-            for (int j = 0; j < towersPlacedThisTurn.size(); j++)
-            {
-                if (towersPlacedThisTurn.get(j).getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates()))
-                {
+            for (Tower tower : towersPlacedThisTurn) {
+                if (tower.getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates())) {
                     alreadyExists = true;
                     break;
                 }
@@ -221,12 +214,10 @@ public class GameController {
         }
     }
 
-    private static void attackerUpdgradeDefender()
-    {
+    private static void attackerUpdgradeDefender() {
         // when defender attempts to upgrade, the event manager only increments this value if upgrade
         // is successful, so no more checks are needed and we can immediately upgrade the defender
-        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++)
-        {
+        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++) {
             defenderUpgrade();
         }
     }
@@ -249,8 +240,8 @@ public class GameController {
             waveState = WaveState.AttackerBuild;
             
             // mark all placed towers as complete
-            for (int i = 0; i < towersPlacedThisTurn.size(); i++) {
-                towersPlacedThisTurn.get(i).setIsCompleted();
+            for (Tower tower : towersPlacedThisTurn) {
+                tower.setIsCompleted();
             }
             towersPlacedThisTurn.clear();
             
@@ -272,9 +263,7 @@ public class GameController {
                 System.out.println("Defender Wins");
                 try {
                     Leaderboard.addWinner(defender,wave);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
@@ -494,19 +483,13 @@ public class GameController {
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
         
-        // convert realWorldCoords to matrix
         MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
         
         Tile tile = (Tile) map[mc.getY()][mc.getX()];
-        
-        if (tbp.getTowerType() == TowerType.type1) {
-            tower = new TowerType1(tbp.getRealWorldCoordinates());
-        }
-        else if (tbp.getTowerType() == TowerType.type2) {
-            tower = new TowerType2(tbp.getRealWorldCoordinates());
-        }
-        else if (tbp.getTowerType() == TowerType.type3) {
-            tower = new TowerType3(tbp.getRealWorldCoordinates());
+        switch (tbp.getTowerType()) {
+            case type1: tower = new TowerType1(tbp.getRealWorldCoordinates()); break;
+            case type2: tower = new TowerType2(tbp.getRealWorldCoordinates()); break;
+            case type3: tower = new TowerType3(tbp.getRealWorldCoordinates()); break;
         }
         
         towers.add(tower);
@@ -518,8 +501,7 @@ public class GameController {
         return tower;
     }
 
-    public static Tower serializeableTowerToTower(SerializableTower serTower, List<Tower> towers)
-    {
+    public static Tower serializeableTowerToTower(SerializableTower serTower, List<Tower> towers) {
         Tower foundTower = null;
         for (int i = 0; i < towers.size(); i++) {
             if (towers.get(i).getRealWorldCoordinates().equals(serTower.getRealWorldCoordinates())) {

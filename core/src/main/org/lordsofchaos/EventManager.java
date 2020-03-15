@@ -85,8 +85,7 @@ public class EventManager
     public static List<Integer> getPathsUnblockedThisTurn() { return pathsUnblockedThisTurn; }
 
     public static void unblockPath(int index) {
-        if (GameController.canAttackerUnblockPath(index))
-        {
+        if (GameController.canAttackerUnblockPath(index)) {
             GameController.unblockPath(index);
             pathsUnblockedThisTurn.add(index);
         }

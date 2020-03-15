@@ -27,10 +27,7 @@ import org.lordsofchaos.graphics.buttons.*;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
 
@@ -44,7 +41,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static Texture coinTexture;
     private static BitmapFont coinCounter;
     private static GameClient client;
-    private static Texture towerType1Texture;
     private static SpriteBatch batch;
     private static float timerChangeTurn;
     private static boolean changedTurn = false;
@@ -134,34 +130,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             timerChangeTurn = 0;
         }
     }
-    public static Texture getTowerTexture(TowerType type) {
-        switch (type) {
-            default:
-                return towerType1Texture;
-        }
-    }
 
     
     public void isometricPov() {
         renderer.render();
-        
-        List<GameObject> objectsToAdd = new ArrayList<>();
-        objectsToAdd.addAll(GameController.getTowers());
-        objectsToAdd.addAll(GameController.getTroops());
-        Collections.sort(objectsToAdd);
 
         renderer.getBatch().begin();
-        
-        for (GameObject object : objectsToAdd) {
-            Sprite sprite = object.getSprite();
-            Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
-            float w = 48f;
-            if (object instanceof Tower)
-                if (!((Tower) object).getIsCompleted()) renderer.getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
-            renderer.getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w,
-                    w * sprite.getHeight() / sprite.getWidth());
-            renderer.getBatch().setColor(Color.WHITE);
-        }
+
         if (player == 0) {
             // DEFENDER
             if (buildMode) {
@@ -234,18 +209,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
         towerAttackPixmap.setColor(Color.YELLOW);
+        boolean draw = false;
         for (Tower tower : towers) {
             Troop tmpTroop = tower.getTarget();
             if (tmpTroop != null) {
-                
-                int troopX = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).x;
-                int troopY = (int) Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates()).y;
-                int towerX = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).x;
-                int towerY = (int) Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates()).y;
+                draw = true;
+                Vector2 troopScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates());
+                int troopX = (int) troopScreenPosition.x, troopY = (int) troopScreenPosition.y;
+                Vector2 towerScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates());
+                int towerX = (int) towerScreenPosition.x, towerY = (int) towerScreenPosition.y;
                 //System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
                 towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
             }
         }
+        if (!draw) return;
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
@@ -442,7 +419,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
         //endTurnTexture = new Texture(Gdx.files.internal("UI/"))
-        towerType1Texture = new Texture(Gdx.files.internal("towers/sprites/TowerType1.png"), true);
         GameController.initialise();
         renderer.setMap(GameController.getMap());
         hpSpriteW = healthSprite.getWidth();
@@ -486,7 +462,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             showTowerAttack();
             if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                         GameController.getWaveState() == GameController.WaveState.DefenderBuild){
-                String timerTmp = String.format("%02d" , 30 - (int)GameController.getBuildPhaseTimer());
+                String timerTmp = String.format("%02d" , 30 - (int) GameController.getBuildPhaseTimer());
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
             batch.end();
@@ -520,6 +496,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;
             renderer.setMap(GameController.getMap());
+            renderer.setColourExceptions(new HashMap<>());
             levelEditor = null;
         }
         return false;
@@ -546,8 +523,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (currentScreen == Screen.GAME || currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
             if (player == 1) attackerTouchDown(screenX, y, pointer, button);
             else if (player == 0) defenderTouchDown(screenX, y, pointer, button);
-        } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null)
-                levelEditor.setPlaced(true);
+        } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
+            if (button == Buttons.LEFT) levelEditor.setPlaced(true);
+            else if (button == Buttons.RIGHT) levelEditor.remove();
+        }
         return false;
     }
 

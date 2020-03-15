@@ -1,4 +1,18 @@
 package org.lordsofchaos.gameobjects.towers;
 
-public class DefenderTower {
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.gameobjects.DamageType;
+import org.lordsofchaos.gameobjects.GameObject;
+import org.lordsofchaos.gameobjects.TowerType;
+
+public class DefenderTower extends GameObject {
+
+    private static DamageType damageType = DamageType.Light;
+
+    public DefenderTower(int x, int y, boolean corner, boolean middle) {
+        super(middle ? "DefenderTowerMiddle" : corner ? "DefenderTowerCorner" : "DefenderTower", new RealWorldCoordinates(new MatrixCoordinates(y, x)));
+    }
+
+
 }

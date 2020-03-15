@@ -15,8 +15,8 @@ import org.lordsofchaos.matrixobjects.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tower extends InteractiveObject
-{
+public class Tower extends InteractiveObject {
+
     private static int globalDamageMultiplier = 1;
     private static float globalSpeedMultiplier = 1;
 
@@ -37,7 +37,6 @@ public class Tower extends InteractiveObject
         super(spriteName, rwc, cost, damage);
         setRange(range);
         setDamageType(damageType);
-        this.sprite = new Sprite(Game.getTowerTexture(type));
         isCompleted = false;
         this.type = type;
     }
