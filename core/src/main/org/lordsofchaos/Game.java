@@ -106,6 +106,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 Gdx.graphics.getWidth() / 2 - 150,
                 Gdx.graphics.getHeight() / 2 - 160,Screen.MAIN_MENU,null));
 
+        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160-105, Screen.MAIN_MENU, Screen.LEADERBOARD));
+
         // troop buttons
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
         buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50,Screen.ATTACKER_SCREEN, currentPath,1));
