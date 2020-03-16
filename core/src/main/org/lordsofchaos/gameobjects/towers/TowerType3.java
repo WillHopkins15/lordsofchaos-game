@@ -7,7 +7,7 @@ import org.lordsofchaos.gameobjects.TowerType;
 public class TowerType3 extends Tower
 {
     private static String spriteName = "TowerType3";
-    private static int cost = 10;
+    private static int cost = 30;
     private static int damage = 6;
     private static int range = 2;
     private static DamageType damageType = DamageType.Heavy;

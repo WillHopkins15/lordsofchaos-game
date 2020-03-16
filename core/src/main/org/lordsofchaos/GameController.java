@@ -541,7 +541,7 @@ public class GameController {
         } else if (towerType == TowerType.type2) {
             return 20;
         }
-        else if (towerType == TowerType.type2) {
+        else if (towerType == TowerType.type3) {
             return 30;
         }
         return 0;
@@ -567,7 +567,7 @@ public class GameController {
     }
     
     public static boolean canAffordTower(TowerType towerType) {
-        return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
+        return defender.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
     
     // once a purchase has been verified and added to event manager, finally need to take money from attacker
