@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapGenerator
-{
+public class MapGenerator {
+
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(
             Arrays.asList(new MatrixCoordinates(8, 0), new MatrixCoordinates(8, 1), new MatrixCoordinates(8, 2),
                     new MatrixCoordinates(8, 3), new MatrixCoordinates(8, 4), new MatrixCoordinates(8, 5),
@@ -21,7 +21,7 @@ public class MapGenerator
                     new MatrixCoordinates(7, 18), new MatrixCoordinates(8, 18), new MatrixCoordinates(9, 18),
                     new MatrixCoordinates(10, 18), new MatrixCoordinates(11, 18), new MatrixCoordinates(12, 18),
                     new MatrixCoordinates(13, 18), new MatrixCoordinates(14, 18), new MatrixCoordinates(15, 18),
-                    new MatrixCoordinates(16, 18), new MatrixCoordinates(17, 18), new MatrixCoordinates(18, 18)));
+                    new MatrixCoordinates(16, 18)));
     
     private static ArrayList<Coordinates> path2 = new ArrayList<Coordinates>(Arrays.asList(new MatrixCoordinates(0, 5),
             new MatrixCoordinates(1, 5), new MatrixCoordinates(2, 5), new MatrixCoordinates(3, 5),
@@ -34,7 +34,7 @@ public class MapGenerator
             new MatrixCoordinates(15, 12), new MatrixCoordinates(15, 13), new MatrixCoordinates(15, 14),
             new MatrixCoordinates(14, 14), new MatrixCoordinates(14, 15), new MatrixCoordinates(14, 16),
             new MatrixCoordinates(14, 17), new MatrixCoordinates(14, 18), new MatrixCoordinates(15, 18),
-            new MatrixCoordinates(16, 18), new MatrixCoordinates(17, 18), new MatrixCoordinates(18, 18)));
+            new MatrixCoordinates(16, 18)));
     
     private static ArrayList<Coordinates> path3 = new ArrayList<Coordinates>(Arrays.asList(new MatrixCoordinates(0, 15),
             new MatrixCoordinates(1, 15), new MatrixCoordinates(2, 15), new MatrixCoordinates(3, 15),
@@ -47,7 +47,7 @@ public class MapGenerator
             new MatrixCoordinates(16, 9), new MatrixCoordinates(17, 9), new MatrixCoordinates(18, 9),
             new MatrixCoordinates(18, 10), new MatrixCoordinates(18, 11), new MatrixCoordinates(18, 12),
             new MatrixCoordinates(18, 13), new MatrixCoordinates(18, 14), new MatrixCoordinates(18, 15),
-            new MatrixCoordinates(18, 16), new MatrixCoordinates(18, 17), new MatrixCoordinates(18, 18)));
+            new MatrixCoordinates(18, 16)));
 
     private static ArrayList<Obstacle> baseObstacles = new ArrayList<Obstacle>(
             Arrays.asList(
@@ -96,7 +96,7 @@ public class MapGenerator
         
         List<List<Coordinates>> coordinatesLists = new ArrayList<List<Coordinates>>();
         List<List<Path>> paths = new ArrayList<List<Path>>();
-        
+
         coordinatesLists.add(path1); // can add as many paths as needed here
         coordinatesLists.add(path2);
         coordinatesLists.add(path3);
@@ -111,12 +111,12 @@ public class MapGenerator
             
             // within each list, loop through each pair of coordinates and create a new Path
             // object
-            for (int element = 0; element < currentList.size(); element++) {
-                Coordinates coords = currentList.get(element);
-                Path pathElement = new Path(coords.getY(), coords.getX());
-                path.add(pathElement);
-            }
+            for (Coordinates coords : currentList)
+                path.add(new Path(coords.getY(), coords.getX()));
         }
+        paths.get(0).get(0).setSpawn(true);
+        paths.get(1).get(0).setSpawn(true);
+        paths.get(2).get(0).setSpawn(true);
         return paths;
     }
     
@@ -126,35 +126,24 @@ public class MapGenerator
         
         //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
         // initialise array with empty tiles
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
                 map[y][x] = new Tile(y, x, null);
-            }
-        }
 
-        if (obstacles != null) {
-            obstacles.forEach(o -> {
-                map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
-            });
-        }
+        if (obstacles != null)
+            obstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
 
-        baseObstacles.forEach(o -> {
-            map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o;
-        });
-        
         // loop through the given list of paths and set the corresponding matrix element
         // to a path
-        if (paths != null) {
-            for (int path = 0; path < paths.size(); path++) {
-                List<Path> currentPath = paths.get(path);
-                for (int element = 0; element < currentPath.size(); element++) {
-                    Path pathTile = currentPath.get(element);
+        if (paths != null)
+            for (List<Path> currentPath : paths)
+                for (Path pathTile : currentPath) {
                     Coordinates coords = pathTile.getMatrixPosition();
                     map[coords.getY()][coords.getX()] = pathTile;
                 }
-            }
-        }
-        
+
+        baseObstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
+
         return map;
     }
     

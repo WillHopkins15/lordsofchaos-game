@@ -1,6 +1,7 @@
-package org.lordsofchaos.graphics;
+package org.lordsofchaos.graphics.buttons;
 
 import org.lordsofchaos.Game;
+import org.lordsofchaos.graphics.Screen;
 
 public class MenuButton extends Button {
     protected Screen targetScreen;

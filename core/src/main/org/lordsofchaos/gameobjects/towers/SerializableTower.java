@@ -6,8 +6,8 @@ import org.lordsofchaos.gameobjects.TowerType;
 
 import java.io.Serializable;
 
-public class SerializableTower implements Serializable
-{
+public class SerializableTower implements Serializable {
+
     // SerializableTower tells you what sort of tower has been placed and where,
     // GameController then uses this to create instances of towers
     // GameController contains a list of SerializableTowers which will be sent over the

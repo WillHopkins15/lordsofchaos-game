@@ -1,13 +1,14 @@
-package org.lordsofchaos.graphics;
+package org.lordsofchaos.graphics.buttons;
 
 import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
+import org.lordsofchaos.graphics.Screen;
 
 public class PlayerButton extends MenuButton {
     private int playerType;
     boolean ifMultiplayer;
     int targetPlayerType;
-    public PlayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation,Screen targetScreen,int playerType) {
+    public PlayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen, int playerType) {
         super(path, buttonX1, buttonY1, screenLocation,targetScreen);
         this.playerType = playerType;
     }
