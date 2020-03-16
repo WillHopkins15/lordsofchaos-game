@@ -140,11 +140,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (player == 0) {
             // DEFENDER
             if (buildMode) {
-                Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/TowerType1.png"));
+                Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/" + ghostTowerType.getSpriteName() + ".png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
-                if (GameController.verifyTowerPlacement(TowerType.type1, rwc))
+                if (GameController.verifyTowerPlacement(ghostTowerType, rwc))
                     renderer.getBatch().setColor(0, 1, 0, 0.5f);
                 else renderer.getBatch().setColor(1, 0, 0, 0.5f);
 
@@ -317,14 +317,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (button == Buttons.LEFT)  {
                 if (buildMode) {
                     // Place tower
-                    System.out.println("TEST1");
                     mouseClicked = true;
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-                    if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
+                    if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(0.75f);
-                        EventManager.towerPlaced(TowerType.type1, rwc);
+                        EventManager.towerPlaced(ghostTowerType, rwc);
                         buildMode = false;
-                        System.out.println("TEST");
                     }
 
                 } else {
