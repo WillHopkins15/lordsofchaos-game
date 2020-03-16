@@ -116,6 +116,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
         buttonList.add(new LevelEditorButton("UI/button.png", 100, Gdx.graphics.getHeight() / 8, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
 
+        // defender upgrade button
+        buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262+106, 50,Screen.DEFENDER_SCREEN));
+    }
+
+    // need to hide button once defender has bought all upgrades
+    public static void defenderMaxLevel() {
+        UpgradeButton.maxLevel = true;
     }
 
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -139,7 +146,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         if (player == 0) {
             // DEFENDER
-            if (buildMode) {
+            if (buildMode && ghostTowerType != null) {
                 Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/" + ghostTowerType.getSpriteName() + ".png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
@@ -248,8 +255,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 
         for (Button button : buttonList)
-            if (button.getScreenLocation() == Screen.DEFENDER_SCREEN)
-                button.getSprite().draw(batch);
+            if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
+                if (button instanceof  UpgradeButton)
+                {
+                    if (!((UpgradeButton) button).maxLevel)
+                    {
+                        button.getSprite().draw(batch);
+                    }
+                }
+                else {
+                    button.getSprite().draw(batch);
+                }
+            }
         /*
          * tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,
          * Gdx.graphics.getHeight() - Gdx.input.getY()); batch.setColor(0, 200, 0,
@@ -315,7 +332,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT)  {
-                if (buildMode) {
+                if (buildMode && ghostTowerType != null) {
                     // Place tower
                     mouseClicked = true;
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());

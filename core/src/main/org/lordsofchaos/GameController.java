@@ -66,9 +66,9 @@ public class GameController {
     private static int height;
     private static int width;
 
-    private static final int defenderUpgradeBaseCost = 100;
+    private static final int defenderUpgradeBaseCost = 50;
     private static int defenderUpgradeLevel = 0;
-    private static int defenderMaxUpgradeLevel = 4;
+    private static int defenderMaxUpgradeLevel = 3;
 
     @SuppressWarnings("unused")
 
@@ -257,9 +257,8 @@ public class GameController {
             waveState = WaveState.DefenderBuild;
             
             System.out.println("Defender build phase begins");
-
             // check here rather than in update, because defender only wins if they survive a round at max level
-            if(defenderUpgradeLevel == 4) {
+            if(defenderUpgradeLevel == defenderMaxUpgradeLevel) {
                 System.out.println("Defender Wins");
                 try {
                     Leaderboard.addWinner(defender,wave);
@@ -652,8 +651,9 @@ public class GameController {
     // so attacker only uses defenderUpgrade()
     public static boolean canDefenderCanUpgrade()
     {
-        if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
+        if (defenderUpgradeLevel == defenderMaxUpgradeLevel)
         {
+            Game.defenderMaxLevel();
             System.out.print("Max level");
             return false;
         }

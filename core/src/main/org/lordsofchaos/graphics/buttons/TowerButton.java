@@ -17,6 +17,7 @@ public class TowerButton extends Button {
        Game.instance.buildTrue();
        Game.instance.setGhostTowerType(towerType);
     }
+
     public void rightButtonAction(){
         return;
     }
