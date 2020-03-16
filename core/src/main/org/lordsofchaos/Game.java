@@ -96,11 +96,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 156, 50,Screen.DEFENDER_SCREEN,TowerType.type2));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
+
+        // main menu
         buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
-                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
         buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
-                Gdx.graphics.getHeight() / 2 - 84 * 2,Screen.MAIN_MENU,null));
+                Gdx.graphics.getHeight() / 2 - 160,Screen.MAIN_MENU,null));
 
         // troop buttons
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
@@ -113,8 +117,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.ATTACKER_SCREEN));
         buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.DEFENDER_SCREEN));
-        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
-        buttonList.add(new LevelEditorButton("UI/button.png", 100, Gdx.graphics.getHeight() / 8, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
 
         // defender upgrade button
         buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262+106, 50,Screen.DEFENDER_SCREEN));

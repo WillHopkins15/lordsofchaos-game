@@ -653,7 +653,7 @@ public class GameController {
     {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel)
         {
-            Game.defenderMaxLevel();
+            Game.defenderMaxLevel(); // this hides the upgrade button
             System.out.print("Max level");
             return false;
         }
