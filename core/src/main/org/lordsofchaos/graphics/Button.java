@@ -5,8 +5,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-abstract public class Button
-{
+public abstract class Button {
+
     protected Texture texture;
     protected Sprite sprite;
     protected float buttonX1;

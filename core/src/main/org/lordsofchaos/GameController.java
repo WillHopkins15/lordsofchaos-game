@@ -10,6 +10,7 @@ import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.gameobjects.troops.TroopType2;
 import org.lordsofchaos.gameobjects.troops.TroopType3;
 import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.player.Attacker;
@@ -70,7 +71,7 @@ public class GameController
 
     // A list containing different lists that are have the co-ordinates of a paths
     private static List<List<Path>> paths = new ArrayList<List<Path>>();
-    private static List<Coordinates> obstacles = new ArrayList<Coordinates>();
+    private static List<Obstacle> obstacles = new ArrayList<Obstacle>();
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
     
@@ -442,22 +443,13 @@ public class GameController
     private static void debugVisualiseMap() {
         for (int y = height - 1; y > -1; y--) {
             for (int x = 0; x < width; x++) {
-                if (map[y][x].getClass() == Tile.class) {
+                if (map[y][x] instanceof Tile) {
                     Tile t = (Tile) map[y][x];
-                    if (t.getIsBuildable()) {
-                        if (t.getTower() != null) {
-                            System.out.println("T ");
-                        } else {
-                            System.out.print("- ");
-                        }
-                    } else {
-                        System.out.print("X ");
-                    }
-                } else if (map[y][x].getClass() == Path.class) {
-                    System.out.print("@ ");
-                } else {
-                    System.out.print("!");
-                }
+                    if (t.getTower() != null) System.out.println("T ");
+                    else System.out.print("- ");
+                } else if (map[y][x] instanceof Path) System.out.print("@ ");
+                else if (map[y][x] instanceof Obstacle) System.out.print("X ");
+                else System.out.print("!");
             }
         }
     }
@@ -625,11 +617,11 @@ public class GameController
         
         // check if this matrix position is legal
         MatrixObject mo = map[mc.getY()][mc.getX()];
-        if (mo.getClass() == Path.class) {
+        if (mo instanceof Path || mo instanceof Obstacle) {
             return false; // cannot place towers on path
         } else if (mo instanceof Tile) {
             Tile tile = (Tile) mo;
-            return tile.getTower() == null && tile.getIsBuildable(); // else it is a tile, but a tower exists here already
+            return tile.getTower() == null; // else it is a tile, but a tower exists here already
         }
         return true;
     }
