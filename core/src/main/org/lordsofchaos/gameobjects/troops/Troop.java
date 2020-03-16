@@ -29,6 +29,13 @@ public class Troop extends InteractiveObject
     protected boolean targeted;
     protected boolean atEnd;
     private String previousdir = "nothing";
+
+    private MatrixCoordinates nextTile;
+
+    public MatrixCoordinates getNextTile()
+    {
+        return nextTile;
+    }
     
     
     public Troop(String spriteName, int cost, int damage,
@@ -143,6 +150,7 @@ public class Troop extends InteractiveObject
         if (index != (path.size() - 1)) {
             MatrixCoordinates nexttile;
             nexttile = (getPath().get(index + 1)).getMatrixPosition();
+            nextTile = nexttile;
             String direction;
             
             if ((currentco.getY() - nexttile.getY()) == 0) {

@@ -20,7 +20,7 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
-import org.lordsofchaos.gameobjects.towers.Tower;
+import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.*;
 import org.lordsofchaos.graphics.buttons.*;
@@ -217,21 +217,28 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public void showTowerAttack() {
-        List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
-        towerAttackPixmap.setColor(Color.YELLOW);
+
         boolean draw = false;
-        for (Tower tower : towers) {
-            Troop tmpTroop = tower.getTarget();
-            if (tmpTroop != null) {
-                draw = true;
-                Vector2 troopScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates());
-                int troopX = (int) troopScreenPosition.x, troopY = (int) troopScreenPosition.y;
-                Vector2 towerScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates());
-                int towerX = (int) towerScreenPosition.x, towerY = (int) towerScreenPosition.y;
-                //System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
-                towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
+
+        for (Projectile proj : GameController.getProjectiles()) {
+
+            if (proj.getTower() instanceof TowerType1) {
+                towerAttackPixmap.setColor(Color.RED);
             }
+            else if (proj.getTower() instanceof TowerType2) {
+                towerAttackPixmap.setColor(Color.BLUE);
+            }
+            else if (proj.getTower() instanceof TowerType3) {
+                towerAttackPixmap.setColor(Color.YELLOW);
+            }
+
+            draw = true;
+            Vector2 projScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(proj.getRealWorldCoordinates());
+
+            int projX = (int) projScreenPosition.x, projY = (int) projScreenPosition.y;
+
+            towerAttackPixmap.fillCircle(projX, Gdx.graphics.getHeight() - projY, 3);
         }
         //towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);

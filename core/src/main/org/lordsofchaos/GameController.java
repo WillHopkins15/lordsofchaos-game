@@ -87,6 +87,17 @@ public class GameController {
     private static List<Obstacle> obstacles = new ArrayList<>();
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
+
+    private static List<Projectile> projectiles;
+
+    public static List<Projectile> getProjectiles()
+    {
+        if (projectiles == null)
+        {
+            projectiles = new ArrayList<>();
+        }
+        return projectiles;
+    }
     
     public static float getBuildPhaseTimer() {
         return buildTimer;
@@ -317,7 +328,14 @@ public class GameController {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
                 spawnTroop(deltaTime);
+                moveProjectiles(deltaTime);
             }
+        }
+    }
+
+    private static void moveProjectiles(float deltaTime) {
+        for (int i = 0; i < getProjectiles().size(); i++) {
+            getProjectiles().get(i).update(deltaTime);
         }
     }
     
@@ -462,8 +480,9 @@ public class GameController {
     public static MatrixObject getMatrixObject(int y, int x) {
         return map[y][x];
     }
-    
-    public static void shootTroop(Tower tower, Troop troop) {
+
+    public static void damageTroop(Tower tower, Troop troop, Projectile proj)
+    {
         int temp;
         if (tower.getDamageType().equals(troop.getArmourType())) {
             temp = troop.getCurrentHealth() - (tower.getDamage() + 5 );
@@ -477,6 +496,14 @@ public class GameController {
         if (troop.getCurrentHealth() <= 0) {
             troopDies(troop);
         }
+
+        getProjectiles().remove(proj);
+        proj = null;
+    }
+
+    public static void shootTroop(Tower tower, Troop troop) {
+        Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
+        projectiles.add(projectile);
     }
 
     public static Tower createTower(SerializableTower tbp) {
