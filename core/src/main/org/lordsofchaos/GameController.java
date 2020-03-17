@@ -680,11 +680,10 @@ public class GameController {
     {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel)
         {
-            Game.defenderMaxLevel(); // this hides the upgrade button
             System.out.print("Max level");
             return false;
         }
-        int cost = defenderUpgradeBaseCost*defenderUpgradeLevel;
+        int cost = defenderUpgradeBaseCost*(defenderUpgradeLevel+1);
         // check if can afford
         if (defender.getCurrentMoney() >= cost)
         {
@@ -704,6 +703,9 @@ public class GameController {
             Tower.upgradeTowerDamage();
         } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
             Tower.upgradeTowerSpeed();
+        }
+        if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+            Game.defenderMaxLevel(); // this hides the upgrade button
         }
     }
     
