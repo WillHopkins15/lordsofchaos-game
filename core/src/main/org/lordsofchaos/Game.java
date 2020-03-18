@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.*;
@@ -27,6 +28,7 @@ import org.lordsofchaos.graphics.buttons.*;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
@@ -70,6 +72,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static int currentPath;
     private static boolean mouseClicked;
 
+    // leaderbaord
+    private String[][] leaderBoardTop;
+    private static Texture leaderboardRowTexture;
+    private static List<Sprite> leaderboardRowSprites;
+    private static BitmapFont leaderBoardRowText;
 
     public static void main(String[] args) {
         setupClient();
@@ -106,7 +113,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 Gdx.graphics.getWidth() / 2 - 150,
                 Gdx.graphics.getHeight() / 2 - 160,Screen.MAIN_MENU,null));
 
-        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160-105, Screen.MAIN_MENU, Screen.LEADERBOARD));
+        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160-105, Screen.MAIN_MENU, Screen.LEADERBOARD));
 
         // troop buttons
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
@@ -142,6 +149,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
     }
 
+    public void setLeaderBoardTop(int count) throws SQLException, ClassNotFoundException {
+        leaderBoardTop = Leaderboard.getTop(count);
+    }
 
     public void isometricPov() {
         renderer.render();
@@ -176,12 +186,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
+
     public void generateFont(){
         fontParameter.size  = 30;
         timerFont = fontGenerator.generateFont(fontParameter);
         fontParameter.size = 40;
         font = fontGenerator.generateFont(fontParameter);
     }
+
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -191,7 +203,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
 
     }
-
 
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
@@ -448,10 +459,23 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         GameController.initialise();
         renderer.setMap(GameController.getMap());
         hpSpriteW = healthSprite.getWidth();
+        healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
+
+        leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
+        leaderboardRowSprites = new ArrayList<>();
+        leaderBoardRowText = new BitmapFont();
+        leaderBoardRowText.getData().setScale(2);
+
+        int yOffset = 0;
+        for (int i = 0; i < 5; i++, yOffset-=100) {
+            Sprite sprite = new Sprite(leaderboardRowTexture);
+            sprite.setPosition(Gdx.graphics.getWidth() / 2 - 500, Gdx.graphics.getHeight() / 2 + 100 + yOffset);
+            leaderboardRowSprites.add(sprite);
+        }
+
         currentScreen = Screen.MAIN_MENU;
 
         Gdx.input.setInputProcessor(this);
-
     }
 
     @Override
@@ -468,6 +492,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer);
             levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
+        }else if (currentScreen == Screen.LEADERBOARD) {
+            batch.begin();
+            int i = 0;
+            int yOffset = 0;
+            for (Sprite sprite : leaderboardRowSprites) {
+                String str = "name: " + leaderBoardTop[i][0] + ", waves: " + leaderBoardTop[i][1] + ", date:  " + leaderBoardTop[i][2];
+
+                leaderBoardRowText.draw(batch, str, Gdx.graphics.getWidth() / 2 - 400, Gdx.graphics.getHeight() / 2 + 175 + yOffset);
+                sprite.draw(batch);
+
+                yOffset-=100;
+                i++;
+            }
+            batch.end();
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);

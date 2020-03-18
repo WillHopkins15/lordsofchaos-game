@@ -10,7 +10,7 @@ public class LeaderboardRow {
 
     private void verifyWaves(int waves)
     {
-        if (waves > 0)
+        if (waves >= 0)
             this.waves = waves;
         else
             this.waves = 100;
