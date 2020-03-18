@@ -111,9 +111,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
         buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
-                Gdx.graphics.getHeight() / 2 - 160,Screen.MAIN_MENU,null));
+                Gdx.graphics.getHeight() / 2 - 160-105,Screen.MAIN_MENU,null));
 
-        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160-105, Screen.MAIN_MENU, Screen.LEADERBOARD));
+        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160, Screen.MAIN_MENU, Screen.LEADERBOARD));
 
         // troop buttons
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
@@ -556,6 +556,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) )
             currentScreen = Screen.CHOOSE_FACTION;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
+            currentScreen = Screen.MAIN_MENU;
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;

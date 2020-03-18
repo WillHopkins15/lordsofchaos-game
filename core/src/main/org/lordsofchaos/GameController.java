@@ -1,5 +1,6 @@
 package org.lordsofchaos;
 
+import com.badlogic.gdx.Gdx;
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
@@ -9,6 +10,7 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.gameobjects.troops.TroopType2;
 import org.lordsofchaos.gameobjects.troops.TroopType3;
+import org.lordsofchaos.graphics.MyTextInputListener;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
@@ -90,6 +92,12 @@ public class GameController {
 
     private static List<Projectile> projectiles;
 
+    private static String inputName;
+    public static void setInputName(String name) {
+        inputName = name;
+        waveState = WaveState.SubmitInput;
+    }
+
     public static List<Projectile> getProjectiles()
     {
         if (projectiles == null)
@@ -130,7 +138,7 @@ public class GameController {
     }
     
     public static void setPlayerType(Boolean type) {
-        clientPlayerType = type ? defender : attacker;
+        clientPlayerType = type ? attacker : defender;
     }
     
     public static void initialise() {
@@ -270,12 +278,7 @@ public class GameController {
             System.out.println("Defender build phase begins");
             // check here rather than in update, because defender only wins if they survive a round at max level
             if(defenderUpgradeLevel == defenderMaxUpgradeLevel) {
-                System.out.println("Defender Wins");
-                try {
-                    Leaderboard.addWinner(defender,wave);
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                playerWins(defender);
             }
             
             // reset all tower cooldowns
@@ -291,9 +294,39 @@ public class GameController {
             resetUnitSpawnTimer();
         }
     }
+
+    private static void playerWins(Player player) {
+        if (clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
+        {
+            waveState = WaveState.WaitingForInput;
+            MyTextInputListener listener = new MyTextInputListener();
+            Gdx.input.getTextInput(listener, "Type name", "", "Hint Value");
+        }
+        else
+        {
+            waveState = WaveState.End;
+        }
+    }
     
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
+        if (waveState == WaveState.WaitingForInput) {
+            return;
+        }
+        if (waveState == WaveState.SubmitInput) {
+            try {
+                Leaderboard.addWinner(inputName,wave);
+                waveState = WaveState.End;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        if (waveState == waveState.End) {
+            return;
+        } // winner has been declared, so don't let the game play
         if (waveState == WaveState.DefenderBuild) {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
@@ -309,15 +342,7 @@ public class GameController {
         } else {
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
-                System.out.println("Defender loses");
-                try {
-                    Leaderboard.addWinner(attacker,wave);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-
+                playerWins(attacker);
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
@@ -711,6 +736,6 @@ public class GameController {
     
     public enum WaveState
     {
-        DefenderBuild, AttackerBuild, Play
+        DefenderBuild, AttackerBuild, Play, WaitingForInput, SubmitInput, End
     }
 }

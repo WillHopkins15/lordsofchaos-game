@@ -12,8 +12,8 @@ import java.sql.SQLException;
 
 public class Leaderboard {
 
-    public static void addWinner(Player winner, int wave) throws SQLException, ClassNotFoundException {
-        LeaderboardRow Winner = new LeaderboardRow(winner.getName(),wave);
+    public static void addWinner(String name, int wave) throws SQLException, ClassNotFoundException {
+        LeaderboardRow Winner = new LeaderboardRow(name, wave);
         DatabaseCommunication.addRow(Winner);
     }
 
@@ -23,7 +23,7 @@ public class Leaderboard {
 
         String[][] displayTop = new String[count][3];
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < Top.size(); i++) {
             displayTop[i][0] = Top.get(i).getName();
             displayTop[i][1] = Integer.toString(Top.get(i).getWaves());
             displayTop[i][2] = (Top.get(i).getDateTime()).toString();
