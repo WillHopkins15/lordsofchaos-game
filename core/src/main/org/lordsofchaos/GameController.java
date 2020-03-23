@@ -273,6 +273,8 @@ public class GameController {
             wave++;
             resetBuildTimer();
         } else {
+            removeAllProjectiles();
+
             waveState = WaveState.DefenderBuild;
             
             System.out.println("Defender build phase begins");
@@ -530,6 +532,19 @@ public class GameController {
         Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
         projectiles.add(projectile);
     }
+
+
+    private static void removeAllProjectiles() {
+        while (!projectiles.isEmpty()) {
+            deleteProj(projectiles.get(0));
+        }
+    }
+
+    private static void deleteProj(Projectile projectile) {
+        projectile = null;
+        projectiles.remove(0);
+    }
+
 
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
