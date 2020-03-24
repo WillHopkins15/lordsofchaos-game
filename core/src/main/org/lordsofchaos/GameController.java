@@ -159,6 +159,7 @@ public class GameController {
         }
         unblockPath(0); // unblock the first path
         unblockPath(0);
+        unblockPath(0);
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
@@ -400,6 +401,7 @@ public class GameController {
         if (unitSpawnTimer > unitSpawnTimeLimit) {
             // loop through each path and spawn a troop into each
             for (int path = 0; path < getPaths().size(); path++) {
+                System.out.println("Spawning on path - " + path );
                 int troop;
                 Troop newTroop = null;
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
@@ -412,7 +414,7 @@ public class GameController {
                     troop = 2;
                     newTroop = new TroopType3(getPaths().get(path));
                 } else {
-                    break;
+                    continue;
                 }
                 //calls upgrade troop function
                 upgradeTroops();
