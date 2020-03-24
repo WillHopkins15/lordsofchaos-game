@@ -39,13 +39,8 @@ public class NetworkingTest
         BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp);
         
         //Connect both players to server
-        new Thread(() -> {
-            player1.makeConnection();
-        }).start();
-        
-        new Thread(() -> {
-            player2.makeConnection();
-        }).start();
+        new Thread(() -> player1.makeConnection()).start();
+        new Thread(() -> player2.makeConnection()).start();
         
         //Wait for game instance to be set up
         Thread.sleep(2000);

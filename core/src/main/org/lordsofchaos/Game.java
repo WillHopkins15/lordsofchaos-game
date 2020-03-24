@@ -1,17 +1,19 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
@@ -46,7 +48,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static SpriteBatch batch;
     private static float timerChangeTurn;
     private static boolean changedTurn = false;
-    public static boolean multiplayer = false;
     final int height = 720;
     final int width = 1280;
     private MapRenderer renderer;
@@ -82,10 +83,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         setupClient();
     }
 
-    private static void setupClient() {
+    public static boolean setupClient() {
         client = new GameClient();
-        if (!client.makeConnection()) return;
+        if (!client.makeConnection()) return false;
         client.start();
+        return true;
     }
 
     public static void newTurn() {
@@ -103,7 +105,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static int getCurrentPath(){
         return currentPath;
     }
-    public GameClient getClient(){return client;}
+    public static GameClient getClient(){return client;}
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
@@ -113,7 +115,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         // main menu
         buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
-        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
+                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,player==1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
         buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
         buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
@@ -307,7 +310,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
          * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
          */
         //fix this later
-        if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
+        if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
         showHealth();
 
         showCoins(GameController.defender);
@@ -433,7 +436,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
-        font=fontGenerator.generateFont(fontParameter);
+        font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));

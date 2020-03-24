@@ -121,11 +121,6 @@ public class GameClient extends UDPSocket
         }
     }
     
-    @Override
-    protected void phaseChange() {
-        GameController.endPhase();
-    }
-    
     /**
      * Sends an object to the server
      *
@@ -133,7 +128,24 @@ public class GameClient extends UDPSocket
      */
     @Override
     public void send(Object contents) {
-        sendObject(server, contents);
+        sendObject(server, new NumberedPacket(contents));
+    }
+    
+    @Override
+    protected void parsePacket(DatagramPacket packet) {
+        Object received = getObjectFromBytes(packet.getData());
+        if (received == null) {
+            System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
+        } else if (received.getClass() == String.class) {
+            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(), received);
+            if (received.equals("Change Phase")) {
+                GameController.endPhase();
+            }
+        } else if (received.getClass() == BuildPhaseData.class) {
+            System.out.printf("[%d] Received game state\n", socket.getLocalPort());
+            gameState = (BuildPhaseData) received;
+            setGameState(gameState);
+        }
     }
     
     /**
@@ -198,33 +210,5 @@ public class GameClient extends UDPSocket
      */
     public boolean isMyTurn() {
         return getCurrentWave().equals(getPlayerType() + "Build");
-    }
-    
-    @Override
-    protected void createInputThread() {
-        new Thread(() -> {
-            while (running) {
-                if (!isMyTurn()) {
-                    receiveObject();
-                }
-            }
-        }).start();
-    }
-    
-    @Override
-    protected void createOutputThread() {
-        new Thread(() -> {
-            while (running) {
-                if (!getCurrentWave().equals("Play"))
-                    send(gameState);
-                else
-                    send("Keep Alive");
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    running = false;
-                }
-            }
-        }).start();
     }
 }

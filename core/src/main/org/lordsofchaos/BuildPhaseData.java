@@ -11,12 +11,13 @@ import java.util.List;
 
 public class BuildPhaseData implements Serializable
 {
-    private static final long serialVersionUID = 5084L;
+    private static final long serialVersionUID = 1846519348570L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
     private List<SerializableTower> removedTowers;
     private int defenderUpgradesThisTurn;
     private List<Integer> pathsUnblockedThisTurn;
+    private String currentWave;
     
     public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, List<SerializableTower> removedTowers, int defenderUpgradesThisTurn,
                           List<Integer> pathsUnblockedThisTurn) {
@@ -25,6 +26,7 @@ public class BuildPhaseData implements Serializable
         this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
         this.pathsUnblockedThisTurn = pathsUnblockedThisTurn;
         this.removedTowers = removedTowers;
+        this.currentWave = GameController.getWaveState().toString();
     }
     
     public int[][] getUnitBuildPlan() {
@@ -34,14 +36,22 @@ public class BuildPhaseData implements Serializable
     public List<SerializableTower> getTowerBuildPlan() {
         return towerBuildPlan;
     }
-
+    
     public List<SerializableTower> getRemovedTowers() {
         return removedTowers;
     }
-
-    public List<Integer> getPathsUnblockedThisTurn() { return pathsUnblockedThisTurn; }
-
-    public int getDefenderUpgradesThisTurn() { return defenderUpgradesThisTurn; }
+    
+    public List<Integer> getPathsUnblockedThisTurn() {
+        return pathsUnblockedThisTurn;
+    }
+    
+    public int getDefenderUpgradesThisTurn() {
+        return defenderUpgradesThisTurn;
+    }
+    
+    public String getCurrentWave() {
+        return currentWave;
+    }
     
     public String toString() {
         String units = Arrays.deepToString(unitBuildPlan);
