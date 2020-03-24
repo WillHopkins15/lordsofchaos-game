@@ -158,7 +158,7 @@ public class GameController {
             blockedPaths.add(i);
         }
         unblockPath(0); // unblock the first path
-
+        unblockPath(0);
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }

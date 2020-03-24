@@ -97,6 +97,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void setGhostTowerType(TowerType newType){
         ghostTowerType = newType;
     }
+    public static void setCurrentPath(int newPath){
+        currentPath = newPath;
+    }
+    public static int getCurrentPath(){
+        return currentPath;
+    }
     public GameClient getClient(){return client;}
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
@@ -116,10 +122,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160, Screen.MAIN_MENU, Screen.LEADERBOARD));
 
         // troop buttons
-        buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
-        buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50,Screen.ATTACKER_SCREEN, currentPath,1));
-        buttonList.add(new UnitButton("UI/ufo2Button.png", 262, 50,Screen.ATTACKER_SCREEN, currentPath,2));
-
+        buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN,0));
+        buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50,Screen.ATTACKER_SCREEN,1));
+        buttonList.add(new UnitButton("UI/ufo2Button.png", 262, 50,Screen.ATTACKER_SCREEN,2));
         // select attacker/defender buttons
         buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.DEFENDER_SCREEN,0));
         buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png",   Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.ATTACKER_SCREEN,1));
@@ -129,6 +134,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         // defender upgrade button
         buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262+106, 50,Screen.DEFENDER_SCREEN));
+
+        //attacker path buttons
+        //TO DO: Get starting locations for paths
+        buttonList.add(new PathButton("UI/pathHighlight.png",343,169,Screen.ATTACKER_SCREEN,0));
+        buttonList.add(new PathButton("UI/pathHighlight.png",759,121,Screen.ATTACKER_SCREEN,1));
+        //buttonList.add(new PathButton("UI/pathHighlight.png",342,169,Screen.ATTACKER_SCREEN,2));
     }
 
     // need to hide button once defender has bought all upgrades
@@ -415,16 +426,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void create(){
-
         instance = this;
-        currentPath = 0;
+
+        currentPath = 1;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
         font=fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        //soundTrack.loop(0.25f);
+        soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
        /* endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
@@ -509,6 +520,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
+            System.out.println(currentPath );
             isometricPov();
             batch.begin();
             if (player == 0) defenderPOV();
