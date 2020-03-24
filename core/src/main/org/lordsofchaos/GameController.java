@@ -21,6 +21,7 @@ import org.lordsofchaos.player.Player;
 import org.lordsofchaos.database.Leaderboard;
 
 import java.sql.SQLException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -751,7 +752,7 @@ public class GameController {
         }
     }
     
-    public enum WaveState
+    public enum WaveState implements Serializable
     {
         DefenderBuild, AttackerBuild, Play, WaitingForInput, SubmitInput, End
     }
