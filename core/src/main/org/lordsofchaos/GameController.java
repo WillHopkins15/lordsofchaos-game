@@ -159,8 +159,8 @@ public class GameController {
             blockedPaths.add(i);
         }
         unblockPath(0); // unblock the first path
-        unblockPath(0);
-        unblockPath(0);
+        unblockPath(1);
+
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
@@ -194,7 +194,7 @@ public class GameController {
     }
 
     public static void unblockPath(int index) {
-        blockedPaths.remove(index);
+        blockedPaths.remove(new Integer(index));
     }
 
     public static boolean canAttackerUnblockPath(int index) {
