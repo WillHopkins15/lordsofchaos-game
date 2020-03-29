@@ -178,7 +178,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         String nr = GameController.defender.getHealth() + "";
         hpCounter.getData().setScale(1.5f);
         hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
-
     }
 
 
@@ -218,11 +217,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 int troopX = (int) troopScreenPosition.x, troopY = (int) troopScreenPosition.y;
                 Vector2 towerScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates());
                 int towerX = (int) towerScreenPosition.x, towerY = (int) towerScreenPosition.y;
-                //System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
+                // System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
                 towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
             }
         }
-        //towerAttackPixmap.fill();
+        // towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
         Sprite towerAttackSprite = new Sprite(towerAttackTexture);
         towerAttackSprite.setPosition(0, 0);
@@ -433,7 +432,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (currentScreen == null) Gdx.app.exit();
-        else if(currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
+        else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
             for (Button button : buttonList)
                 if (button.getScreenLocation() == currentScreen)
@@ -460,8 +459,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             }
             showUnitHealthBar();
             showTowerAttack();
-            if(GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
-                    GameController.getWaveState() == GameController.WaveState.DefenderBuild){
+            if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
+                    GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
                 String timerTmp = String.format("%02d" , 30 - (int) GameController.getBuildPhaseTimer());
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
             }
