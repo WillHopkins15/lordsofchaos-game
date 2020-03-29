@@ -19,11 +19,12 @@ public class MultiplayerButton extends MenuButton {
             if (Game.getClient().isDefender()) {
                 GameController.setPlayerType(true);
                 Game.player = 0;
+                targetScreen = Screen.DEFENDER_SCREEN;
             } else if (Game.getClient().isAttacker()) {
                 GameController.setPlayerType(false);
                 Game.player = 1;
+                targetScreen = Screen.ATTACKER_SCREEN;
             }
-            targetScreen = Screen.GAME;
             Game.currentScreen = targetScreen;
         }
     }
