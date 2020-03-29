@@ -110,12 +110,14 @@ public class EventManager
 
     public static void buildPlanChange(int unitType, int path, int change, boolean troopSpawned) {
         if (unitType < 0 || unitType > 2 || path < 0 || path > GameController.getPaths().size()) {
+            System.out.println("Invalid buildPlanChange");
             return; // unit or path doesn't exist
         }
 
         // if path is blocked can't add troop (although this check should be performed before this point)
         if (GameController.getBlockedPaths().contains(new Integer(path)))
         {
+            System.out.println("Path is blocked");
             return;
         }
         

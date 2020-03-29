@@ -1,32 +1,36 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
-import org.lordsofchaos.gameobjects.towers.Tower;
+import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.*;
 import org.lordsofchaos.graphics.buttons.*;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
@@ -44,7 +48,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static SpriteBatch batch;
     private static float timerChangeTurn;
     private static boolean changedTurn = false;
-    public static boolean multiplayer = false;
     final int height = 720;
     final int width = 1280;
     private MapRenderer renderer;
@@ -70,15 +73,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static int currentPath;
     private static boolean mouseClicked;
 
+    // leaderbaord
+    private String[][] leaderBoardTop;
+    private static Texture leaderboardRowTexture;
+    private static List<Sprite> leaderboardRowSprites;
+    private static BitmapFont leaderBoardRowText;
 
     public static void main(String[] args) {
         setupClient();
     }
 
-    private static void setupClient() {
+    public static boolean setupClient() {
         client = new GameClient();
-        if (!client.makeConnection()) return;
+        if (!client.makeConnection()) return false;
         client.start();
+        return true;
     }
 
     public static void newTurn() {
@@ -90,32 +99,55 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void setGhostTowerType(TowerType newType){
         ghostTowerType = newType;
     }
-    public GameClient getClient(){return client;}
+    public static void setCurrentPath(int newPath){
+        currentPath = newPath;
+    }
+    public static int getCurrentPath(){
+        return currentPath;
+    }
+    public static GameClient getClient(){return client;}
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 156, 50,Screen.DEFENDER_SCREEN,TowerType.type2));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
+
+        // main menu
         buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
-                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
+        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
+                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,player==1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
+        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
         buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
-                Gdx.graphics.getHeight() / 2 - 84 * 2,Screen.MAIN_MENU,null));
+                Gdx.graphics.getHeight() / 2 - 160-105,Screen.MAIN_MENU,null));
+
+        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160, Screen.MAIN_MENU, Screen.LEADERBOARD));
 
         // troop buttons
-        buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN, currentPath,0));
-        buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50,Screen.ATTACKER_SCREEN, currentPath,1));
-        buttonList.add(new UnitButton("UI/ufo2Button.png", 262, 50,Screen.ATTACKER_SCREEN, currentPath,2));
-
+        buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50,Screen.ATTACKER_SCREEN,0));
+        buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50,Screen.ATTACKER_SCREEN,1));
+        buttonList.add(new UnitButton("UI/ufo2Button.png", 262, 50,Screen.ATTACKER_SCREEN,2));
         // select attacker/defender buttons
         buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.DEFENDER_SCREEN,0));
         buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png",   Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2,Screen.CHOOSE_FACTION,Screen.ATTACKER_SCREEN,1));
 
         buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.ATTACKER_SCREEN));
         buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200,Screen.DEFENDER_SCREEN));
-        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 8,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
-        buttonList.add(new LevelEditorButton("UI/button.png", 100, Gdx.graphics.getHeight() / 8, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
 
+        // defender upgrade button
+        buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262+106, 50,Screen.DEFENDER_SCREEN));
+
+        //attacker path buttons
+        //TO DO: Get starting locations for paths
+        buttonList.add(new PathButton("UI/pathHighlight.png",343,169,Screen.ATTACKER_SCREEN,0));
+        buttonList.add(new PathButton("UI/pathHighlight.png",759,121,Screen.ATTACKER_SCREEN,1));
+        buttonList.add(new PathButton("UI/pathHighlight.png",1079,281,Screen.ATTACKER_SCREEN,2));
+    }
+
+    // need to hide button once defender has bought all upgrades
+    public static void defenderMaxLevel() {
+        UpgradeButton.maxLevel = true;
     }
 
     public static void changeTurn(float targetTime, String currentPlayer) {
@@ -131,6 +163,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
     }
 
+    public void setLeaderBoardTop(int count) throws SQLException, ClassNotFoundException {
+        leaderBoardTop = Leaderboard.getTop(count);
+    }
 
     public void isometricPov() {
         renderer.render();
@@ -139,12 +174,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         if (player == 0) {
             // DEFENDER
-            if (buildMode) {
-                Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/TowerType1.png"));
+            if (buildMode && ghostTowerType != null) {
+                Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/" + ghostTowerType.getSpriteName() + ".png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
 
-                if (GameController.verifyTowerPlacement(TowerType.type1, rwc))
+                if (GameController.verifyTowerPlacement(ghostTowerType, rwc))
                     renderer.getBatch().setColor(0, 1, 0, 0.5f);
                 else renderer.getBatch().setColor(1, 0, 0, 0.5f);
 
@@ -165,12 +200,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
+
     public void generateFont(){
         fontParameter.size  = 30;
         timerFont = fontGenerator.generateFont(fontParameter);
         fontParameter.size = 40;
         font = fontGenerator.generateFont(fontParameter);
     }
+
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -179,7 +216,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         hpCounter.getData().setScale(1.5f);
         hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
     }
-
 
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
@@ -205,21 +241,28 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public void showTowerAttack() {
-        List<Tower> towers = GameController.getTowers();
         towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
-        towerAttackPixmap.setColor(Color.YELLOW);
+
         boolean draw = false;
-        for (Tower tower : towers) {
-            Troop tmpTroop = tower.getTarget();
-            if (tmpTroop != null) {
-                draw = true;
-                Vector2 troopScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tmpTroop.getRealWorldCoordinates());
-                int troopX = (int) troopScreenPosition.x, troopY = (int) troopScreenPosition.y;
-                Vector2 towerScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(tower.getRealWorldCoordinates());
-                int towerX = (int) towerScreenPosition.x, towerY = (int) towerScreenPosition.y;
-                // System.out.println("TowerX: " + towerX + " towerY: " + towerY + " troopX: " + troopX + " troopY: " + troopY);
-                towerAttackPixmap.drawLine(towerX, Gdx.graphics.getHeight() - towerY - 40, troopX, Gdx.graphics.getHeight() - troopY);
+
+        for (Projectile proj : GameController.getProjectiles()) {
+
+            if (proj.getTower() instanceof TowerType1) {
+                towerAttackPixmap.setColor(Color.RED);
             }
+            else if (proj.getTower() instanceof TowerType2) {
+                towerAttackPixmap.setColor(Color.BLUE);
+            }
+            else if (proj.getTower() instanceof TowerType3) {
+                towerAttackPixmap.setColor(Color.YELLOW);
+            }
+
+            draw = true;
+            Vector2 projScreenPosition = Conversions.realWorldCoordinatesToScreenPosition(proj.getRealWorldCoordinates());
+
+            int projX = (int) projScreenPosition.x, projY = (int) projScreenPosition.y;
+
+            towerAttackPixmap.fillCircle(projX, Gdx.graphics.getHeight() - projY, 3);
         }
         // towerAttackPixmap.fill();
         towerAttackTexture = new Texture(towerAttackPixmap);
@@ -247,8 +290,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
 
         for (Button button : buttonList)
-            if (button.getScreenLocation() == Screen.DEFENDER_SCREEN)
-                button.getSprite().draw(batch);
+            if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
+                if (button instanceof  UpgradeButton)
+                {
+                    if (!((UpgradeButton) button).maxLevel)
+                    {
+                        button.getSprite().draw(batch);
+                    }
+                }
+                else {
+                    button.getSprite().draw(batch);
+                }
+            }
         /*
          * tmpSpriteTower.setPosition(Gdx.input.getX() - tmpSpriteTower.getWidth() / 2,
          * Gdx.graphics.getHeight() - Gdx.input.getY()); batch.setColor(0, 200, 0,
@@ -256,7 +309,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
          * Gdx.graphics.getHeight() - Gdx.input.getY() - 16, 48, 94);
          */
         //fix this later
-        if(GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
+        if (GameController.getWaveState() == GameController.WaveState.AttackerBuild) buildMode = false;
         showHealth();
 
         showCoins(GameController.defender);
@@ -273,7 +326,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         String nr = "" + x;
         for (Button button : buttonList) {
             if (button instanceof UnitButton) {
-                int tmpPath = ((UnitButton) button).getUnitPath();
+                int tmpPath = currentPath;
                 int tmpTroopType = ((UnitButton) button).getTroopType();
                 String unitNr = "" + EventManager.getUnitBuildPlan()[tmpTroopType][tmpPath];
                 unitNumber.draw(batch, unitNr, button.getX() + button.getSprite().getWidth() - 20 - (unitNr.length() - 1) * 10, button.getY() + 25);
@@ -314,16 +367,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT)  {
-                if (buildMode) {
+                if (buildMode && ghostTowerType != null) {
                     // Place tower
-                    System.out.println("TEST1");
                     mouseClicked = true;
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-                    if (GameController.verifyTowerPlacement(TowerType.type1, rwc)) {
+                    if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(0.75f);
-                        EventManager.towerPlaced(TowerType.type1, rwc);
+                        EventManager.towerPlaced(ghostTowerType, rwc);
                         buildMode = false;
-                        System.out.println("TEST");
                     }
 
                 } else {
@@ -377,16 +428,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void create(){
-
         instance = this;
+
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
-        font=fontGenerator.generateFont(fontParameter);
+        font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        //soundTrack.loop(0.25f);
+        soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
        /* endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
@@ -421,10 +472,23 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         GameController.initialise();
         renderer.setMap(GameController.getMap());
         hpSpriteW = healthSprite.getWidth();
+        healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
+
+        leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
+        leaderboardRowSprites = new ArrayList<>();
+        leaderBoardRowText = new BitmapFont();
+        leaderBoardRowText.getData().setScale(2);
+
+        int yOffset = 0;
+        for (int i = 0; i < 5; i++, yOffset-=100) {
+            Sprite sprite = new Sprite(leaderboardRowTexture);
+            sprite.setPosition(Gdx.graphics.getWidth() / 2 - 500, Gdx.graphics.getHeight() / 2 + 100 + yOffset);
+            leaderboardRowSprites.add(sprite);
+        }
+
         currentScreen = Screen.MAIN_MENU;
 
         Gdx.input.setInputProcessor(this);
-
     }
 
     @Override
@@ -441,9 +505,24 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer);
             levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
+        }else if (currentScreen == Screen.LEADERBOARD) {
+            batch.begin();
+            int i = 0;
+            int yOffset = 0;
+            for (Sprite sprite : leaderboardRowSprites) {
+                String str = "name: " + leaderBoardTop[i][0] + ", waves: " + leaderBoardTop[i][1] + ", date:  " + leaderBoardTop[i][2];
+
+                leaderBoardRowText.draw(batch, str, Gdx.graphics.getWidth() / 2 - 400, Gdx.graphics.getHeight() / 2 + 175 + yOffset);
+                sprite.draw(batch);
+
+                yOffset-=100;
+                i++;
+            }
+            batch.end();
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
+            //System.out.println(currentPath );
             isometricPov();
             batch.begin();
             if (player == 0) defenderPOV();
@@ -463,6 +542,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
                 String timerTmp = String.format("%02d" , 30 - (int) GameController.getBuildPhaseTimer());
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+            }
+            for(Button button : buttonList){
+                if(button instanceof PathButton && button.getScreenLocation() == currentScreen){
+                    ((PathButton) button).checkHover(Gdx.input.getX(),Gdx.graphics.getHeight() - Gdx.input.getY());
+                }
             }
             batch.end();
             disposeTMP();
@@ -491,6 +575,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) )
             currentScreen = Screen.CHOOSE_FACTION;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
+            currentScreen = Screen.MAIN_MENU;
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;

@@ -1,5 +1,6 @@
 package org.lordsofchaos;
 
+import com.badlogic.gdx.Gdx;
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
@@ -9,6 +10,7 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.gameobjects.troops.TroopType1;
 import org.lordsofchaos.gameobjects.troops.TroopType2;
 import org.lordsofchaos.gameobjects.troops.TroopType3;
+import org.lordsofchaos.graphics.MyTextInputListener;
 import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
@@ -19,6 +21,7 @@ import org.lordsofchaos.player.Player;
 import org.lordsofchaos.database.Leaderboard;
 
 import java.sql.SQLException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,9 +69,9 @@ public class GameController {
     private static int height;
     private static int width;
 
-    private static final int defenderUpgradeBaseCost = 100;
+    private static final int defenderUpgradeBaseCost = 50;
     private static int defenderUpgradeLevel = 0;
-    private static int defenderMaxUpgradeLevel = 4;
+    private static int defenderMaxUpgradeLevel = 3;
 
     @SuppressWarnings("unused")
 
@@ -87,6 +90,23 @@ public class GameController {
     private static List<Obstacle> obstacles = new ArrayList<>();
     // The 2 dimensional array to represent the map
     private static MatrixObject[][] map;
+
+    private static List<Projectile> projectiles;
+
+    private static String inputName;
+    public static void setInputName(String name) {
+        inputName = name;
+        waveState = WaveState.SubmitInput;
+    }
+
+    public static List<Projectile> getProjectiles()
+    {
+        if (projectiles == null)
+        {
+            projectiles = new ArrayList<>();
+        }
+        return projectiles;
+    }
     
     public static float getBuildPhaseTimer() {
         return buildTimer;
@@ -119,7 +139,7 @@ public class GameController {
     }
     
     public static void setPlayerType(Boolean type) {
-        clientPlayerType = type ? defender : attacker;
+        clientPlayerType = type ? attacker : defender;
     }
     
     public static void initialise() {
@@ -139,6 +159,7 @@ public class GameController {
             blockedPaths.add(i);
         }
         unblockPath(0); // unblock the first path
+        unblockPath(1);
 
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
@@ -173,7 +194,7 @@ public class GameController {
     }
 
     public static void unblockPath(int index) {
-        blockedPaths.remove(index);
+        blockedPaths.remove(new Integer(index));
     }
 
     public static boolean canAttackerUnblockPath(int index) {
@@ -254,18 +275,14 @@ public class GameController {
             wave++;
             resetBuildTimer();
         } else {
+            removeAllProjectiles();
+
             waveState = WaveState.DefenderBuild;
             
             System.out.println("Defender build phase begins");
-
             // check here rather than in update, because defender only wins if they survive a round at max level
-            if(defenderUpgradeLevel == 4) {
-                System.out.println("Defender Wins");
-                try {
-                    Leaderboard.addWinner(defender,wave);
-                } catch (SQLException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+            if(defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+                playerWins(defender);
             }
             
             // reset all tower cooldowns
@@ -281,9 +298,39 @@ public class GameController {
             resetUnitSpawnTimer();
         }
     }
+
+    private static void playerWins(Player player) {
+        if (clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
+        {
+            waveState = WaveState.WaitingForInput;
+            MyTextInputListener listener = new MyTextInputListener();
+            Gdx.input.getTextInput(listener, "Type name", "", "Hint Value");
+        }
+        else
+        {
+            waveState = WaveState.End;
+        }
+    }
     
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
+        if (waveState == WaveState.WaitingForInput) {
+            return;
+        }
+        if (waveState == WaveState.SubmitInput) {
+            try {
+                Leaderboard.addWinner(inputName,wave);
+                waveState = WaveState.End;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        if (waveState == waveState.End) {
+            return;
+        } // winner has been declared, so don't let the game play
         if (waveState == WaveState.DefenderBuild) {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
@@ -299,15 +346,7 @@ public class GameController {
         } else {
             // if defender health reaches zero, game over
             if (defender.getHealth() <= 0) {
-                System.out.println("Defender loses");
-                try {
-                    Leaderboard.addWinner(attacker,wave);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-
+                playerWins(attacker);
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
@@ -318,7 +357,14 @@ public class GameController {
                 shootTroops(deltaTime);
                 moveTroops(deltaTime);
                 spawnTroop(deltaTime);
+                moveProjectiles(deltaTime);
             }
+        }
+    }
+
+    private static void moveProjectiles(float deltaTime) {
+        for (int i = 0; i < getProjectiles().size(); i++) {
+            getProjectiles().get(i).update(deltaTime);
         }
     }
     
@@ -356,6 +402,7 @@ public class GameController {
         if (unitSpawnTimer > unitSpawnTimeLimit) {
             // loop through each path and spawn a troop into each
             for (int path = 0; path < getPaths().size(); path++) {
+                System.out.println("Spawning on path - " + path );
                 int troop;
                 Troop newTroop = null;
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
@@ -368,7 +415,7 @@ public class GameController {
                     troop = 2;
                     newTroop = new TroopType3(getPaths().get(path));
                 } else {
-                    break;
+                    continue;
                 }
                 //calls upgrade troop function
                 upgradeTroops();
@@ -463,8 +510,9 @@ public class GameController {
     public static MatrixObject getMatrixObject(int y, int x) {
         return map[y][x];
     }
-    
-    public static void shootTroop(Tower tower, Troop troop) {
+
+    public static void damageTroop(Tower tower, Troop troop, Projectile proj)
+    {
         int temp;
         if (tower.getDamageType().equals(troop.getArmourType())) {
             temp = troop.getCurrentHealth() - (tower.getDamage() + 5 );
@@ -478,7 +526,28 @@ public class GameController {
         if (troop.getCurrentHealth() <= 0) {
             troopDies(troop);
         }
+
+        getProjectiles().remove(proj);
+        proj = null;
     }
+
+    public static void shootTroop(Tower tower, Troop troop) {
+        Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
+        projectiles.add(projectile);
+    }
+
+
+    private static void removeAllProjectiles() {
+        while (!projectiles.isEmpty()) {
+            deleteProj(projectiles.get(0));
+        }
+    }
+
+    private static void deleteProj(Projectile projectile) {
+        projectile = null;
+        projectiles.remove(0);
+    }
+
 
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
@@ -541,7 +610,7 @@ public class GameController {
         } else if (towerType == TowerType.type2) {
             return 20;
         }
-        else if (towerType == TowerType.type2) {
+        else if (towerType == TowerType.type3) {
             return 30;
         }
         return 0;
@@ -567,7 +636,7 @@ public class GameController {
     }
     
     public static boolean canAffordTower(TowerType towerType) {
-        return clientPlayerType.getCurrentMoney() >= getTowerTypeCost(towerType);
+        return defender.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
     
     // once a purchase has been verified and added to event manager, finally need to take money from attacker
@@ -652,12 +721,12 @@ public class GameController {
     // so attacker only uses defenderUpgrade()
     public static boolean canDefenderCanUpgrade()
     {
-        if (defenderUpgradeLevel > defenderMaxUpgradeLevel)
+        if (defenderUpgradeLevel == defenderMaxUpgradeLevel)
         {
             System.out.print("Max level");
             return false;
         }
-        int cost = defenderUpgradeBaseCost*defenderUpgradeLevel;
+        int cost = defenderUpgradeBaseCost*(defenderUpgradeLevel+1);
         // check if can afford
         if (defender.getCurrentMoney() >= cost)
         {
@@ -678,10 +747,13 @@ public class GameController {
         } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
             Tower.upgradeTowerSpeed();
         }
+        if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+            Game.defenderMaxLevel(); // this hides the upgrade button
+        }
     }
     
-    public enum WaveState
+    public enum WaveState implements Serializable
     {
-        DefenderBuild, AttackerBuild, Play
+        DefenderBuild, AttackerBuild, Play, WaitingForInput, SubmitInput, End
     }
 }

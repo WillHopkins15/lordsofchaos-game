@@ -13,11 +13,11 @@ public class TowerButton extends Button {
     }
 
     public void leftButtonAction() {
-        System.out.println("Pressed TOWER BUTTON!!!!!");
        selectSound.play(0.75f);
        Game.instance.buildTrue();
        Game.instance.setGhostTowerType(towerType);
     }
+
     public void rightButtonAction(){
         return;
     }

@@ -10,6 +10,7 @@ public class DatabaseCommunication {
     /*
     Database information:
     dbname= vUx0GmhOrL, username=vUx0GmhOrL, pw= uKKJhxJLlm, server= remotemysql.com, port 3306
+    phpmyadmin user: vUx0GmhOrL, password: uKKJhxJLlm
      */
 
     private static String dbName = "vUx0GmhOrL";

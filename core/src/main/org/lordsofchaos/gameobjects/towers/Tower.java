@@ -244,11 +244,11 @@ public class Tower extends InteractiveObject {
 
         return null;
     }
-    
+
     public void resetTimer() {
         shootTimer = 0;
     }
-    
+
     public void shoot(float deltaTime) {
         shootTimer += deltaTime;
         if (shootTimer > shootTimerLimit/globalSpeedMultiplier) {
