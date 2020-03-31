@@ -76,25 +76,25 @@ public abstract class UDPSocket extends Thread
      * parses the object depending on which object was received.
      */
     @SneakyThrows
-    protected void receiveObject() {
+    protected DatagramPacket receiveObject() {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         
         try {
             socket.receive(packet);
         } catch (SocketException e) {
             System.out.println("Socket closed, ending...");
-            return;
+            return null;
         } catch (SocketTimeoutException e) {
             System.out.println("Receive timed out.");
             if (++timeoutCount >= 10) {
                 System.out.println("Connection dropped. Closing...");
                 this.close();
             }
-            return;
+            return null;
         }
         
         timeoutCount = 0;
-        parsePacket(packet);
+        return(packet);
     }
     
     /**
@@ -103,7 +103,10 @@ public abstract class UDPSocket extends Thread
     protected void createInputThread() {
         new Thread(() -> {
             while (running) {
-                receiveObject();
+                DatagramPacket packet = receiveObject();
+                if (packet != null) {
+                    parsePacket(packet);
+                }
             }
         }).start();
     }

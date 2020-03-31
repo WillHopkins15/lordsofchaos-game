@@ -61,6 +61,18 @@ public class GameClient extends UDPSocket
 
             System.out.println("Found game.");
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
+    
+            // Get confirmation that the other client is ready
+            try {
+                socket.receive(packet);
+            } catch (SocketTimeoutException e) {
+                System.out.println("Other client disconnected.");
+                return false;
+            }
+            if (!(new String(packet.getData())).equals("READY")) {
+                System.out.println("Unexpected Packet Contents");
+                return false;
+            }
             connected = true;
             return true;
         }
@@ -92,6 +104,9 @@ public class GameClient extends UDPSocket
         
         //switch back
         socket = new DatagramSocket(port);
+        
+        //send ready packet
+        send("READY", false);
     }
     
     @SneakyThrows
@@ -108,12 +123,24 @@ public class GameClient extends UDPSocket
     }
     
     /**
-     * Sends an object to the server
-     *
+     * Sends an object to the server.
+     * @param contents Object to send
+     * @param numbered Whether the packet should be time stamped or not
+     */
+    protected void send(Object contents, boolean numbered) {
+        if (numbered) {
+            send(contents);
+        } else {
+            sendObject(server, contents);
+        }
+    }
+    
+    /**
+     * Sends an object to the server as a time stamped packet
      * @param contents Object to send
      */
     @Override
-    public void send(Object contents) {
+    protected void send(Object contents) {
         sendObject(server, new NumberedPacket(contents));
     }
     
