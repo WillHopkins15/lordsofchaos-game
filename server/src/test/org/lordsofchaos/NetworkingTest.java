@@ -10,6 +10,7 @@ import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.server.GameServer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertNotNull;
@@ -36,7 +37,7 @@ public class NetworkingTest
         //init game state
         int[][] units = new int[6][3];
         ArrayList<SerializableTower> tbp = new ArrayList<>();
-        BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp);
+        BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>());
         
         //Connect both players to server
         new Thread(() -> player1.makeConnection()).start();
@@ -57,7 +58,7 @@ public class NetworkingTest
         
         //add things to player 1 game state
         tbp.add(new SerializableTower(TowerType.type1, new RealWorldCoordinates(12, 34)));
-        BuildPhaseData gameState = new BuildPhaseData(units, tbp);
+        BuildPhaseData gameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>());
         
         //update player1 game state
         player1.setGameState(gameState);
