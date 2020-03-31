@@ -106,17 +106,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         return currentPath;
     }
     public static GameClient getClient(){return client;}
+
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 156, 50,Screen.DEFENDER_SCREEN,TowerType.type2));
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
-
         // main menu
         buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
         buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
-                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,player==1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
+                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU, player == 1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
         buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
         buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
@@ -233,9 +233,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     public void disposeUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
-        if (tmpUnits.size() > 0) {
-            unitsSprite = new ArrayList<>();
-        }
+        if (tmpUnits.size() > 0) unitsSprite = new ArrayList<>();
         for (TroopSprite troopSprite : unitsSprite) troopSprite.dispose();
 
     }
@@ -249,11 +247,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
             if (proj.getTower() instanceof TowerType1) {
                 towerAttackPixmap.setColor(Color.RED);
-            }
-            else if (proj.getTower() instanceof TowerType2) {
+            } else if (proj.getTower() instanceof TowerType2) {
                 towerAttackPixmap.setColor(Color.BLUE);
-            }
-            else if (proj.getTower() instanceof TowerType3) {
+            } else if (proj.getTower() instanceof TowerType3) {
                 towerAttackPixmap.setColor(Color.YELLOW);
             }
 
@@ -437,9 +433,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         fontParameter = new FreeTypeFontParameter();
         font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        soundTrack.loop(0.25f);
+        //soundTrack.loop(0.25f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
-       /* endTurnFont = new BitmapFont();
+        /*
+        endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
         endTurnFont.getData().setScale(3f);
         */
@@ -498,14 +495,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (currentScreen == null) Gdx.app.exit();
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
-            for (Button button : buttonList)
-                if (button.getScreenLocation() == currentScreen)
+            for (Button button : buttonList) if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
             batch.end();
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer);
             levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
-        }else if (currentScreen == Screen.LEADERBOARD) {
+            batch.begin();
+            for (Button button: levelEditor.getButtons()) button.getSprite().draw(batch);
+            batch.end();
+        } else if (currentScreen == Screen.LEADERBOARD) {
             batch.begin();
             int i = 0;
             int yOffset = 0;
@@ -605,10 +604,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen)
                     value.leftButtonAction();
         }
-        if (currentScreen == Screen.GAME || currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
+        if (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
             if (player == 1) attackerTouchDown(screenX, y, pointer, button);
             else if (player == 0) defenderTouchDown(screenX, y, pointer, button);
         } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
+            for (Button b: levelEditor.getButtons())
+                if (b.checkClick(screenX, y)) {
+                    if (button == Buttons.LEFT) b.leftButtonAction();
+                    return false;
+                }
             if (button == Buttons.LEFT) levelEditor.setPlaced(true);
             else if (button == Buttons.RIGHT) levelEditor.remove();
         }

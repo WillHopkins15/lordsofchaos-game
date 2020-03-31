@@ -9,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
-import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.towers.DefenderTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
@@ -29,39 +28,37 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     public static final int width = 20;
     public static final int height = 20;
     private MatrixObject[] map = new MatrixObject[400];
+    private MatrixObject[] sortedMap = new MatrixObject[400];
     private HashMap<String, Texture> textures = new HashMap<>();
     private HashMap<Integer, Sprite> cachedTiles = new HashMap<>();
     private HashMap<GameObject, Sprite> cachedSprites = new HashMap<>();
     private HashMap<Integer, Color> colourExceptions = new HashMap<>();
+    private boolean mapUpdated = true;
 
     public MapRenderer() {
         super(new TmxMapLoader().load("maps/BlankMap.tmx"));
         File tileDirectory = new File("core/assets/maps/tiles");
         File[] tileFiles = tileDirectory.listFiles();
         assert tileFiles != null;
-        for (File file : tileFiles)
-            if (!file.isHidden())
-                textures.put(file.getName(), new Texture(Gdx.files.internal("maps/tiles/" + file.getName())));
+        for (File file : tileFiles) if (!file.isHidden())
+            textures.put(file.getName(), new Texture(Gdx.files.internal("maps/tiles/" + file.getName())));
         File towerDirectory = new File("core/assets/towers/sprites");
         File[] towerFiles = towerDirectory.listFiles();
         assert towerFiles != null;
-        for (File file : towerFiles)
-            if (!file.isHidden())
-                textures.put(file.getName(), new Texture(Gdx.files.internal("towers/sprites/" + file.getName())));
+        for (File file : towerFiles) if (!file.isHidden())
+            textures.put(file.getName(), new Texture(Gdx.files.internal("towers/sprites/" + file.getName())));
         File troopDirectory = new File("core/assets/troops/");
         File[] troopFiles = troopDirectory.listFiles();
         assert troopFiles != null;
-        for (File file : troopFiles)
-            if (!file.isHidden())
-                textures.put(file.getName(), new Texture(Gdx.files.internal("troops/" + file.getName())));
-
+        for (File file : troopFiles) if (!file.isHidden())
+            textures.put(file.getName(), new Texture(Gdx.files.internal("troops/" + file.getName())));
     }
 
     public void setMap(MatrixObject[][] map) {
-        for (int y = height - 1; y > -1; y--)
-            for (int x = 0; x < width; x++)
-                this.map[index(x, y)] = map[y][x];
-            cachedTiles.clear();
+        for (int y = height - 1; y > -1; y--) for (int x = 0; x < width; x++)
+            this.map[index(x, y)] = map[y][x];
+        cachedTiles.clear();
+        mapUpdated = true;
     }
 
     public MatrixObject objectAt(int x, int y) {
@@ -76,14 +73,15 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         int x = object.getMatrixPosition().getX(), y = object.getMatrixPosition().getY();
         refreshSprite(x, y);
         map[index(x, y)] = object;
+        mapUpdated = true;
     }
 
     public void refreshSprite(int x, int y) {
         for (int i = x - 1; i < x + 2; i++)
             for (int j = y - 1; j < y + 2; j++)
                 if (index(i, j) >= 0 && index(i, j) < map.length) {
-                    if (objectAt(x, y) instanceof Obstacle)
-                        if (((Obstacle) objectAt(x, y)).getType() == ObstacleType.TREE) continue;
+                    // if (objectAt(x, y) instanceof Obstacle)
+                        // if (((Obstacle) objectAt(x, y)).getType() == ObstacleType.TREE) continue;
                     cachedTiles.remove(index(i, j));
                 }
     }
@@ -91,9 +89,11 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     @Override
     public void render() {
         super.render();
-
-        MatrixObject[] mapClone = map.clone();
-        Arrays.sort(mapClone);
+        if (mapUpdated) {
+            sortedMap = map.clone();
+            Arrays.sort(sortedMap);
+            mapUpdated = false;
+        } else System.out.println("Map Same...");
 
         List<GameObject> objectsToAdd = new ArrayList<>();
         objectsToAdd.addAll(GameController.getTowers());
@@ -103,12 +103,9 @@ public class MapRenderer extends IsometricTiledMapRenderer {
 
         getBatch().begin();
 
-        for (MatrixObject object : mapClone) {
+        for (MatrixObject object: sortedMap) {
             MatrixCoordinates matrixCoordinates = object.getMatrixPosition();
-            RealWorldCoordinates realWorldCoordinates = new RealWorldCoordinates(matrixCoordinates);
-            realWorldCoordinates.setX(realWorldCoordinates.getX() - GameController.getScaleFactor() / 2);
-            realWorldCoordinates.setY(realWorldCoordinates.getY() - GameController.getScaleFactor() / 2);
-            Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(realWorldCoordinates);
+            Vector2 coordinates = Conversions.matrixCooridinateToIsometric(matrixCoordinates);
             getBatch().setColor(Color.WHITE);
             int i = index(matrixCoordinates.getX(), matrixCoordinates.getY());
             if (colourExceptions.containsKey(i)) getBatch().setColor(colourExceptions.get(i));
@@ -120,9 +117,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
             float w = 48f, a = sprite.getHeight() / sprite.getWidth();
             if (object instanceof DefenderTower) w = 72f;
-            else if (object instanceof Tower)
-                if (!((Tower) object).getIsCompleted())
-                    getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
+            else if (object instanceof Tower) if (!((Tower) object).getIsCompleted())
+                getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
             getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w, w * a);
             getBatch().setColor(Color.WHITE);
         }
@@ -130,13 +126,19 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         getBatch().end();
     }
 
-    private boolean adjacentTileIs(int x, int y, String direction, String type) {
+    public boolean adjacentTileIs(int x, int y, String direction, String type) {
         MatrixObject tile = null;
+        if (x < 0 || y < 0 || x >= width || y >= height) return false;
         switch (direction) {
             case "N": if (y < height - 1) tile = map[index(x, y + 1)]; break;
             case "S": if (y > 0) tile = map[index(x, y - 1)]; break;
             case "E": if (x < width - 1) tile = map[index(x + 1, y)]; break;
-            default: if (x > 0) tile = map[index(x - 1, y)];
+            case "W": if (x > 0) tile = map[index(x - 1, y)]; break;
+            case "NE": if (y < height - 1 && x < width - 1) tile = map[index(x + 1, y + 1)]; break;
+            case "NW": if (y < height - 1 && x > 0) tile = map[index(x - 1, y + 1)]; break;
+            case "SE": if (y > 0 && x < width - 1) tile = map[index(x + 1, y - 1)]; break;
+            case "SW" : if (y > 0 && x > 0) tile = map[index(x - 1, y - 1)]; break;
+            default: return false;
         }
         if (tile == null) return false;
         switch (type) {
@@ -165,8 +167,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
 
     private Sprite sprite(MatrixObject object) {
         int index = index(object.getMatrixPosition().getX(), object.getMatrixPosition().getY());
-        if (cachedTiles.containsKey(index))
-            return cachedTiles.get(index);
+        if (cachedTiles.containsKey(index)) return cachedTiles.get(index);
         Sprite sprite = new Sprite(textures.get(spriteName(object) + ".png"));
         cachedTiles.put(index, sprite);
         return sprite;
@@ -185,22 +186,21 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             if (adjacentTileIs(x, y, "W", "Path")) s += "W";
             if (s.equals("path") || s.equals("pathN") || s.equals("pathS")) s = "pathNS";
             else if (s.equals("pathE") || s.equals("pathW")) s = "pathEW";
-            if (s.equals("pathNS") &&
-                    adjacentTileIs(x, y, "E", "RiverW") &&
+            if (s.equals("pathNS") && adjacentTileIs(x, y, "E", "RiverW") &&
                     adjacentTileIs(x, y, "W", "RiverE")) s = "bridgeNS";
-            else if (s.equals("pathEW") &&
-                    adjacentTileIs(x, y, "N", "RiverS") &&
+            else if (s.equals("pathEW") && adjacentTileIs(x, y, "N", "RiverS") &&
                     adjacentTileIs(x, y, "S", "RiverN")) s = "bridgeEW";
         } else if (object instanceof Obstacle) {
             Obstacle obstacle = (Obstacle) object;
             switch (obstacle.getType()) {
                 case BASE: return "dirt"; case ROCK: return "rock";
-                case TREE: return  "tree" + new Random().nextInt(5);
+                case TREE: return  "tree4"; // + new Random().nextInt(5);
                 case RIVER: s = "river";
                     if (adjacentTileIs(x, y, "N", "River")) s += "N";
-                    if (adjacentTileIs(x, y, "S", "River")) s += "S";
+                    else if (adjacentTileIs(x, y, "S", "River")) s += "S";
                     if (adjacentTileIs(x, y, "E", "River")) s += "E";
-                    if (adjacentTileIs(x, y, "W", "River")) s += "W";
+                    else if (adjacentTileIs(x, y, "W", "River")) s += "W";
+                    //if (s.length() > 7) s = "riverNS";
                     if (s.equals("river") || s.equals("riverN") || s.equals("riverS")) s = "riverNS";
                     else if (s.equals("riverE") || s.equals("riverW")) s = "riverEW";
             }
