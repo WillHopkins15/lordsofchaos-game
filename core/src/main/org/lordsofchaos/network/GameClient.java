@@ -127,7 +127,7 @@ public class GameClient extends UDPSocket
      * @param contents Object to send
      * @param numbered Whether the packet should be time stamped or not
      */
-    protected void send(Object contents, boolean numbered) {
+    public void send(Object contents, boolean numbered) {
         if (numbered) {
             send(contents);
         } else {
@@ -140,7 +140,7 @@ public class GameClient extends UDPSocket
      * @param contents Object to send
      */
     @Override
-    protected void send(Object contents) {
+    public void send(Object contents) {
         sendObject(server, new NumberedPacket(contents));
     }
     
