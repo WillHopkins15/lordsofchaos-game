@@ -2,6 +2,9 @@ package org.lordsofchaos.network;
 
 import java.net.InetAddress;
 
+/**
+ * Object that holds the local IP Address and port number of a socket open on a network;
+ */
 public class ConnectionPoint
 {
     private InetAddress address;

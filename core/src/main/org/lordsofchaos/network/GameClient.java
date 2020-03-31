@@ -57,24 +57,10 @@ public class GameClient extends UDPSocket
                 System.out.printf("Host %s not found.\n", item);
                 continue;
             }
-            //
-            System.out.println("Server found!");
-            System.out.println("Looking for opponent...");
-            socket.setSoTimeout(0); //Stop socket from timing out
-            socket.receive(packet);
-            
+            connectToServerAndGetPlayerType();
+
             System.out.println("Found game.");
-            playerType = (String) getObjectFromBytes(packet.getData());
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
-            //port number of connected server thread
-            int port = packet.getPort();
-            server = new ConnectionPoint(address, port);
-            //
-
-//            connectToServerAndGetPlayerType();
-
-//            System.out.println("Found game.");
-//            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             connected = true;
             return true;
         }

@@ -32,9 +32,7 @@ public class GameInstance extends UDPSocket
         attacker = player1;
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
-        //connectAndSetTypes(attacker, defender);
-        sendObject(attacker, "Attacker");
-        sendObject(defender, "Defender");
+        connectAndSetTypes(attacker, defender);
     }
     
     /**
