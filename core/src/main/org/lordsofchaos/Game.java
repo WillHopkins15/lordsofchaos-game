@@ -546,7 +546,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             }
             for(Button button : buttonList){
                 if(button instanceof PathButton && button.getScreenLocation() == currentScreen){
-                    ((PathButton) button).checkHover(Gdx.input.getX(),Gdx.graphics.getHeight() - Gdx.input.getY());
+                    ((PathButton) button).update(Gdx.input.getX(),Gdx.graphics.getHeight() - Gdx.input.getY(),batch);
                 }
             }
             batch.end();
