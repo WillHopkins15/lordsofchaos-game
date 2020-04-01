@@ -6,5 +6,6 @@ public enum Screen {
     DEFENDER_SCREEN,
     ATTACKER_SCREEN,
     LEVEL_EDITOR,
-    LEADERBOARD
+    LEADERBOARD,
+    MENU
 }

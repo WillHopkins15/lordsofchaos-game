@@ -17,6 +17,7 @@ public class UpgradeButton extends Button {
     public void leftButtonAction() {
         if (maxLevel)
             return;
+        selectSound.play(Game.getSoundEffectsVolume());
         Game.instance.setGhostTowerType(null); // this alerts Game that a tower isn't being placed, janky yes
         EventManager.defenderUpgrade();
     }

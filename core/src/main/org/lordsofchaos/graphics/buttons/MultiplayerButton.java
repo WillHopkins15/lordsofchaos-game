@@ -4,7 +4,7 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class MultiplayerButton extends MenuButton {
+public class MultiplayerButton extends MainMenuButton {
 
 
     public MultiplayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
@@ -13,7 +13,7 @@ public class MultiplayerButton extends MenuButton {
 
     @Override
     public void leftButtonAction() {
-        selectSound.play(0.75f);
+        selectSound.play(Game.getSoundEffectsVolume());
         if (Game.setupClient()) {
             Game.currentScreen = Screen.CHOOSE_FACTION;
             if (Game.getClient().isDefender()) {
