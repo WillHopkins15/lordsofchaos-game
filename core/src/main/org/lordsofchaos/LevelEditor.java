@@ -169,7 +169,8 @@ public class LevelEditor {
     }
 
     public boolean isPlaceable(int x, int y) {
-        if (x < 0 || y < 0 || x >= MapRenderer.width || y >= MapRenderer.height) return false;
+        if (x < 0 || y < 0 || x >= MapRenderer.width || y >= MapRenderer.height)
+            return false;
         if (renderer.objectAt(x, y) instanceof Obstacle)
             return ((Obstacle) renderer.objectAt(x, y)).getType() != ObstacleType.BASE;
         return true;

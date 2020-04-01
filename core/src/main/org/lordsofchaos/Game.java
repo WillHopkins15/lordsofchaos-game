@@ -84,6 +84,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private int selectedSlider;
     private static float soundTrackVolume = 1.0f;
     private static float soundEffectsVolume;
+
     public static void main(String[] args) {
         setupClient();
     }
@@ -312,15 +313,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
-                if (button instanceof  UpgradeButton)
-                {
-                    if (!((UpgradeButton) button).maxLevel)
-                    {
+                if (button instanceof UpgradeButton) {
+                    if (!UpgradeButton.maxLevel) {
                         button.getSprite().draw(batch);
                     }
-                }
-
-                else {
+                } else {
                     if(!(button instanceof SliderButton))
                         button.getSprite().draw(batch);
                 }
@@ -462,7 +459,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.setVolume(1.0f);
-        soundTrack.play();
+        //soundTrack.play();
         soundTrack.setLooping(true);
 
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -699,10 +696,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
             for (Button b: levelEditor.getButtons())
                 if (b.checkClick(screenX, y)) {
-                    if (button == Buttons.LEFT) b.leftButtonAction();
+                    if (button == Buttons.LEFT)
+                        b.leftButtonAction();
                     return false;
                 }
-
             if (button == Buttons.LEFT) levelEditor.setPlaced(true);
             else if (button == Buttons.RIGHT) levelEditor.remove();
         }
@@ -711,7 +708,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if(sliderClicked){
+        if (sliderClicked) {
             sliderClicked = false;
             //soundTrack.setVolume(soundTrackVolume,);
         }
