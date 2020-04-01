@@ -17,7 +17,7 @@ import java.util.List;
 public class Troop extends InteractiveObject
 {
     protected float moveTimer;
-    protected float moveTimeLimit = 0.01f;
+    protected float moveTimeLimit = 0.1f;
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -121,10 +121,8 @@ public class Troop extends InteractiveObject
     }
     
     public void move(float deltaTime) {
-        moveTimer += deltaTime;
-        if (moveTimer < moveTimeLimit) {
-            return;
-        }
+        int move = (int)(movementSpeed * deltaTime);
+
         resetTimer();
         
         setMoved(false);
@@ -168,16 +166,16 @@ public class Troop extends InteractiveObject
             if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
                 switch (previousdir) {
                     case "north":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) movementSpeed);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
                         break;
                     case "east":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) movementSpeed);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
                         break;
                     case "south":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) movementSpeed);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
                         break;
                     case "west":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) movementSpeed);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                         break;
                     
                 }
@@ -187,16 +185,16 @@ public class Troop extends InteractiveObject
             
             switch (direction) {
                 case "north":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) movementSpeed);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
                     break;
                 case "east":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) movementSpeed);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
                     break;
                 case "south":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) movementSpeed);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
                     break;
                 case "west":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) movementSpeed);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                     break;
                 
             }
