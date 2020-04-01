@@ -4,7 +4,7 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class PlayerButton extends MenuButton {
+public class PlayerButton extends MainMenuButton {
     private int playerType;
     boolean ifMultiplayer;
     int targetPlayerType;
@@ -15,7 +15,7 @@ public class PlayerButton extends MenuButton {
     @Override
     public void leftButtonAction() {
         if (!ifMultiplayer) {
-            selectSound.play(0.75f);
+            selectSound.play(Game.getSoundEffectsVolume());
             Game.currentScreen = targetScreen;
             Game.player = playerType;
             boolean tmpBool = playerType == 1;

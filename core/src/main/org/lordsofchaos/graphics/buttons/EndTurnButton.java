@@ -9,7 +9,7 @@ public class EndTurnButton extends Button {
         super(path, buttonX1, buttonY1,screenLocation);
     }
     public void leftButtonAction(){
-        selectSound.play(0.75f);
+        selectSound.play(Game.getSoundEffectsVolume());
         if (Game.instance.getClient() != null) {
             Game.instance.getClient().send("Change Phase");
         } else {

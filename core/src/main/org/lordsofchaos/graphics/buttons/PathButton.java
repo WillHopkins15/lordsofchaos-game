@@ -18,12 +18,13 @@ public class PathButton extends Button {
         super.sprite.setColor(1,1,1,0);
         super.sprite.setScale(0.5f,0.5f);
         selected = new boolean[3];
+        selected[0] = true;
         this.justSelected = false;
     }
 
     @Override
     public void leftButtonAction() {
-        selectSound.play(0.75f);
+        selectSound.play(Game.getSoundEffectsVolume());
         for(int i = 0; i < 3; i++)
             selected[i] = false;
         selected[pathNr] = true;
@@ -59,7 +60,7 @@ public class PathButton extends Button {
         if(selected[pathNr] && GameController.getBlockedPaths().contains(pathNr)){
             if(justSelected){
                 justSelected = false;
-                buyPathButton = new BuyPathButton("UI/NewArtMaybe/removeRocksButton.png",buttonX1,buttonY1 + 50,Screen.ATTACKER_SCREEN,pathNr);
+                buyPathButton = new BuyPathButton("UI/removeRocksButton.png",buttonX1 + 20,buttonY1 + 70,Screen.ATTACKER_SCREEN,pathNr);
             }
             buyPathButton.getSprite().draw(batch);
             if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {

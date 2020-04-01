@@ -2,6 +2,7 @@ package org.lordsofchaos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.Input;
@@ -12,16 +13,10 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.database.Leaderboard;
-import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -60,7 +55,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
-    private Sound soundTrack;
+    private Music soundTrack;
     private Sound selectSound;
     private LevelEditor levelEditor;
     private static FreeTypeFontParameter fontParameter;
@@ -70,15 +65,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static Game instance;
     private TowerType ghostTowerType;
     private static ArrayList<Button> buttonList;
+    private static ArrayList<Button> menuButtonList;
     private static int currentPath;
-    private static boolean mouseClicked;
-
-    // leaderbaord
+    private static boolean menuOpen;
+    private static Texture menuTexture;
+    private static Sprite menuSprite;
+    // leaderboard
     private String[][] leaderBoardTop;
     private static Texture leaderboardRowTexture;
     private static List<Sprite> leaderboardRowSprites;
     private static BitmapFont leaderBoardRowText;
-
+    // sound related
+    private boolean sliderClicked;
+    private int selectedSlider;
+    private static float soundTrackVolume = 1.0f;
+    private static float soundEffectsVolume;
     public static void main(String[] args) {
         setupClient();
     }
@@ -106,6 +107,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         return currentPath;
     }
     public static GameClient getClient(){return client;}
+    public static void setSoundTrackVolume( float x){
+        soundTrackVolume = x;
+    }
+    public static float getSoundEffectsVolume(){ return soundEffectsVolume; }
+    public static void setSoundEffectsVolume(float x){ soundEffectsVolume = x;}
+    public static void setMenuOpen(boolean bool){
+        menuOpen = bool;
+    }
+    public static boolean getMenuOpen(){
+        return menuOpen;
+    }
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50,Screen.DEFENDER_SCREEN,TowerType.type1));
@@ -113,12 +125,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50,Screen.DEFENDER_SCREEN,TowerType.type3));
 
         // main menu
-        buttonList.add( new MenuButton("UI/NewArtMaybe/playLocalButton.png",
+        buttonList.add( new MainMenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55,Screen.MAIN_MENU,Screen.CHOOSE_FACTION));
         buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160,Screen.MAIN_MENU,player==1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
         buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
-        buttonList.add(new MenuButton("UI/NewArtMaybe/exitButton.png",
+        buttonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
                 Gdx.graphics.getHeight() / 2 - 160-105,Screen.MAIN_MENU,null));
 
@@ -143,6 +155,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new PathButton("UI/pathHighlight.png",343,169,Screen.ATTACKER_SCREEN,0));
         buttonList.add(new PathButton("UI/pathHighlight.png",759,121,Screen.ATTACKER_SCREEN,1));
         buttonList.add(new PathButton("UI/pathHighlight.png",1079,281,Screen.ATTACKER_SCREEN,2));
+
+        //menu buttons
+        menuButtonList = new ArrayList<Button>();
+        //slider buttons
+        menuButtonList.add(new SliderButton("UI/slider.png",557,410,Screen.MENU,0));
+        menuButtonList.add(new SliderButton("UI/slider.png",557,360,Screen.MENU,1));
+
+        menuButtonList.add(new MenuButton("UI/returnToGameTmp.png",510,470,Screen.MENU));
+        menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png",510,250,Screen.MENU,Screen.CHOOSE_FACTION));
     }
 
     // need to hide button once defender has bought all upgrades
@@ -299,8 +320,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         button.getSprite().draw(batch);
                     }
                 }
+
                 else {
-                    button.getSprite().draw(batch);
+                    if(!(button instanceof SliderButton))
+                        button.getSprite().draw(batch);
                 }
             }
         /*
@@ -320,7 +343,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     public void attackerPOV() {
         for (Button button : buttonList)
-            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN)
+            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton))
                 button.getSprite().draw(batch);
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
@@ -370,7 +393,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (button == Buttons.LEFT)  {
                 if (buildMode && ghostTowerType != null) {
                     // Place tower
-                    mouseClicked = true;
+                    //mouseClicked = true;
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
                     if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(0.75f);
@@ -430,15 +453,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     @Override
     public void create(){
         instance = this;
-
-        currentPath = 0;
+        menuOpen = false;
+        soundEffectsVolume = 1.0f;
+        soundTrackVolume = 1.0f;
+        selectedSlider = -1;
+        sliderClicked = false;
+        currentPath = 1;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
         font = fontGenerator.generateFont(fontParameter);
-        soundTrack = Gdx.audio.newSound(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        soundTrack.loop(0.25f);
+        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
+        soundTrack.setVolume(1.0f);
+        soundTrack.play();
+        soundTrack.setLooping(true);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
        /* endTurnFont = new BitmapFont();
         endTurnFont.setColor(255, 255, 255, 1f);
@@ -469,6 +498,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
+
+        menuTexture = new Texture(Gdx.files.internal("UI/menu_2.png"));
+        menuSprite = new Sprite(menuTexture);
+        menuSprite.setPosition(Gdx.graphics.getWidth() / 3.2f, Gdx.graphics.getHeight() / 3);
         //endTurnTexture = new Texture(Gdx.files.internal("UI/"))
         GameController.initialise();
         renderer.setMap(GameController.getMap());
@@ -496,6 +529,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         if (currentScreen == null) Gdx.app.exit();
         else if(currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
@@ -549,6 +583,47 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     ((PathButton) button).update(Gdx.input.getX(),Gdx.graphics.getHeight() - Gdx.input.getY(),batch);
                 }
             }
+            if(menuOpen){
+                int x = Gdx.input.getX();
+                int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+                menuSprite.draw(batch);
+                for(Button button : menuButtonList) {
+                    button.getSprite().draw(batch);
+                    if (button instanceof SliderButton) {
+
+                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                            // System.out.println("TEST!!!!!!");
+                            if (button.checkClick(x,y) && !sliderClicked) {
+                                button.leftButtonAction();
+                                sliderClicked = true;
+                                selectedSlider = ((SliderButton) button).getSoundType();
+                                if (((SliderButton) button).getSoundType() == 0)
+                                    soundTrack.setVolume(soundTrackVolume);
+                                //break;
+                            } else if (((SliderButton) button).getSoundType() == selectedSlider && sliderClicked) {
+                                button.leftButtonAction();
+                                if (((SliderButton) button).getSoundType() == 0) {
+                                    soundTrack.setVolume(soundTrackVolume);
+                                    System.out.println(soundTrackVolume);
+                                }
+                                //System.out.println("ELSE!!!!!");
+                            }
+                            //System.out.println(((SliderButton) button).getSoundType() + " "+ selectedSlider + " " + sliderClicked);
+                        }
+                    }
+                    else {
+
+                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                            if (button.checkClick(x, y)) {
+                                button.leftButtonAction();
+                                setMenuOpen(false);
+                            }
+                        }
+
+                    }
+                }
+
+            }
             batch.end();
             disposeTMP();
         }
@@ -573,8 +648,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) )
-            currentScreen = Screen.CHOOSE_FACTION;
+        if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) ){
+            //currentScreen = Screen.CHOOSE_FACTION;
+            if(menuOpen)
+                menuOpen = false;
+            else {
+                menuOpen = true;
+                buildMode = false;
+            }
+        }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
@@ -607,9 +689,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     value.leftButtonAction();
         }
         if (currentScreen == Screen.GAME || currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
-            if (player == 1) attackerTouchDown(screenX, y, pointer, button);
-            else if (player == 0) defenderTouchDown(screenX, y, pointer, button);
-        } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
+            if (player == 1 && !menuOpen) attackerTouchDown(screenX, y, pointer, button);
+            else if (player == 0 && !menuOpen) defenderTouchDown(screenX, y, pointer, button);
+
+            }
+        else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
             if (button == Buttons.LEFT) levelEditor.setPlaced(true);
             else if (button == Buttons.RIGHT) levelEditor.remove();
         }
@@ -618,6 +702,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if(sliderClicked){
+            sliderClicked = false;
+            //soundTrack.setVolume(soundTrackVolume,);
+        }
         return false;
     }
 
