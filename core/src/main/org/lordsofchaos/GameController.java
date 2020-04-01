@@ -33,8 +33,8 @@ public class GameController
     private static final int scaleFactor = 64;
     private static final int defenderUpgradeBaseCost = 50;
     private static final int unblockPathCost = 10;
-    public static Attacker attacker = new Attacker(ATTACKERNAME);
-    public static Defender defender = new Defender(DEFENDERNAME);
+    public static Attacker attacker;// = new Attacker(ATTACKERNAME);
+    public static Defender defender;// = new Defender(DEFENDERNAME);
     // this records if the player on the client machine is an attacker or a defender
     public static Player clientPlayerType;
     @SuppressWarnings("unused")
@@ -140,6 +140,18 @@ public class GameController
     }
     
     public static void initialise() {
+        attacker= new Attacker(ATTACKERNAME);
+        defender = new Defender(DEFENDERNAME);
+        defenderUpgradeLevel = 0;
+        defenderMaxUpgradeLevel = 3;
+        troopUpgradeThreshold = 25;
+        troopsMade = 0;
+        upgradeNo = 0;
+        healthUpgrade = 0;
+        speedUpgrade = 0;
+        damageUpgrade = 0;
+        towersPlacedThisTurn = new ArrayList<>();
+        towers = new ArrayList<>();
         buildTimer = 0;
         unitSpawnTimer = 0;
         addMoneyTimer = 0;
