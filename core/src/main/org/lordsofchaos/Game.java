@@ -694,7 +694,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN)) {
+
+
+         if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN)){
             //currentScreen = Screen.CHOOSE_FACTION;
             if (menuOpen)
                 menuOpen = false;
@@ -702,8 +704,20 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 menuOpen = true;
                 buildMode = false;
             }
-        } else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
-            currentScreen = Screen.MAIN_MENU;
+
+        }
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
+             currentScreen = Screen.MAIN_MENU;
+             GameController.initialise();
+             currentPath = 0;
+             for(Button button : buttonList)
+                 if(button instanceof PathButton){
+                     ((PathButton)button).resetSelected();
+                     break;
+                 }
+             renderer.setMap(GameController.getMap());
+         }
+
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
@@ -713,6 +727,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             renderer.setLevelEditing(false);
             levelEditor = null;
         }
+
         return false;
     }
     

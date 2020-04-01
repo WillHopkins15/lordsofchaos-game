@@ -40,9 +40,9 @@ public class LevelEditor
         renderer.setMap(MapGenerator.generateMap(20, 20, null, null));
         continueButton = new EditorButton("UI/NewArtMaybe/panel.png", Gdx.graphics.getWidth() - 320, 20, this);
         buttons.put(EditorPhase.OBSTACLES, new ArrayList<>(Arrays.asList(
-                new ObstacleButton("UI/NewArtMaybe/buttonSmall.png", 20, 20, this, ObstacleType.RIVER),
-                new ObstacleButton("UI/NewArtMaybe/buttonSmall.png", 140, 20, this, ObstacleType.TREE),
-                new ObstacleButton("UI/NewArtMaybe/buttonSmall.png", 260, 20, this, ObstacleType.ROCK),
+                new ObstacleButton("UI/LevelEditor/river.png", 20, 20, this, ObstacleType.RIVER),
+                new ObstacleButton("UI/LevelEditor/trees.png", 140, 20, this, ObstacleType.TREE),
+                new ObstacleButton("UI/LevelEditor/rocks.png", 260, 20, this, ObstacleType.ROCK),
                 continueButton
         )));
         renderer.setLevelEditing(true);

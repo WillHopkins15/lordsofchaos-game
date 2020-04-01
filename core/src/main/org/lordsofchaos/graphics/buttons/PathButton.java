@@ -72,5 +72,11 @@ public class PathButton extends Button
                 buyPathButton.dispose();
         }
     }
-    
+    public static void resetSelected(){
+        for(int i = 0; i < selected.length;i++)
+            selected[i] = false;
+        selected[0] = true;
+
+    }
+
 }
