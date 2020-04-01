@@ -42,6 +42,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public static Game instance;
     public static boolean multiplayer = false;
     private static boolean buildMode = false;
+    private static boolean loading = true;
     private static Texture healthBarTexture;
     private static Texture healthTexture;
     private static Sprite healthBarSprite;
@@ -193,7 +194,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
-        timerChangeTurn += Gdx.graphics.getDeltaTime();
+        //timerChangeTurn += Gdx.graphics.getDeltaTime();
         //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
             font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
@@ -588,6 +589,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
             }
             batch.end();
         } else {
+            if (loading)
+            {
+                loading = false;
+                return;
+            }
             if (multiplayer) {
                 if (!client.isConnected()) {
                     return;
