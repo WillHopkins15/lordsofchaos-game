@@ -93,7 +93,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             sortedMap = map.clone();
             Arrays.sort(sortedMap);
             mapUpdated = false;
-        } else System.out.println("Map Same...");
+        }
 
         List<GameObject> objectsToAdd = new ArrayList<>();
         objectsToAdd.addAll(GameController.getTowers());

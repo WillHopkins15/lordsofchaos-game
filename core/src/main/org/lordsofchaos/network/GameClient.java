@@ -57,20 +57,18 @@ public class GameClient extends UDPSocket
                 System.out.printf("Host %s not found.\n", item);
                 continue;
             }
+            System.out.println("Server Found.\nAwaiting Opponent.");
+            
             connectToServerAndGetPlayerType();
 
-            System.out.println("Found game.");
+            System.out.println("Opponent Found.");
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
     
             // Get confirmation that the other client is ready
             try {
                 socket.receive(packet);
             } catch (SocketTimeoutException e) {
-                System.out.println("Other client disconnected.");
-                return false;
-            }
-            if (!(new String(packet.getData())).equals("READY")) {
-                System.out.println("Unexpected Packet Contents");
+                System.out.println("Opponent disconnected.");
                 return false;
             }
             connected = true;
@@ -104,9 +102,6 @@ public class GameClient extends UDPSocket
         
         //switch back
         socket = new DatagramSocket(port);
-        
-        //send ready packet
-        send("READY", false);
     }
     
     @SneakyThrows

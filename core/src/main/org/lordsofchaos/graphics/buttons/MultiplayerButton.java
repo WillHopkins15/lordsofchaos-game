@@ -14,8 +14,8 @@ public class MultiplayerButton extends MenuButton {
     @Override
     public void leftButtonAction() {
         selectSound.play(0.75f);
+        Game.multiplayer = true;
         if (Game.setupClient()) {
-            Game.currentScreen = Screen.CHOOSE_FACTION;
             if (Game.getClient().isDefender()) {
                 GameController.setPlayerType(true);
                 Game.player = 0;
@@ -26,6 +26,8 @@ public class MultiplayerButton extends MenuButton {
                 targetScreen = Screen.ATTACKER_SCREEN;
             }
             Game.currentScreen = targetScreen;
+        } else {
+            Game.multiplayer = false;
         }
     }
 

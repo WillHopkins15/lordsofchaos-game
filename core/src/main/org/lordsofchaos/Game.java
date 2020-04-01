@@ -72,6 +72,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static ArrayList<Button> buttonList;
     private static int currentPath;
     private static boolean mouseClicked;
+    public static boolean multiplayer = false;
 
     // leaderbaord
     private String[][] leaderBoardTop;
@@ -520,7 +521,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             batch.end();
         } else {
             elapsedTime = Gdx.graphics.getDeltaTime();
-            GameController.update(elapsedTime);
+            if (multiplayer) {
+                if (client.isConnected()) {
+                    GameController.update(elapsedTime);
+                }
+            } else {
+                GameController.update(elapsedTime);
+            }
             //System.out.println(currentPath );
             isometricPov();
             batch.begin();
