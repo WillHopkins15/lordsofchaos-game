@@ -34,6 +34,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     private HashMap<GameObject, Sprite> cachedSprites = new HashMap<>();
     private HashMap<Integer, Color> colourExceptions = new HashMap<>();
     private boolean mapUpdated = true;
+    private boolean levelEditing = false;
 
     public MapRenderer() {
         super(new TmxMapLoader().load("maps/BlankMap.tmx"));
@@ -55,10 +56,15 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     }
 
     public void setMap(MatrixObject[][] map) {
-        for (int y = height - 1; y > -1; y--) for (int x = 0; x < width; x++)
-            this.map[index(x, y)] = map[y][x];
+        for (int y = height - 1; y > -1; y--)
+            for (int x = 0; x < width; x++)
+                this.map[index(x, y)] = map[y][x];
         cachedTiles.clear();
         mapUpdated = true;
+    }
+
+    public MatrixObject objectAt(MatrixCoordinates mc) {
+        return objectAt(mc.getX(), mc.getY());
     }
 
     public MatrixObject objectAt(int x, int y) {
@@ -93,13 +99,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             sortedMap = map.clone();
             Arrays.sort(sortedMap);
             mapUpdated = false;
-        } else System.out.println("Map Same...");
+        }
 
-        List<GameObject> objectsToAdd = new ArrayList<>();
-        objectsToAdd.addAll(GameController.getTowers());
-        objectsToAdd.addAll(GameController.getTroops());
-        objectsToAdd.addAll(GameController.getDefenderTowers());
-        Collections.sort(objectsToAdd);
 
         getBatch().begin();
 
@@ -111,6 +112,18 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             if (colourExceptions.containsKey(i)) getBatch().setColor(colourExceptions.get(i));
             getBatch().draw(sprite(object), coordinates.x + tileOffsetX, coordinates.y + tileOffsetY, tileWidth, tileHeight);
         }
+
+        getBatch().end();
+
+        if (levelEditing) return;
+
+        List<GameObject> objectsToAdd = new ArrayList<>();
+        objectsToAdd.addAll(GameController.getTowers());
+        objectsToAdd.addAll(GameController.getTroops());
+        objectsToAdd.addAll(GameController.getDefenderTowers());
+        Collections.sort(objectsToAdd);
+
+        getBatch().begin();
 
         for (GameObject object : objectsToAdd) {
             Sprite sprite = sprite(object);
@@ -206,6 +219,10 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             }
         }
         return s;
+    }
+
+    public void setLevelEditing(boolean levelEditing) {
+        this.levelEditing = levelEditing;
     }
 
     public void setColourExceptions(HashMap<Integer, Color> colourExceptions) {

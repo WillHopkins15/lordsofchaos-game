@@ -19,6 +19,7 @@ public class ObstacleButton extends Button {
     public void leftButtonAction() {
         selectSound.play(0.75f);
         levelEditor.setCurrentObstacleType(obstacleType);
+        levelEditor.run(levelEditor.getMousePosition(), true);
     }
 
     @Override

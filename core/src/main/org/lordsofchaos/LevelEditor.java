@@ -7,10 +7,7 @@ import org.lordsofchaos.graphics.MapRenderer;
 import org.lordsofchaos.graphics.buttons.Button;
 import org.lordsofchaos.graphics.buttons.EditorButton;
 import org.lordsofchaos.graphics.buttons.ObstacleButton;
-import org.lordsofchaos.matrixobjects.MatrixObject;
-import org.lordsofchaos.matrixobjects.Obstacle;
-import org.lordsofchaos.matrixobjects.ObstacleType;
-import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.matrixobjects.*;
 
 import java.util.*;
 
@@ -27,6 +24,7 @@ public class LevelEditor {
     private Path lastPath;
     private List<ArrayList<Path>> paths = new ArrayList<>();
     private List<Path> spawns = new ArrayList<>();
+    private List<Obstacle> obstacles = new ArrayList<>();
     private Color cantPlace = new Color(0.4f, 0.4f, 0.4f, 1f);
     private Color canPlace = new Color(0.6f, 1f, 0.6f, 1f);
     private Color canPlaceEndpoint = new Color(0.6f, 1f, 1f, 1f);
@@ -35,7 +33,6 @@ public class LevelEditor {
     private List<MatrixCoordinates> pathEndpoints = new ArrayList<>(Arrays.asList(
             new MatrixCoordinates(18, 16), new MatrixCoordinates(16, 18)));
     private EditorButton continueButton;
-    private List<Button> obstacleButtons;
 
     public List<Button> getButtons() {
         if (buttons.containsKey(currentPhase)) return buttons.get(currentPhase);
@@ -52,16 +49,15 @@ public class LevelEditor {
                 new ObstacleButton("UI/NewArtMaybe/buttonSmall.png", 260, 20, this, ObstacleType.ROCK),
                 continueButton
         )));
+        renderer.setLevelEditing(true);
     }
     
-    public void run(MatrixCoordinates mousePosition) {
-        if (this.mousePosition == null || !this.mousePosition.equals(mousePosition) || placed) {
+    public void run(MatrixCoordinates mousePosition, boolean force) {
+        if (this.mousePosition == null || !this.mousePosition.equals(mousePosition) || placed || force) {
             int x = mousePosition.getX(), y = mousePosition.getY();
             if (hoveredTile != null && !placed) {
-                if (this.mousePosition != mousePosition) {
-                    renderer.addObject(hoveredTile);
-                    hoveredTile = renderer.objectAt(x, y);
-                }
+                renderer.addObject(hoveredTile);
+                hoveredTile = renderer.objectAt(x, y);
             } else {
                 hoveredTile = renderer.objectAt(x, y);
                 if (placed && currentPhase == EditorPhase.SPAWNS) spawns.add((Path) hoveredTile);
@@ -80,6 +76,10 @@ public class LevelEditor {
                     } else {
                         this.lastPath = paths.get(currentPathIndex).get(paths.get(currentPathIndex).size() - 2);
                     }
+                } else if (placed && currentPhase == EditorPhase.OBSTACLES && hoveredTile instanceof Obstacle) {
+                    Obstacle obstacle = (Obstacle) hoveredTile;
+                    obstacles.remove(obstacle);
+                    obstacles.add(obstacle);
                 }
                 placed = false;
             }
@@ -129,7 +129,8 @@ public class LevelEditor {
     }
 
     public void darkenMap(HashMap<Integer, Color> exceptions) {
-        for (int i = 0; i < MapRenderer.width * MapRenderer.width; i++) exceptions.put(i, cantPlace);
+        for (int i = 0; i < MapRenderer.width * MapRenderer.width; i++)
+            exceptions.put(i, cantPlace);
     }
 
     public List<Integer> surroundingPlacable() {
@@ -169,9 +170,8 @@ public class LevelEditor {
 
     public boolean isPlaceable(int x, int y) {
         if (x < 0 || y < 0 || x >= MapRenderer.width || y >= MapRenderer.height) return false;
-        if (renderer.objectAt(x, y) instanceof Obstacle) {
+        if (renderer.objectAt(x, y) instanceof Obstacle)
             return ((Obstacle) renderer.objectAt(x, y)).getType() != ObstacleType.BASE;
-        }
         return true;
     }
 
@@ -206,13 +206,45 @@ public class LevelEditor {
             System.out.println("Editing Complete.");
         }
     }
-    
-    public void remove() {
-    
+
+    public boolean canRemoveAt(MatrixCoordinates mc) {
+        int x = mc.getX(),  y = mc.getY();
+        MatrixObject object = renderer.objectAt(mc);
+        if (currentPhase == EditorPhase.SPAWNS) {
+            if (object instanceof Path) return ((Path) object).isSpawn();
+        } else if (currentPhase == EditorPhase.PATHS) {
+            List<Path> currentPath = paths.get(currentPathIndex);
+            return object.equals(currentPath.get(currentPath.size() - 1));
+        } else if (currentPhase == EditorPhase.OBSTACLES) {
+            return object instanceof Obstacle;
+        }
+        return false;
     }
     
+    @SuppressWarnings("SuspiciousMethodCalls")
+    public void remove() {
+        if (!canRemoveAt(mousePosition)) return;
+        if (currentPhase == EditorPhase.SPAWNS) {
+            spawns.remove(renderer.objectAt(mousePosition));
+        } else if (currentPhase == EditorPhase.PATHS) {
+            List<Path> currentPath = paths.get(currentPathIndex);
+            currentPath.remove(currentPath.size() - 1);
+            lastPath = currentPath.get(currentPath.size() - ((currentPath.size() > 1) ? 2 : 1));
+        } else if (currentPhase == EditorPhase.OBSTACLES) {
+            obstacles.remove(renderer.objectAt(mousePosition));
+        }
+        Tile tile = new Tile(mousePosition.getY(), mousePosition.getX(), null);
+        hoveredTile = tile;
+        renderer.addObject(tile);
+        run(mousePosition, true);
+    }
+
     public void setPlaced(boolean placed) {
         this.placed = placed && canPlaceAt(mousePosition.getX(), mousePosition.getY());
+    }
+
+    public MatrixCoordinates getMousePosition() {
+        return mousePosition;
     }
 
     public void setCurrentObstacleType(ObstacleType currentObstacleType) {

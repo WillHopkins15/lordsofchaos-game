@@ -72,6 +72,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static ArrayList<Button> buttonList;
     private static int currentPath;
     private static boolean mouseClicked;
+    private int currentbutton;
+    private Sprite backgroundSprite;
 
     // leaderbaord
     private String[][] leaderBoardTop;
@@ -358,9 +360,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public void defenderTouchDown(int x, int y, int pointer, int button) {
-        if (button == Buttons.LEFT) {
-            System.out.println("HERE");
-        }
         if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT)  {
                 if (buildMode && ghostTowerType != null) {
@@ -425,7 +424,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     @Override
     public void create(){
         instance = this;
-
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
@@ -440,6 +438,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         endTurnFont.setColor(255, 255, 255, 1f);
         endTurnFont.getData().setScale(3f);
         */
+        backgroundSprite = new Sprite(new Texture("maps/background.png"));
         generateFont();
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
@@ -495,12 +494,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (currentScreen == null) Gdx.app.exit();
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
+            backgroundSprite.draw(batch);
             for (Button button : buttonList) if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
             batch.end();
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer);
-            levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())));
+            levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())), false);
             batch.begin();
             for (Button button: levelEditor.getButtons()) button.getSprite().draw(batch);
             batch.end();
@@ -581,6 +581,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             currentScreen = Screen.MAIN_MENU;
             renderer.setMap(GameController.getMap());
             renderer.setColourExceptions(new HashMap<>());
+            renderer.setLevelEditing(false);
             levelEditor = null;
         }
         return false;
@@ -598,6 +599,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        currentbutton = button;
         int y = Gdx.graphics.getHeight() - screenY;
         if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION)) {
             for (Button value : buttonList)
@@ -626,7 +628,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) levelEditor.setPlaced(true);
+        if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null && (currentbutton == Buttons.LEFT))
+            levelEditor.setPlaced(true);
         return false;
     }
 
