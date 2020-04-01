@@ -94,7 +94,7 @@ public abstract class UDPSocket extends Thread
         }
         
         timeoutCount = 0;
-        return(packet);
+        return (packet);
     }
     
     /**

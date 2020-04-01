@@ -10,7 +10,6 @@ import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
 import org.lordsofchaos.matrixobjects.Path;
-import org.lordsofchaos.matrixobjects.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 public class Troop extends InteractiveObject
 {
     protected float moveTimer;
-    protected float moveTimeLimit = 0.01f;
+    protected float moveTimeLimit = 0.1f;
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -29,14 +28,8 @@ public class Troop extends InteractiveObject
     protected boolean targeted;
     protected boolean atEnd;
     private String previousdir = "nothing";
-
-    private MatrixCoordinates nextTile;
-
-    public MatrixCoordinates getNextTile()
-    {
-        return nextTile;
-    }
     
+    private MatrixCoordinates nextTile;
     
     public Troop(String spriteName, int cost, int damage,
                  float movementSpeed, int maxHealth, DamageType armourType, List<Path> path) {
@@ -49,6 +42,10 @@ public class Troop extends InteractiveObject
         Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
         
+    }
+    
+    public MatrixCoordinates getNextTile() {
+        return nextTile;
     }
     
     public float getMovementSpeed() {
@@ -114,7 +111,7 @@ public class Troop extends InteractiveObject
     public void setAtEnd(boolean atEnd) {
         this.atEnd = atEnd;
     }
-
+    
     public DamageType getArmourType() {
         return armourType;
     }
@@ -124,17 +121,15 @@ public class Troop extends InteractiveObject
     }
     
     public void move(float deltaTime) {
-        moveTimer += deltaTime;
-        if (moveTimer < moveTimeLimit) {
-            return;
-        }
+        int move = (int)(movementSpeed * deltaTime);
+
         resetTimer();
         
         setMoved(false);
         // move along set path
         
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
-
+        
         Path foundPath = (Path) GameController.getMatrixObject(currentco.getY(), currentco.getX());
         
         int index = -1;
@@ -171,16 +166,16 @@ public class Troop extends InteractiveObject
             if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
                 switch (previousdir) {
                     case "north":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int)movementSpeed);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
                         break;
                     case "east":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int)movementSpeed);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
                         break;
                     case "south":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int)movementSpeed);
+                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
                         break;
                     case "west":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int)movementSpeed);
+                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                         break;
                     
                 }
@@ -190,16 +185,16 @@ public class Troop extends InteractiveObject
             
             switch (direction) {
                 case "north":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int)movementSpeed);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
                     break;
                 case "east":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int)movementSpeed);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
                     break;
                 case "south":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int)movementSpeed);
+                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
                     break;
                 case "west":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int)movementSpeed);
+                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                     break;
                 
             }
@@ -208,7 +203,7 @@ public class Troop extends InteractiveObject
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if ((currentco.equals(updatedco)) == false) {
-               // System.out.println("Troop co is : " + currentco);
+                // System.out.println("Troop co is : " + currentco);
                 previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);

@@ -33,7 +33,6 @@ public class GameInstance extends UDPSocket
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
         connectAndSetTypes(attacker, defender);
-        confirmReadyness();
     }
     
     /**
@@ -72,23 +71,6 @@ public class GameInstance extends UDPSocket
         
         //Switch back to UDP
         this.socket = new DatagramSocket(localPort);
-    }
-    
-    /**
-     * Waits for both clients to say they are ready before beginning the game.
-     */
-    private void confirmReadyness() {
-        DatagramPacket received = receiveObject();
-        String message = (String) getObjectFromBytes(received.getData());
-        if (!message.equals("READY")) {
-            return;
-        }
-        received = receiveObject();
-        message = (String) getObjectFromBytes(received.getData());
-        if (!message.equals("READY")) {
-            return;
-        }
-        send("READY");
     }
     
     @SneakyThrows

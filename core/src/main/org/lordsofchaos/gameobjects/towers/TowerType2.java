@@ -11,7 +11,7 @@ public class TowerType2 extends Tower
     private static int damage = 6;
     private static int range = 2;
     private static DamageType damageType = DamageType.Normal;
-
+    
     public TowerType2(RealWorldCoordinates rwc) {
         super(spriteName, rwc, cost, damage, range, damageType, TowerType.type1);
     }

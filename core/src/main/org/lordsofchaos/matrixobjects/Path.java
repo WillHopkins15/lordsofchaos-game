@@ -5,8 +5,9 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path extends MatrixObject {
-
+public class Path extends MatrixObject
+{
+    
     private List<Troop> troops;
     private boolean isSpawn = false;
     
@@ -27,11 +28,15 @@ public class Path extends MatrixObject {
         getTroops().add(troop);
     }
     
-    public void removeTroop(Troop troop) { getTroops().remove(troop); }
-
-    public void setSpawn(boolean spawn) { isSpawn = spawn; }
-
+    public void removeTroop(Troop troop) {
+        getTroops().remove(troop);
+    }
+    
     public boolean isSpawn() {
         return isSpawn;
+    }
+    
+    public void setSpawn(boolean spawn) {
+        isSpawn = spawn;
     }
 }

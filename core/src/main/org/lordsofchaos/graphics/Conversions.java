@@ -6,8 +6,9 @@ import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
-abstract public class Conversions {
-
+abstract public class Conversions
+{
+    
     public static Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);
         return new Vector2(isometric.x / 2, Gdx.graphics.getHeight() - (Gdx.graphics.getHeight() - isometric.y) / 2);
@@ -25,7 +26,7 @@ abstract public class Conversions {
         Vector2 v2 = isometricToCartesian(vector.x, vector.y - 38);
         return new RealWorldCoordinates((int) (v2.y + 1280), (int) (v2.x));
     }
-
+    
     public static Vector2 matrixCooridinateToIsometric(MatrixCoordinates mc) {
         final int sf = GameController.getScaleFactor();
         Vector2 v2 = cartesianToIsometric(mc.getX() * sf, mc.getY() * sf - 1280);

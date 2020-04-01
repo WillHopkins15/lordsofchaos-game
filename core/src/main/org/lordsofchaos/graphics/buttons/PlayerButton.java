@@ -4,14 +4,17 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class PlayerButton extends MainMenuButton {
-    private int playerType;
+public class PlayerButton extends MainMenuButton
+{
     boolean ifMultiplayer;
     int targetPlayerType;
+    private int playerType;
+    
     public PlayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen, int playerType) {
-        super(path, buttonX1, buttonY1, screenLocation,targetScreen);
+        super(path, buttonX1, buttonY1, screenLocation, targetScreen);
         this.playerType = playerType;
     }
+    
     @Override
     public void leftButtonAction() {
         if (!ifMultiplayer) {
@@ -20,9 +23,8 @@ public class PlayerButton extends MainMenuButton {
             Game.player = playerType;
             boolean tmpBool = playerType == 1;
             GameController.setPlayerType(tmpBool);
-        }
-        else{
-            if(playerType == targetPlayerType){
+        } else {
+            if (playerType == targetPlayerType) {
                 Game.currentScreen = targetScreen;
                 Game.player = playerType;
                 boolean tmpBool = playerType == 1;
@@ -30,11 +32,13 @@ public class PlayerButton extends MainMenuButton {
             }
         }
     }
-    public void IsMultiplayer(int targetPlayerType){
+    
+    public void IsMultiplayer(int targetPlayerType) {
         ifMultiplayer = true;
         this.targetPlayerType = targetPlayerType;
     }
-    public void rightButtonAction(){
+    
+    public void rightButtonAction() {
         return;
     }
 }
