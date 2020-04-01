@@ -9,6 +9,7 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
 import org.lordsofchaos.gameobjects.InteractiveObject;
+import org.lordsofchaos.matrixobjects.MatrixObject;
 import org.lordsofchaos.matrixobjects.Path;
 
 import java.util.ArrayList;
@@ -130,7 +131,7 @@ public class Troop extends InteractiveObject
         
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
         
-        Path foundPath = (Path) GameController.getMatrixObject(currentco.getY(), currentco.getX());
+        MatrixObject foundPath = GameController.getMatrixObject(currentco.getY(), currentco.getX());
         
         int index = -1;
         

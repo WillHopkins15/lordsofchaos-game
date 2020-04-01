@@ -152,6 +152,8 @@ public class GameController
         damageUpgrade = 0;
         towersPlacedThisTurn = new ArrayList<>();
         towers = new ArrayList<>();
+        troops = new ArrayList<>();
+
         buildTimer = 0;
         unitSpawnTimer = 0;
         addMoneyTimer = 0;
@@ -319,6 +321,13 @@ public class GameController
     
     // called by renderer every frame/ whatever
     public static void update(float deltaTime) {
+
+        // if frame time is too high, don't process the frame as it's likely a lag spike/ loading
+        if (deltaTime > 0.2f)
+        {
+            return;
+        }
+
         if (waveState == WaveState.WaitingForInput) {
             return;
         }
