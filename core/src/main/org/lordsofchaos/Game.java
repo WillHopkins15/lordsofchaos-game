@@ -194,7 +194,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public static void changeTurn(float targetTime, String currentPlayer) {
-        //timerChangeTurn += Gdx.graphics.getDeltaTime();
+        timerChangeTurn += Gdx.graphics.getDeltaTime();
         //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
             font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
@@ -485,7 +485,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         soundTrackVolume = 1.0f;
         selectedSlider = -1;
         sliderClicked = false;
-        currentPath = 1;
+        currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
