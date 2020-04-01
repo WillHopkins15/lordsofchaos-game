@@ -1,7 +1,5 @@
 package org.lordsofchaos.gameobjects.towers;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.Pair;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -15,14 +13,13 @@ import org.lordsofchaos.matrixobjects.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tower extends InteractiveObject {
-
-    private static int globalDamageMultiplier = 1;
-    private static float globalSpeedMultiplier = 1;
-
+public class Tower extends InteractiveObject
+{
+    
     private static final int damageUpgrade = 1;
     private static final float speedUpgrade = 1.2f;
-
+    private static int globalDamageMultiplier = 1;
+    private static float globalSpeedMultiplier = 1;
     protected float shootTimer = 0;
     protected float shootTimerLimit = 0.5f;
     protected int range;
@@ -40,13 +37,17 @@ public class Tower extends InteractiveObject {
         isCompleted = false;
         this.type = type;
     }
-
+    
     // increases damage for ALL towers
-    public static void upgradeTowerDamage() { globalDamageMultiplier+=damageUpgrade; }
-
+    public static void upgradeTowerDamage() {
+        globalDamageMultiplier += damageUpgrade;
+    }
+    
     // decrease cooldown for ALL towers
-    public static void upgradeTowerSpeed() { globalSpeedMultiplier*=speedUpgrade; }
-
+    public static void upgradeTowerSpeed() {
+        globalSpeedMultiplier *= speedUpgrade;
+    }
+    
     public int getDamage() {
         return damage * globalDamageMultiplier;
     }
@@ -88,11 +89,11 @@ public class Tower extends InteractiveObject {
         
         // List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
-
-       //System.out.println("matrixco is: " + matrixco.getY() + "," + matrixco.getX());
+        
+        //System.out.println("matrixco is: " + matrixco.getY() + "," + matrixco.getX());
         MatrixCoordinates tempco;
         MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
-      //  System.out.println("defenderbase is at: " + defenderbase.getY() + "," + defenderbase.getX());
+        //  System.out.println("defenderbase is at: " + defenderbase.getY() + "," + defenderbase.getX());
         
         // creating the numerical bounds for the tiles that would be in range
         
@@ -111,14 +112,14 @@ public class Tower extends InteractiveObject {
                 if (GameController.inBounds(a, b)) {
                     //System.out.println("the inRange coords: " + a + "," + b);
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
-                       // System.out.println("the path coords: " + a + "," + b);
+                        // System.out.println("the path coords: " + a + "," + b);
                         count++;
                     }
                 }
             }
         }
-
-      //  System.out.println("count is: " + count);
+        
+        //  System.out.println("count is: " + count);
         
         if (count != 0) {
             
@@ -134,7 +135,7 @@ public class Tower extends InteractiveObject {
             // loop to add the coordinates of the tiles to that are paths to a pair
             // the key of the pair is the coordinates and the value is the distance from the
             // defenders base to the tiles
-
+            
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
                     
@@ -159,8 +160,8 @@ public class Tower extends InteractiveObject {
             
             sort(temp, 0, count - 1);
             for (int i = 0; i < count; i++) {
-             //   System.out.println(temp[i].getKey() + "," + temp[i].getValue());
-
+                //   System.out.println(temp[i].getKey() + "," + temp[i].getValue());
+                
             }
             
             // loop to add path tiles to arraylist inRange in descending order of distance
@@ -172,7 +173,7 @@ public class Tower extends InteractiveObject {
                 // debugging
                 inRange.add((Path) GameController.getMatrixObject(tco.getY(), tco.getX()));
             }
-
+            
             for (int i = 0; i < count; i++) {
                 //System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
             }
@@ -223,44 +224,47 @@ public class Tower extends InteractiveObject {
             while (count < inRange.size()) {
                 //System.out.println("this is the current tile path" + inRange.get(count).getMatrixPosition());
                 if ((inRange.get(count).getTroops()).isEmpty()) {
-                    MatrixCoordinates hi = new MatrixCoordinates(8,5);
+                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
-                       // System.out.println("fucking knew it was this bitch ass tile");
+                        // System.out.println("fucking knew it was this bitch ass tile");
                     }
                     count++;
-
+                    
                 } else {
-                    MatrixCoordinates hi = new MatrixCoordinates(8,5);
+                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
-                       // System.out.println("fucking knew it was this bitch ass tile pt 2");
+                        // System.out.println("fucking knew it was this bitch ass tile pt 2");
                     }
-                   // System.out.println("coord of tile: " + inRange.get(count).getMatrixPosition());
+                    // System.out.println("coord of tile: " + inRange.get(count).getMatrixPosition());
                     return inRange.get(count).getTroops().get(0);
                 }
             }
-
+            
             return null;
         }
-
+        
         return null;
     }
-
+    
     public void resetTimer() {
         shootTimer = 0;
     }
-
+    
     public void shoot(float deltaTime) {
         shootTimer += deltaTime;
-        if (shootTimer > shootTimerLimit/globalSpeedMultiplier) {
+        if (shootTimer > shootTimerLimit / globalSpeedMultiplier) {
             target = findNearestTroop();
             // if target is null, no troops are in range
             if (target != null) {
                 MatrixCoordinates temp = new MatrixCoordinates(target.getRealWorldCoordinates());
-             //   System.out.println("Current of target is : " + temp);
+                //   System.out.println("Current of target is : " + temp);
                 GameController.shootTroop(this, target);
             }
             resetTimer();
         }
     }
     
+    public TowerType getType() {
+        return type;
+    }
 }

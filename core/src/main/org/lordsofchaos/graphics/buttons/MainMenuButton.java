@@ -1,23 +1,20 @@
 package org.lordsofchaos.graphics.buttons;
 
 import org.lordsofchaos.Game;
-import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class EndTurnButton extends Button
+public class MainMenuButton extends Button
 {
-    public EndTurnButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
+    protected Screen targetScreen;
+    
+    public MainMenuButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
         super(path, buttonX1, buttonY1, screenLocation);
+        this.targetScreen = targetScreen;
     }
     
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
-        if (Game.getClient() != null) {
-            Game.getClient().send("Change Phase");
-        } else {
-            GameController.endPhase();
-        }
-        
+        Game.currentScreen = targetScreen;
     }
     
     public void rightButtonAction() {

@@ -60,10 +60,10 @@ public class GameClient extends UDPSocket
             System.out.println("Server Found.\nAwaiting Opponent.");
             
             connectToServerAndGetPlayerType();
-
+            
             System.out.println("Opponent Found.");
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
-    
+            
             // Get confirmation that the other client is ready
             try {
                 socket.receive(packet);
@@ -119,6 +119,7 @@ public class GameClient extends UDPSocket
     
     /**
      * Sends an object to the server.
+     *
      * @param contents Object to send
      * @param numbered Whether the packet should be time stamped or not
      */
@@ -132,6 +133,7 @@ public class GameClient extends UDPSocket
     
     /**
      * Sends an object to the server as a time stamped packet
+     *
      * @param contents Object to send
      */
     @Override
@@ -207,12 +209,14 @@ public class GameClient extends UDPSocket
     public boolean isConnected() {
         return connected;
     }
+    
     /**
      * @return Current wave state
      */
     public String getCurrentWave() {
         return GameController.getWaveState().toString();
     }
+    
     /**
      * @return Whether it is this players turn.
      */

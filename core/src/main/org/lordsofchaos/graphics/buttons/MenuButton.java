@@ -3,17 +3,22 @@ package org.lordsofchaos.graphics.buttons;
 import org.lordsofchaos.Game;
 import org.lordsofchaos.graphics.Screen;
 
-public class MenuButton extends Button {
-    protected Screen targetScreen;
-    public MenuButton(String path, float buttonX1, float buttonY1,Screen screenLocation,Screen targetScreen) {
-        super(path, buttonX1, buttonY1,screenLocation);
-        this.targetScreen = targetScreen;
+public class MenuButton extends Button
+{
+    public MenuButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
+        super(path, buttonX1, buttonY1, screenLocation);
     }
-    public void leftButtonAction(){
-        selectSound.play(0.75f);
-        Game.currentScreen = targetScreen;
+    
+    @Override
+    public void leftButtonAction() {
+        if (Game.getMenuOpen()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.setMenuOpen(false);
+        }
     }
-    public void rightButtonAction(){
-        return;
+    
+    @Override
+    public void rightButtonAction() {
+    
     }
 }

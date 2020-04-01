@@ -33,10 +33,10 @@ public class Defender extends Player
          */
         
         // change this when the actual coordinate for the game is decided
-        MatrixCoordinates temp = new MatrixCoordinates(18,18);
+        MatrixCoordinates temp = new MatrixCoordinates(18, 18);
         //System.out.println(temp);
         int sf = GameController.getScaleFactor();
-
+        
         // int y = (GameController.getMap().length - mc.getY()) * sf;
         int y = temp.getY() * sf;
         int x = temp.getX() * sf;

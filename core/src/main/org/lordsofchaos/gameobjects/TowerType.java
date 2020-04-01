@@ -1,7 +1,8 @@
 package org.lordsofchaos.gameobjects;
 
-public enum TowerType {
-
+public enum TowerType
+{
+    
     type1("TowerType1"), type2("TowerType2"), type3("TowerType3");
     
     private String spriteName;

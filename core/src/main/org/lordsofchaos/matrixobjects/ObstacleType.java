@@ -1,6 +1,7 @@
 package org.lordsofchaos.matrixobjects;
 
-public enum ObstacleType {
+public enum ObstacleType
+{
     RIVER,
     TREE,
     ROCK,

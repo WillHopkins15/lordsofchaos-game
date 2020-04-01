@@ -4,16 +4,17 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class MultiplayerButton extends MenuButton {
-
-
+public class MultiplayerButton extends MainMenuButton
+{
+    
+    
     public MultiplayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
-
+    
     @Override
     public void leftButtonAction() {
-        selectSound.play(0.75f);
+        selectSound.play(Game.getSoundEffectsVolume());
         Game.multiplayer = true;
         if (Game.setupClient()) {
             if (Game.getClient().isDefender()) {
@@ -30,9 +31,9 @@ public class MultiplayerButton extends MenuButton {
             Game.multiplayer = false;
         }
     }
-
+    
     @Override
     public void rightButtonAction() {
-
+    
     }
 }

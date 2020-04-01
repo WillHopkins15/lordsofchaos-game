@@ -1,10 +1,10 @@
 package org.lordsofchaos.gameobjects;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
-public abstract class GameObject implements Comparable<GameObject> {
-
+public abstract class GameObject implements Comparable<GameObject>
+{
+    
     protected String spriteName;
     protected RealWorldCoordinates realWorldCoordinates;
     
@@ -37,7 +37,7 @@ public abstract class GameObject implements Comparable<GameObject> {
     public void remove() {
     
     }
-
+    
     
     @Override
     public int compareTo(GameObject o) {

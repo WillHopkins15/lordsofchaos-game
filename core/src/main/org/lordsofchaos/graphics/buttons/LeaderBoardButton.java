@@ -5,15 +5,16 @@ import org.lordsofchaos.graphics.Screen;
 
 import java.sql.SQLException;
 
-public class LeaderBoardButton extends MenuButton {
-
+public class LeaderBoardButton extends MainMenuButton
+{
+    
     public LeaderBoardButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
-
+    
     @Override
     public void leftButtonAction() {
-        selectSound.play(0.75f);
+        selectSound.play(Game.getSoundEffectsVolume());
         Game.currentScreen = targetScreen;
         try {
             Game.instance.setLeaderBoardTop(5);
@@ -23,9 +24,9 @@ public class LeaderBoardButton extends MenuButton {
             e.printStackTrace();
         }
     }
-
+    
     @Override
     public void rightButtonAction() {
-
+    
     }
 }
