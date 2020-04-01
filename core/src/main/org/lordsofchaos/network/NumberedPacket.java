@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Object that contains data in the form of a Serializable object, annotated with the time of creation.
+ */
 public class NumberedPacket implements Serializable
 {
     private Object data;

@@ -15,6 +15,5 @@ public class DesktopLauncher
         GameController.initialise();
         
         new LwjglApplication(new Game(), config);
-        
     }
 }
