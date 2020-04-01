@@ -453,7 +453,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         soundTrackVolume = 1.0f;
         selectedSlider = -1;
         sliderClicked = false;
-        currentPath = 1;
+        currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
@@ -647,7 +647,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN) ){
+
+         if (keycode == Input.Keys.ESCAPE && (currentScreen == Screen.DEFENDER_SCREEN ||  currentScreen == Screen.ATTACKER_SCREEN)){
             //currentScreen = Screen.CHOOSE_FACTION;
             if(menuOpen)
                 menuOpen = false;
@@ -656,8 +657,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 buildMode = false;
             }
         }
-        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION)
-            currentScreen = Screen.MAIN_MENU;
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
+             currentScreen = Screen.MAIN_MENU;
+             GameController.initialise();
+             currentPath = 0;
+             for(Button button : buttonList)
+                 if(button instanceof PathButton){
+                     ((PathButton)button).resetSelected();
+                     break;
+                 }
+             renderer.setMap(GameController.getMap());
+         }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
@@ -666,6 +676,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             renderer.setColourExceptions(new HashMap<>());
             levelEditor = null;
         }
+
         return false;
     }
 
