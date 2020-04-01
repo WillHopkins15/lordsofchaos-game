@@ -262,5 +262,8 @@ public class Tower extends InteractiveObject {
             resetTimer();
         }
     }
-    
+
+    public TowerType getType() {
+        return type;
+    }
 }

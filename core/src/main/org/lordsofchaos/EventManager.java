@@ -48,9 +48,8 @@ public class EventManager
         SerializableTower serTower = findSerializeableTower(tower, towerBuilds);
        if (GameController.removeTower(serTower)) {
            removedTowers.add(serTower);
-       }
-       else
-       {
+           towerBuilds.remove(serTower);
+       } else {
            System.out.println("Couldn't find tower to remove in gc");
        }
     }

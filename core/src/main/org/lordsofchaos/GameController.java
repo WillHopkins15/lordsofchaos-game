@@ -582,10 +582,15 @@ public class GameController {
 
     public static boolean removeTower(SerializableTower serTower) {
         Tower tower = serializeableTowerToTower(serTower, towersPlacedThisTurn);
+        return removeTower(tower);
+    }
+
+    public static boolean removeTower(Tower tower) {
         if (towers.contains(tower) && towersPlacedThisTurn.contains(tower)) {
             towers.remove(tower);
             towersPlacedThisTurn.remove(tower);
-            Tile tile = (Tile) map[tower.getRealWorldCoordinates().getY()][tower.getRealWorldCoordinates().getX()];
+            MatrixCoordinates mc = new MatrixCoordinates(tower.getRealWorldCoordinates());
+            Tile tile = (Tile) map[mc.getY()][mc.getX()];
             tile.setTower(null);
             defender.addMoney(tower.getCost());
             System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());

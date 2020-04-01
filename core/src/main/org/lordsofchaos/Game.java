@@ -22,6 +22,7 @@ import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.*;
 import org.lordsofchaos.graphics.buttons.*;
+import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
@@ -381,7 +382,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         return roundToCentreTile(rwc);
     }
 
-    public void defenderTouchDown(int x, int y, int pointer, int button) {
+    public void defenderTouchDown(int x, int y, int button) {
         if (GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             if (button == Buttons.LEFT)  {
                 if (buildMode && ghostTowerType != null) {
@@ -404,6 +405,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                             break;
                         }
                     }
+                }
+            } else {
+                RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
+                MatrixCoordinates mc = new MatrixCoordinates(rwc);
+                if (renderer.objectAt(mc) instanceof Tile) {
+                    Tile t = (Tile) renderer.objectAt(mc);
+                    if (t.getTower() != null && !t.getTower().getIsCompleted())
+                        EventManager.towerRemoved(t.getTower());
+                        //GameController.removeTower(new SerializableTower(t.getTower().getType(), rwc));
                 }
             }
         }
@@ -692,7 +702,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         if (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
             if (player == 1 && !menuOpen) attackerTouchDown(screenX, y, pointer, button);
-            else if (player == 0 && !menuOpen) defenderTouchDown(screenX, y, pointer, button);
+            else if (player == 0 && !menuOpen) defenderTouchDown(screenX, y, button);
         } else if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null) {
             for (Button b: levelEditor.getButtons())
                 if (b.checkClick(screenX, y)) {
