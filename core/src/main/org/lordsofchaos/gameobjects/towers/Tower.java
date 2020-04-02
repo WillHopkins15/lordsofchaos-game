@@ -186,7 +186,14 @@ public class Tower extends InteractiveObject
         }
         
     }
-    
+
+    /**
+     * this functions is part of the quicksort algorithm
+     * @param tiles
+     * @param l
+     * @param h
+     * @return
+     */
     public int partition(Pair[] tiles, int l, int h) {
         
         double pivot = (double) tiles[h].getValue();
@@ -209,12 +216,17 @@ public class Tower extends InteractiveObject
         
         return i + 1;
     }
-    
+
+    /**
+     * this function is about of the quicksort algorithm used to sort the tiles by their distance to the defender's base
+     * @param tiles
+     * @param l
+     * @param h
+     */
     public void sort(Pair[] tiles, int l, int h) {
         if (l < h) {
             
             int part = partition(tiles, l, h);
-            
             sort(tiles, l, part - 1);
             sort(tiles, part + 1, h);
         }

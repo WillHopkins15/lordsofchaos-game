@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import org.lordsofchaos.GameController;
-import org.lordsofchaos.GameStart;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.DamageType;
@@ -186,25 +185,11 @@ public class Troop extends InteractiveObject
             }
         } else {
             (getPath().get(index)).removeTroop(this);
-            damageBase();
             setAtEnd(true);
         }
         
     }
 
-    /**
-     * Lower the defender's health by this troops damage value
-     */
-    public void damageBase() {
-        int temp;
-        temp = GameStart.defender.getHealth() - getDamage();
-        
-        if (temp <= 0) {
-            GameStart.defender.setHealth(0);
-            //end of game and relevant graphics and sound need to be done.
-        } else {
-            GameStart.defender.setHealth(temp);
-        }
-    }
+
     
 }
