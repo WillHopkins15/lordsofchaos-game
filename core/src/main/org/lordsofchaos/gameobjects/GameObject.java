@@ -4,7 +4,6 @@ import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
 public abstract class GameObject implements Comparable<GameObject>
 {
-    
     protected String spriteName;
     protected RealWorldCoordinates realWorldCoordinates;
     
@@ -16,8 +15,7 @@ public abstract class GameObject implements Comparable<GameObject>
     public String getSpriteName() {
         return spriteName;
     }
-    
-    // Getters and Setters
+
     public void setSpriteName(String spriteName) {
         this.spriteName = spriteName;
     }
@@ -29,15 +27,6 @@ public abstract class GameObject implements Comparable<GameObject>
     public void setRealWorldCoordinates(RealWorldCoordinates rwc) {
         realWorldCoordinates = rwc;
     }
-    
-    public void initialise() {
-    
-    }
-    
-    public void remove() {
-    
-    }
-    
     
     @Override
     public int compareTo(GameObject o) {

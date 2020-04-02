@@ -17,8 +17,7 @@ public abstract class InteractiveObject extends GameObject
     public int getCost() {
         return cost;
     }
-    
-    // Getters and Setters
+
     public void setCost(int cost) {
         this.cost = cost;
     }

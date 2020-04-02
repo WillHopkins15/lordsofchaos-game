@@ -4,7 +4,6 @@ import java.sql.Date;
 
 public class LeaderboardRow
 {
-    
     private int id;
     private String name;
     private int waves;

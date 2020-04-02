@@ -17,8 +17,6 @@ import java.util.List;
 
 public class Troop extends InteractiveObject
 {
-    protected float moveTimer;
-    protected float moveTimeLimit = 0.1f;
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -42,7 +40,6 @@ public class Troop extends InteractiveObject
         setAtEnd(false);
         Texture texture = new Texture(Gdx.files.internal("troops/" + spriteName + ".png"));
         this.sprite = new Sprite(texture);
-        
     }
     
     public MatrixCoordinates getNextTile() {
@@ -52,8 +49,7 @@ public class Troop extends InteractiveObject
     public float getMovementSpeed() {
         return movementSpeed;
     }
-    
-    // Getters and setters
+
     public void setMovementSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
     }
@@ -85,24 +81,8 @@ public class Troop extends InteractiveObject
         this.path = path;
     }
     
-    public Sprite getSprite() {
-        return sprite;
-    }
-    
-    public boolean getMoved() {
-        return moved;
-    }
-    
     public void setMoved(boolean moved) {
         this.moved = moved;
-    }
-    
-    public boolean getTargeted() {
-        return targeted;
-    }
-    
-    public void setTargeted(boolean targeted) {
-        this.targeted = targeted;
     }
     
     public boolean getAtEnd() {
@@ -116,16 +96,15 @@ public class Troop extends InteractiveObject
     public DamageType getArmourType() {
         return armourType;
     }
-    
-    private void resetTimer() {
-        moveTimer = 0;
-    }
-    
+
+    /**
+     * This troop will move along the path it has stored, scaled with deltaTime to make movement framerate-independent
+     *
+     * @param deltaTime time taken to execute the last frame
+     */
     public void move(float deltaTime) {
         int move = (int)(movementSpeed * deltaTime);
 
-        resetTimer();
-        
         setMoved(false);
         // move along set path
         
@@ -178,11 +157,8 @@ public class Troop extends InteractiveObject
                     case "west":
                         realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                         break;
-                    
                 }
-                
             }
-            
             
             switch (direction) {
                 case "north":
@@ -197,9 +173,7 @@ public class Troop extends InteractiveObject
                 case "west":
                     realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
                     break;
-                
             }
-            
             
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
@@ -209,10 +183,7 @@ public class Troop extends InteractiveObject
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
                 setMoved(true);
-                
             }
-            
-            
         } else {
             (getPath().get(index)).removeTroop(this);
             damageBase();
@@ -220,8 +191,10 @@ public class Troop extends InteractiveObject
         }
         
     }
-    
-    
+
+    /**
+     * Lower the defender's health by this troops damage value
+     */
     public void damageBase() {
         int temp;
         temp = GameStart.defender.getHealth() - getDamage();
@@ -232,7 +205,6 @@ public class Troop extends InteractiveObject
         } else {
             GameStart.defender.setHealth(temp);
         }
-        
     }
     
 }
