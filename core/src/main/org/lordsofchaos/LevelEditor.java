@@ -246,6 +246,8 @@ public class LevelEditor {
             HashMap<String, Object> object = new HashMap<>();
             object.put("obstacles", obstacleStrings);
             object.put("paths", pathStrings);
+            object.put("width", MapRenderer.width);
+            object.put("height", MapRenderer.height);
             JSONObject json = new JSONObject(object);
             System.out.println(json.toString());
         }

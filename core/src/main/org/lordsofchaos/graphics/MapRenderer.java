@@ -12,10 +12,7 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.towers.DefenderTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
-import org.lordsofchaos.matrixobjects.MatrixObject;
-import org.lordsofchaos.matrixobjects.Obstacle;
-import org.lordsofchaos.matrixobjects.ObstacleType;
-import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.matrixobjects.*;
 
 import java.io.File;
 import java.util.*;
@@ -28,6 +25,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     private static final int tileOffsetY = -170;
     private static final int tileWidth = 512;
     private static final int tileHeight = 512;
+
     private MatrixObject[] map = new MatrixObject[400];
     private MatrixObject[] sortedMap = new MatrixObject[400];
     private HashMap<String, Texture> textures = new HashMap<>();
@@ -36,7 +34,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     private HashMap<Integer, Color> colourExceptions = new HashMap<>();
     private boolean mapUpdated = true;
     private boolean levelEditing = false;
-    
+
     public MapRenderer() {
         super(new TmxMapLoader().load("maps/BlankMap.tmx"));
         File tileDirectory = new File("core/assets/maps/tiles");
@@ -89,23 +87,20 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     public void refreshSprite(int x, int y) {
         for (int i = x - 1; i < x + 2; i++)
             for (int j = y - 1; j < y + 2; j++)
-                if (index(i, j) >= 0 && index(i, j) < map.length) {
-                    // if (objectAt(x, y) instanceof Obstacle)
-                    // if (((Obstacle) objectAt(x, y)).getType() == ObstacleType.TREE) continue;
+                if (index(i, j) >= 0 && index(i, j) < map.length)
                     cachedTiles.remove(index(i, j));
-                }
     }
     
     @Override
     public void render() {
         super.render();
+
         if (mapUpdated) {
             sortedMap = map.clone();
             Arrays.sort(sortedMap);
             mapUpdated = false;
         }
-        
-        
+
         getBatch().begin();
         
         for (MatrixObject object : sortedMap) {
@@ -134,54 +129,47 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             Vector2 coordinates = Conversions.realWorldCooridinateToIsometric(object.getRealWorldCoordinates());
             float w = 48f, a = sprite.getHeight() / sprite.getWidth();
             if (object instanceof DefenderTower) w = 72f;
-            else if (object instanceof Tower) if (!((Tower) object).getIsCompleted())
-                getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
+            else if (object instanceof Tower)
+                if (!((Tower) object).getIsCompleted())
+                    getBatch().setColor(0.5f, 0.5f, 0.5f, 0.5f);
             getBatch().draw(sprite, coordinates.x - w / 2, coordinates.y - w / 6, w, w * a);
             getBatch().setColor(Color.WHITE);
         }
         
         getBatch().end();
+
     }
     
     public boolean adjacentTileIs(int x, int y, String direction, String type) {
         MatrixObject tile = null;
         if (x < 0 || y < 0 || x >= width || y >= height) return false;
-        switch (direction) {
-            case "N":
-                if (y < height - 1) tile = map[index(x, y + 1)];
-                break;
-            case "S":
-                if (y > 0) tile = map[index(x, y - 1)];
-                break;
-            case "E":
-                if (x < width - 1) tile = map[index(x + 1, y)];
-                break;
-            case "W":
-                if (x > 0) tile = map[index(x - 1, y)];
-                break;
-            case "NE":
-                if (y < height - 1 && x < width - 1) tile = map[index(x + 1, y + 1)];
-                break;
-            case "NW":
-                if (y < height - 1 && x > 0) tile = map[index(x - 1, y + 1)];
-                break;
-            case "SE":
-                if (y > 0 && x < width - 1) tile = map[index(x + 1, y - 1)];
-                break;
-            case "SW":
-                if (y > 0 && x > 0) tile = map[index(x - 1, y - 1)];
-                break;
-            default:
-                return false;
-        }
+        if ("N".equals(direction)) {
+            if (y < height - 1) tile = map[index(x, y + 1)];
+        } else if ("S".equals(direction)) {
+            if (y > 0) tile = map[index(x, y - 1)];
+        } else if ("E".equals(direction)) {
+            if (x < width - 1) tile = map[index(x + 1, y)];
+        } else if ("W".equals(direction)) {
+            if (x > 0) tile = map[index(x - 1, y)];
+        } else if ("NE".equals(direction)) {
+            if (y < height - 1 && x < width - 1) tile = map[index(x + 1, y + 1)];
+        } else if ("NW".equals(direction)) {
+            if (y < height - 1 && x > 0) tile = map[index(x - 1, y + 1)];
+        } else if ("SE".equals(direction)) {
+            if (y > 0 && x < width - 1) tile = map[index(x + 1, y - 1)];
+        } else if ("SW".equals(direction)) {
+            if (y > 0 && x > 0) tile = map[index(x - 1, y - 1)];
+        } else return false;
         if (tile == null) return false;
         switch (type) {
             case "Path":
                 return tile instanceof Path;
             case "Base":
-                if (tile instanceof Obstacle) return ((Obstacle) tile).getType() == ObstacleType.BASE;
+                if (tile instanceof Obstacle)
+                    return ((Obstacle) tile).getType() == ObstacleType.BASE;
             case "River":
-                if (tile instanceof Obstacle) return ((Obstacle) tile).getType() == ObstacleType.RIVER;
+                if (tile instanceof Obstacle)
+                    return ((Obstacle) tile).getType() == ObstacleType.RIVER;
             case "RiverN":
                 if (tile instanceof Obstacle)
                     return ((Obstacle) tile).getType() == ObstacleType.RIVER && spriteName(tile).contains("N");
@@ -236,12 +224,9 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         } else if (object instanceof Obstacle) {
             Obstacle obstacle = (Obstacle) object;
             switch (obstacle.getType()) {
-                case BASE:
-                    return "dirt";
-                case ROCK:
-                    return "rock";
-                case TREE:
-                    return "tree4"; // + new Random().nextInt(5);
+                case BASE: return "dirt";
+                case ROCK: return "rock";
+                case TREE: return "tree4"; // + new Random().nextInt(5);
                 case RIVER:
                     s = "river";
                     if (adjacentTileIs(x, y, "N", "River")) s += "N";

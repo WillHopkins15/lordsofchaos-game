@@ -230,7 +230,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/" + ghostTowerType.getSpriteName() + ".png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-                
                 if (GameController.verifyTowerPlacement(ghostTowerType, rwc))
                     renderer.getBatch().setColor(0, 1, 0, 0.5f);
                 else renderer.getBatch().setColor(1, 0, 0, 0.5f);
@@ -335,8 +334,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public void defenderPOV() {
-        
-        
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
                 if (button instanceof UpgradeButton) {
@@ -423,11 +420,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 } else {
                     System.out.println("NONTEST");
                     //buildMode = true;
-                    for (int i = 0; i < buttonList.size(); i++) {
-                        if (buttonList.get(i).checkClick(x, y) && buttonList.get(i).getScreenLocation() == currentScreen) {
-                            buttonList.get(i).leftButtonAction();
+                    for (Button value : buttonList) {
+                        if (value.checkClick(x, y) && value.getScreenLocation() == currentScreen) {
+                            value.leftButtonAction();
                             buildMode = true;
-                            break;
+                            return;
                         }
                     }
                 }
@@ -436,8 +433,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 MatrixCoordinates mc = new MatrixCoordinates(rwc);
                 if (renderer.objectAt(mc) instanceof Tile) {
                     Tile t = (Tile) renderer.objectAt(mc);
-                    if (t.getTower() != null && !t.getTower().getIsCompleted())
+                    if (t.getTower() != null && !t.getTower().getIsCompleted() && !buildMode) {
                         EventManager.towerRemoved(t.getTower());
+                        return;
+                    }
                     //GameController.removeTower(new SerializableTower(t.getTower().getType(), rwc));
                 }
             }
@@ -754,8 +753,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
         int y = Gdx.graphics.getHeight() - screenY;
         if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION)) {
             for (Button value : buttonList)
-                if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen)
+                if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen) {
                     value.leftButtonAction();
+                    return false;
+                }
         }
         
         if (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {

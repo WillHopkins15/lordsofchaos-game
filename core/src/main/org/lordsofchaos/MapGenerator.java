@@ -1,11 +1,13 @@
 package org.lordsofchaos;
 
+import org.json.JSONObject;
 import org.lordsofchaos.coordinatesystems.Coordinates;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.matrixobjects.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class MapGenerator {
@@ -122,16 +124,13 @@ public class MapGenerator {
     
     public static MatrixObject[][] generateMap(int width, int height, List<List<Path>> paths, List<Obstacle> obstacles) {
         MatrixObject[][] map = new MatrixObject[width][height];
-        
         //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
         // initialise array with empty tiles
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 map[y][x] = new Tile(y, x, null);
-        
         if (obstacles != null)
             obstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
-        
         // loop through the given list of paths and set the corresponding matrix element
         // to a path
         if (paths != null)
@@ -142,7 +141,8 @@ public class MapGenerator {
                 }
         
         baseObstacles.forEach(o -> map[o.getMatrixPosition().getY()][o.getMatrixPosition().getX()] = o);
-        
+
+
         return map;
     }
     
