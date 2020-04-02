@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.database.DatabaseCommunication;
-import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Projectile;
@@ -95,7 +94,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
-    
+    private Texture upgradeBarTexture[];
+    private Sprite upgradeBarSprite[];
+
     public static void main(String[] args) {
         setupClient();
     }
@@ -142,12 +143,13 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public static void setMenuOpen(boolean bool) {
         menuOpen = bool;
     }
-    
+
+    public static void setBuildMode(boolean bool){buildMode = bool; }
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
-        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 50, 50, Screen.DEFENDER_SCREEN, TowerType.type1));
-        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 156, 50, Screen.DEFENDER_SCREEN, TowerType.type2));
-        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 262, 50, Screen.DEFENDER_SCREEN, TowerType.type3));
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType1Button.png", 30, 50, Screen.DEFENDER_SCREEN, TowerType.type1));
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType2Button.png", 136, 50, Screen.DEFENDER_SCREEN, TowerType.type2));
+        buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 242, 50, Screen.DEFENDER_SCREEN, TowerType.type3));
         // main menu
         buttonList.add(new MainMenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55, Screen.MAIN_MENU, Screen.CHOOSE_FACTION));
@@ -168,11 +170,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
         buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.DEFENDER_SCREEN, 0));
         buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.ATTACKER_SCREEN, 1));
         
-        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200, Screen.ATTACKER_SCREEN));
-        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", 0, Gdx.graphics.getHeight() - 200, Screen.DEFENDER_SCREEN));
+        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", Gdx.graphics.getWidth() - 350, 50, Screen.ATTACKER_SCREEN));
+        buttonList.add(new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", Gdx.graphics.getWidth() - 350, 50, Screen.DEFENDER_SCREEN));
         
         // defender upgrade button
-        buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262 + 106, 50, Screen.DEFENDER_SCREEN));
+        buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262 + 86, 50, Screen.DEFENDER_SCREEN));
         
         //attacker path buttons
         //TO DO: Get starting locations for paths
@@ -267,7 +269,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         healthSprite.draw(batch);
         String nr = GameController.defender.getHealth() + "";
         hpCounter.getData().setScale(1.5f);
-        hpCounter.draw(batch, nr + " / 100", 220 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
+        hpCounter.draw(batch, nr + " / 100", 205 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
     }
     
     public void showUnitHealthBar() {
@@ -524,7 +526,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
         healthSprite = new Sprite(healthTexture);
         
         healthSprite.setScale(5);
-        healthSprite.setPosition(225, Gdx.graphics.getHeight() - 64);
+        healthSprite.setPosition(210, Gdx.graphics.getHeight() - 64);
         healthBarSprite.setScale(5);
         healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
         coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
@@ -538,14 +540,23 @@ public class Game extends ApplicationAdapter implements InputProcessor
         GameController.initialise();
         renderer.setMap(GameController.getMap());
         hpSpriteW = healthSprite.getWidth();
-        healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
+        healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
         leaderBoardRowText = new BitmapFont();
         leaderBoardRowText.getData().setScale(2);
         
         currentScreen = Screen.MAIN_MENU;
-        
+        //Upgrade bar
+        upgradeBarSprite =  new Sprite[4];
+        upgradeBarTexture = new Texture[4];
+        for(int i = 0; i < 4; i++){
+            upgradeBarTexture[i] = new Texture("UI/" + i + "Upgrade.png");
+            upgradeBarSprite[i] = new Sprite(upgradeBarTexture[i]);
+
+            upgradeBarSprite[i].scale(1.5f);
+            upgradeBarSprite[i].setPosition(100,570);
+        }
         Gdx.input.setInputProcessor(this);
     }
     
@@ -634,10 +645,11 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
                 String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                 timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                upgradeBarSprite[GameController.getDefenderUpgrade()].draw(batch);
             }
             for (Button button : buttonList) {
-                if (button instanceof PathButton && button.getScreenLocation() == currentScreen) {
-                    ((PathButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
+                if (button instanceof HoverButton && button.getScreenLocation() == currentScreen) {
+                    ((HoverButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
                 }
             }
             if (menuOpen) {
@@ -757,8 +769,10 @@ public class Game extends ApplicationAdapter implements InputProcessor
         int y = Gdx.graphics.getHeight() - screenY;
         if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION)) {
             for (Button value : buttonList)
-                if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen)
+                if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen) {
                     value.leftButtonAction();
+                    return false;
+                }
         }
         
         if (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {

@@ -17,7 +17,7 @@ public class EndTurnButton extends Button
         } else {
             GameController.endPhase();
         }
-        
+        Game.setBuildMode(false);
     }
     
     public void rightButtonAction() {

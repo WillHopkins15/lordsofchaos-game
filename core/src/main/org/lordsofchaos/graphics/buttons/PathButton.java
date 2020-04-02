@@ -7,7 +7,7 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class PathButton extends Button
+public class PathButton extends HoverButton
 {
     private static boolean[] selected;
     private int pathNr;
@@ -45,14 +45,9 @@ public class PathButton extends Button
             return y > buttonY1 && y < buttonY2;
         return false;
     }
-    
-    public boolean checkHover(int x, int y) {
-        //System.out.println("Selected path: " + pathNr + " Selected[i]: " + selected[0] + " " + selected[1] + " " + selected[2]);
-        return (x > buttonX1 && x < buttonX2 - 20 && y > buttonY1 + 20 && y < buttonY2) || selected[pathNr];
-    }
-    
+
     public void update(int x, int y, SpriteBatch batch) {
-        if (checkHover(x, y)) {
+        if (checkHover(x , y) || selected[pathNr]) {
             super.sprite.setColor(1, 1, 1, 1);
         } else {
             super.sprite.setColor(1, 1, 1, 0);

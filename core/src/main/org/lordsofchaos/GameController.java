@@ -152,7 +152,9 @@ public class GameController
     public static List<List<Path>> getPaths() {
         return paths;
     }
-    
+
+    public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
+
     public static void setPlayerType(Boolean type) {
         if (type)
             clientPlayerType = defender;
