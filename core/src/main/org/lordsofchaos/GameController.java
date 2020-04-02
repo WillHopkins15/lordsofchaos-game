@@ -276,17 +276,14 @@ public class GameController {
      */
     private static void attackerPlaceTowers() {
         for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-            boolean alreadyExists = false;
+            System.out.println("Attacker Placing tower " + i);
+            MatrixCoordinates mc = new MatrixCoordinates(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates());
+
+            if (((Tile) (getMatrixObject(mc.getY(), mc.getX()))).getTower() == null)
+                createTower(EventManager.getTowerBuilds().get(i));
             // check if tower has not already benn added
-            for (Tower tower : towersPlacedThisTurn) {
-                if (tower.getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates())) {
-                    alreadyExists = true;
-                    break;
-                }
-            }
-            if (!alreadyExists)
-                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
         }
+        EventManager.getTowerBuilds().clear();
     }
 
     /**
