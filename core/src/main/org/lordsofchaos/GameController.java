@@ -190,7 +190,7 @@ public class GameController
         for (int i = 0; i < paths.size(); i++) {
             blockedPaths.add(i);
         }
-        unblockPath(0); // unblock the first pat
+        unblockPath(0, true); // unblock the first pat
         
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
@@ -230,11 +230,19 @@ public class GameController
      */
     private static void defenderNetworkUpdates() {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
-            unblockPath(i);
+            unblockPath(i, true);
         }
     }
-    
-    public static void unblockPath(int index) {
+
+    /**
+     * Remove the given path from the blocked paths list, so the attacker can now send troops along that path
+     *
+     * @param index path to unblock
+     * @param isFree when true, attacker is not charged- used to initialise the first path and when defender applies path unblocking
+     */
+    public static void unblockPath(int index, boolean isFree) {
+        if (!isFree)
+            attacker.addMoney(-unblockPathCost);
         blockedPaths.remove(new Integer(index));
     }
 
@@ -242,14 +250,7 @@ public class GameController
      * Does the attacker have enough money to unblock a path
      */
     public static boolean canAttackerUnblockPath() {
-        // if path already unblocked return false;
-        if (attacker.getCurrentMoney() >= unblockPathCost) {
-            attacker.addMoney(-unblockPathCost);
-            return true;
-        } else {
-            System.out.println("Can't afford path unblock");
-            return false;
-        }
+        return attacker.getCurrentMoney() >= unblockPathCost;
     }
 
     /**

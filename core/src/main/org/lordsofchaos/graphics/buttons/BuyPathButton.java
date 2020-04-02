@@ -1,5 +1,6 @@
 package org.lordsofchaos.graphics.buttons;
 
+import org.lordsofchaos.EventManager;
 import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
@@ -16,8 +17,8 @@ public class BuyPathButton extends Button
     
     @Override
     public void leftButtonAction() {
-        if (GameController.canAttackerUnblockPath(pathNr)) {
-            GameController.unblockPath(pathNr);
+        if (GameController.canAttackerUnblockPath()) {
+            EventManager.unblockPath(pathNr);
             selectSound.play(Game.getSoundEffectsVolume());
             System.out.println("Unblocked path: " + pathNr);
         } else System.out.println("Can't unblock path");
