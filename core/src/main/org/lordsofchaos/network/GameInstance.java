@@ -101,7 +101,7 @@ public class GameInstance extends UDPSocket
     @Override
     protected void parsePacket(DatagramPacket packet) {
         int senderPort = packet.getPort();
-        NumberedPacket received = (NumberedPacket) getObjectFromBytes(packet.getData());
+        TimestampedPacket received = (TimestampedPacket) getObjectFromBytes(packet.getData());
         Object data = received.getData();
         if (data == null) {
             System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), senderPort);
@@ -125,24 +125,22 @@ public class GameInstance extends UDPSocket
         }
     }
     
-    private boolean validatePacket(NumberedPacket packetData, int sender) {
+    /**
+     * Checks whether the packet received is the most recent packet sent.
+     * @param packetData timestamped packet
+     * @param sender port number of the sender
+     * @return true if the packet is valid
+     */
+    private boolean validatePacket(TimestampedPacket packetData, int sender) {
         if (sender == attacker.getPort()) {
             LocalDateTime newTime = LocalDateTime.parse(packetData.getTime());
-            if (lastAttPacketTime == null) {
-                lastAttPacketTime = newTime;
-                return true;
-            }
-            if (newTime.isAfter(lastAttPacketTime)) {
+            if (lastAttPacketTime == null || newTime.isAfter(lastAttPacketTime)) {
                 lastAttPacketTime = newTime;
                 return true;
             }
         } else if (sender == defender.getPort()) {
             LocalDateTime newTime = LocalDateTime.parse(packetData.getTime());
-            if (lastDefPacketTime == null) {
-                lastDefPacketTime = newTime;
-                return true;
-            }
-            if (newTime.isAfter(lastDefPacketTime)) {
+            if (lastDefPacketTime == null || newTime.isAfter(lastDefPacketTime)) {
                 lastDefPacketTime = newTime;
                 return true;
             }
