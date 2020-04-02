@@ -15,7 +15,6 @@ import java.util.List;
 
 public class Tower extends InteractiveObject
 {
-    
     private static final int damageUpgrade = 1;
     private static final float speedUpgrade = 1.2f;
     private static int globalDamageMultiplier = 1;
@@ -37,13 +36,17 @@ public class Tower extends InteractiveObject
         isCompleted = false;
         this.type = type;
     }
-    
-    // increases damage for ALL towers
+
+    /**
+     * Increase damage for all towers
+     */
     public static void upgradeTowerDamage() {
         globalDamageMultiplier += damageUpgrade;
     }
-    
-    // decrease cooldown for ALL towers
+
+    /**
+     * Decrease the shot cooldown for all towers
+     */
     public static void upgradeTowerSpeed() {
         globalSpeedMultiplier *= speedUpgrade;
     }
@@ -63,8 +66,7 @@ public class Tower extends InteractiveObject
     public int getRange() {
         return range;
     }
-    
-    // Getters and Setters
+
     public void setRange(int range) {
         this.range = range;
         findPathInRange();
@@ -82,7 +84,10 @@ public class Tower extends InteractiveObject
     public Troop getTarget() {
         return target;
     }
-    
+
+    /**
+     * When the range of this tower is changed/set, get a list of all the path tiles that are in range (can be shot at)
+     */
     private void findPathInRange() {
         // use range to find all in-range path objects in matrix
         inRange = new ArrayList<Path>();
@@ -214,7 +219,10 @@ public class Tower extends InteractiveObject
             sort(tiles, part + 1, h);
         }
     }
-    
+
+    /**
+     * Loop through each tile in the list of in range tiles and return the closest
+     */
     private Troop findNearestTroop() {
         Troop temp;
         if (inRange != null && !inRange.isEmpty()) {
@@ -249,7 +257,11 @@ public class Tower extends InteractiveObject
     public void resetTimer() {
         shootTimer = 0;
     }
-    
+
+    /**
+     * when the shootTimerLimit has elapsed, find the nearest troop and notify GameController that this tower
+     * is shooting at it, then reset the timer
+     */
     public void shoot(float deltaTime) {
         shootTimer += deltaTime;
         if (shootTimer > shootTimerLimit / globalSpeedMultiplier) {

@@ -75,8 +75,7 @@ public class EventManager
         return removedTowers;
     }
     
-    
-    public static int getDefenderUpgradesThisTurn() {
+        public static int getDefenderUpgradesThisTurn() {
         return defenderUpgradesThisTurn;
     }
     
@@ -85,11 +84,10 @@ public class EventManager
     }
     
     public static void unblockPath(int index) {
-        if (GameController.canAttackerUnblockPath(index)) {
+        if (GameController.canAttackerUnblockPath()) {
             GameController.unblockPath(index);
             pathsUnblockedThisTurn.add(index);
         }
-        
     }
     
     public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {

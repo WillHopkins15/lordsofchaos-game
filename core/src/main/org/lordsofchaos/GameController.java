@@ -33,7 +33,7 @@ public class GameController
     protected final static String DEFENDERNAME = "blank";
     private static final int scaleFactor = 64;
     private static final int defenderUpgradeBaseCost = 50;
-    private static final int unblockPathCost = 10;
+    private static final int unblockPathCost = 100;
     public static Attacker attacker;// = new Attacker(ATTACKERNAME);
     public static Defender defender;// = new Defender(DEFENDERNAME);
     // this records if the player on the client machine is an attacker or a defender
@@ -91,7 +91,15 @@ public class GameController
     private static List<Projectile> projectiles;
     
     private static String inputName;
-    
+
+    /**
+     * When a player wins the game, they need to enter a name to add to the database,
+     * this function is called by a MyTextInputListener object when they interact with the buttons
+     * on the box
+     *
+     * @param name the name the player has entered
+     * @param listener the textbox object that is calling this function
+     */
     public static void setInputName(String name, MyTextInputListener listener) {
         if (LeaderboardRow.verifyName(name))
         {
@@ -100,6 +108,8 @@ public class GameController
         }
         else
         {
+            // if the name entered was invalid (and this includes the case
+            // // where the user closed the box or pressed cancel), re-draw the text box
             Gdx.input.getTextInput(listener, "Congratulations, you won!", "", "Name must be at least one character!");
         }
     }
@@ -146,7 +156,10 @@ public class GameController
     public static void setPlayerType(Boolean type) {
         clientPlayerType = type ? attacker : defender;
     }
-    
+
+    /**
+     * Reset all values at the start of the game, and when a new game starts
+     */
     public static void initialise() {
         attacker= new Attacker(ATTACKERNAME);
         defender = new Defender(DEFENDERNAME);
@@ -182,16 +195,23 @@ public class GameController
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
-    
+
+    /**
+     * Collects all the information about what has changed since the last packet was sent
+     */
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
                 EventManager.getPathsUnblockedThisTurn());
-        //System.out.println("Get Game State: " + bpd.toString());
         return bpd;
-        // then clear data ready for next turn
     }
-    
+
+    /**
+     * Receive a packet from the other client, then depending on whether this client is the attacker or defender
+     * apply that information to this version of the game
+     *
+     * @param bpd the object that contains all the required information about what has changed
+     */
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd);
         
@@ -203,7 +223,11 @@ public class GameController
     public static List<Integer> getBlockedPaths() {
         return blockedPaths;
     }
-    
+
+    /**
+     * When the defender receives a new packet from the attacker, if the attacker unblocked any paths,
+     * this client needs to reflect that
+     */
     private static void defenderNetworkUpdates() {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(i);
@@ -213,8 +237,11 @@ public class GameController
     public static void unblockPath(int index) {
         blockedPaths.remove(new Integer(index));
     }
-    
-    public static boolean canAttackerUnblockPath(int index) {
+
+    /**
+     * Does the attacker have enough money to unblock a path
+     */
+    public static boolean canAttackerUnblockPath() {
         // if path already unblocked return false;
         if (attacker.getCurrentMoney() >= unblockPathCost) {
             attacker.addMoney(-unblockPathCost);
@@ -224,19 +251,28 @@ public class GameController
             return false;
         }
     }
-    
+
+    /**
+     * Attacker has various updates it needs to perform whenever it receives a new packet from the defender
+     */
     private static void attackerNetworkUpdates() {
         attackerPlaceTowers();
         attackerRemoveTowers();
         attackerUpdgradeDefender();
     }
-    
+
+    /**
+     * Any towers the defender placed but then decided to remove, need to be removed from the attacker's game
+     */
     private static void attackerRemoveTowers() {
         for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
             removeTower(EventManager.getRemovedTowers().get(i));
         }
     }
-    
+
+    /**
+     * Any towers the defender placed need to be added to the attacker's game
+     */
     private static void attackerPlaceTowers() {
         for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
             boolean alreadyExists = false;
@@ -251,7 +287,10 @@ public class GameController
                 towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
         }
     }
-    
+
+    /**
+     * If the defender bought an upgrade(s), attacker needs to apply this change also
+     */
     private static void attackerUpdgradeDefender() {
         // when defender attempts to upgrade, the event manager only increments this value if upgrade
         // is successful, so no more checks are needed and we can immediately upgrade the defender
@@ -271,7 +310,12 @@ public class GameController
     private static void resetAddMoneyTimer() {
         addMoneyTimer = 0;
     }
-    
+
+    /**
+     * The three play phases are DefenderBuild, AttackerBuild, and Play
+     * Whenever the current phase ends, this function is called and the
+     * game is moved on to the next phase
+     */
     public static void endPhase() {
         Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
@@ -315,7 +359,11 @@ public class GameController
             resetUnitSpawnTimer();
         }
     }
-    
+
+    /**
+     * When a player wins the game, need to create an input text box for them to write their name in.
+     * The waveState becomes WaitingForInput so that update() is paused
+     */
     private static void playerWins(Player player) {
         if (clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
         {
@@ -326,8 +374,13 @@ public class GameController
             waveState = WaveState.End;
         }
     }
-    
-    // called by renderer every frame/ whatever
+
+    /**
+     * This is called by render() in Game.java every frame. This is the main game loop
+     * from which all gameplay processes are carried out
+     *
+     * @param deltaTime the time taken to process the last frame
+     */
     public static void update(float deltaTime) {
 
         // if frame time is too high, don't process the frame as it's likely a lag spike/ loading
@@ -383,7 +436,7 @@ public class GameController
             }
         }
     }
-    
+
     private static void moveProjectiles(float deltaTime) {
         for (int i = 0; i < getProjectiles().size(); i++) {
             getProjectiles().get(i).update(deltaTime);
@@ -403,7 +456,10 @@ public class GameController
             resetAddMoneyTimer();
         }
     }
-    
+
+    /**
+     * Returns true if the unitBuildPlan is empty- if there are no more troops to spawn
+     */
     private static Boolean unitBuildPlanEmpty() {
         int paths = EventManager.getUnitBuildPlan()[0].length;
         int types = EventManager.getUnitBuildPlan().length;
@@ -418,7 +474,11 @@ public class GameController
         
         return true;
     }
-    
+
+    /**
+     * When enough time has elapsed, spawn a troop onto each path that has a troop queued up. Add it to
+     * the troop list so it can receive movement updates
+     */
     private static void spawnTroop(float deltaTime) {
         unitSpawnTimer += deltaTime;
         if (unitSpawnTimer > unitSpawnTimeLimit) {
@@ -462,7 +522,11 @@ public class GameController
             resetUnitSpawnTimer();
         }
     }
-    
+
+    /**
+     * Loop through every troop in the game and call its move function. If any troops have reached the end
+     * of their path, remove the troop from the troop list
+     */
     public static void moveTroops(float deltaTime) {
         int size = GameController.troops.size();
         
@@ -483,12 +547,21 @@ public class GameController
             troopReachesDefender(troopsToRemove.get(i));
         }
     }
-    
+
+    /**
+     * When a troop reaches the defender's base, damage the base and kill the troop
+     *
+     * @param troop the troop that has reached the base
+     */
     private static void troopReachesDefender(Troop troop) {
         defender.takeDamage(troop.getDamage());
         troopDies(troop);
     }
-    
+
+    /**
+     * Loop through all towers in the game and call their shoot function. Any towers
+     * that have elapsed their shootTime will then fire a projectile at a chosen troop
+     */
     public static void shootTroops(float deltaTime) {
         if (!GameController.towers.isEmpty()) {
             for (int j = 0; j < GameController.towers.size(); j++) {
@@ -510,7 +583,12 @@ public class GameController
             }
         }
     }
-    
+
+    /**
+     * When a troops is killed, it needs to be removed from the path it was travelling along
+     *
+     * @param troop the troop that died
+     */
     private static void troopDies(Troop troop) {
         if (troops.contains(troop)) {
             troops.remove(troop);
@@ -532,7 +610,14 @@ public class GameController
     public static MatrixObject getMatrixObject(int y, int x) {
         return map[y][x];
     }
-    
+
+    /**
+     * when a projectile hits a troop, damage the troop and kill it if its health is zero
+     *
+     * @param tower the tower this projectile was shot from
+     * @param troop the troop that was hit
+     * @param proj the projectile that hit the troop
+     */
     public static void damageTroop(Tower tower, Troop troop, Projectile proj) {
         int temp;
         if (tower.getDamageType().equals(troop.getArmourType())) {
@@ -551,13 +636,22 @@ public class GameController
         getProjectiles().remove(proj);
         proj = null;
     }
-    
+
+    /**
+     * When a tower is shoots, it calls this function and a projectile is spawned, add this to the projectiles list
+     * so it can receive movement updates
+     *
+     * @param tower the tower that has shot
+     * @param troop the troop the tower is shooting at
+     */
     public static void shootTroop(Tower tower, Troop troop) {
         Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
         projectiles.add(projectile);
     }
-    
-    
+
+    /**
+     * At the end of the play phase, any lingering projectiles need to be deleted
+     */
     private static void removeAllProjectiles() {
         while (!projectiles.isEmpty()) {
             deleteProj(projectiles.get(0));
@@ -568,8 +662,14 @@ public class GameController
         projectile = null;
         projectiles.remove(0);
     }
-    
-    
+
+    /**
+     * When the EventManager receives the towerPlaced event, createTower is passed a SerializableTower, which
+     * is a bare-bones networking object that contains just enough information to re-create a Tower object. createTower
+     * therefore converts a SerializableTower to a Tower and places it into the matrix, and the tower lists
+     *
+     * @param tbp a SerializableTower sent from EventManager
+     */
     public static Tower createTower(SerializableTower tbp) {
         Tower tower = null;
         
@@ -596,7 +696,14 @@ public class GameController
         defender.addMoney(-tower.getCost());
         return tower;
     }
-    
+
+    /**
+     * Given a list of Tower objects, find (if one exists) the Tower that corresponds to the given SerializableTower, using
+     * coordinates to compare objects
+     *
+     * @param serTower the SerializableTower you want to convert
+     * @param towers the Tower list to search
+     */
     public static Tower serializeableTowerToTower(SerializableTower serTower, List<Tower> towers) {
         Tower foundTower = null;
         for (int i = 0; i < towers.size(); i++) {
@@ -607,12 +714,23 @@ public class GameController
         }
         return foundTower;
     }
-    
+
+    /**
+     * When a tower is initially placed, it is added to the towersPlacedThisTurn list, and the towers list. If this
+     * tower is subsequently removed, these lists need to be updated to reflect that change
+     *
+     * @param serTower the SerializableTower that was removed, sent by the EventManager
+     */
     public static boolean removeTower(SerializableTower serTower) {
         Tower tower = serializeableTowerToTower(serTower, towersPlacedThisTurn);
         return removeTower(tower);
     }
-    
+
+    /**
+     * Remove a specified tower from the matrix and any lists it exists in, refund the defender
+     *
+     * @param tower the tower to remove
+     */
     public static boolean removeTower(Tower tower) {
         if (towers.contains(tower) && towersPlacedThisTurn.contains(tower)) {
             towers.remove(tower);
@@ -626,7 +744,12 @@ public class GameController
         }
         return false;
     }
-    
+
+    /**
+     * Returns true if the given MatrixCoordinates are within the bounds of the matrix
+     *
+     * @param mc coordinates to check
+     */
     public static boolean inBounds(MatrixCoordinates mc) {
         return mc.getX() >= 0 && mc.getY() >= 0 && mc.getX() < width && mc.getY() < height;
     }
@@ -634,8 +757,10 @@ public class GameController
     public static boolean inBounds(int y, int x) {
         return x >= 0 && y >= 0 && x < width && y < height;
     }
-    
-    // want to find the cost of a tower before it has been placed
+
+    /**
+     * Return the price of the given TowerType
+     */
     private static int getTowerTypeCost(TowerType towerType) {
         if (towerType == TowerType.type1) {
             return 10;
@@ -646,7 +771,10 @@ public class GameController
         }
         return 0;
     }
-    
+
+    /**
+     * Return the price of the given troop type
+     */
     private static int getTroopTypeCost(int troopType) {
         if (troopType == 0) {
             return 10;
@@ -658,28 +786,45 @@ public class GameController
         } else return 0;
         // add elses for other troops here
     }
-    
-    // used by EventManager
+
+    /**
+     * Called by EventManager when a the attacker attempts to add a troop to the build plan
+     */
     public static boolean canAffordTroop(int troopType) {
         return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
     }
-    
+
+    /**
+     * Called by EventManager when a tower is attempted to be placed
+     */
     public static boolean canAffordTower(TowerType towerType) {
         return defender.getCurrentMoney() >= getTowerTypeCost(towerType);
     }
     
-    // once a purchase has been verified and added to event manager, finally need to take money from attacker
+    /**
+     * Once a purchase has been verified and added to event manager, finally need to take money from attacker
+     */
     public static void troopPurchased(int troopType) {
         attacker.addMoney(-getTroopTypeCost(troopType));
     }
-    
+
+    /**
+     * If a troop is cancelled, need to refund the attacker
+     */
     public static void troopCancelled(int troopType, int path) {
         // check if build plan is empty at that place, if so, don't give a refund
         if (EventManager.getUnitBuildPlan()[troopType][path] > 0) {
             attacker.addMoney(getTroopTypeCost(troopType));
         }
     }
-    
+
+    /**
+     * Returns true if the defender can afford the given TowerType, and the location is valid (i.e. not an obstacle
+     * or path tile)
+     *
+     * @param towerType the TowerType of the tower the user is attempting to place
+     * @param rwc the location that the defender is attempting to place a tower at
+     */
     public static boolean verifyTowerPlacement(TowerType towerType, RealWorldCoordinates rwc) {
         // convert realWorldCoords to matrix
         MatrixCoordinates mc = new MatrixCoordinates(rwc);
@@ -704,7 +849,10 @@ public class GameController
         }
         return true;
     }
-    
+
+    /**
+     * If enough troops have been spawned by the attacker, upgrade all troops
+     */
     public static void upgradeTroops() {
         if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
             upgradeNo = upgradeNo + 1;
@@ -746,8 +894,10 @@ public class GameController
         }
     }
     
-    // attacker needs to recieve updates about defender upgrade level but not worry about money,
-    // so attacker only uses defenderUpgrade()
+    /**
+     * When the defender clicks the upgrade button, this function returns true if they can afford the upgrade and
+     * they are not already at max level
+     */
     public static boolean canDefenderCanUpgrade() {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
             System.out.print("Max level");
@@ -763,7 +913,10 @@ public class GameController
             return false;
         }
     }
-    
+
+    /**
+     * Upgrade the defender based off which level they are at
+     */
     public static void defenderUpgrade() {
         defenderUpgradeLevel++;
         if (defenderUpgradeLevel == 1 || defenderUpgradeLevel == 3) {
