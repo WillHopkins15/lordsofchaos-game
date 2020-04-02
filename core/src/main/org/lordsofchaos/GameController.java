@@ -154,7 +154,10 @@ public class GameController
     }
     
     public static void setPlayerType(Boolean type) {
-        clientPlayerType = type ? attacker : defender;
+        if (type)
+            clientPlayerType = defender;
+        else
+            clientPlayerType = attacker;
     }
 
     /**
@@ -213,11 +216,7 @@ public class GameController
      * @param bpd the object that contains all the required information about what has changed
      */
     public static void setGameState(BuildPhaseData bpd) {
-        EventManager.recieveBuildPhaseData(bpd);
-        
-        if (clientPlayerType == null) return;
-        if (clientPlayerType.equals(attacker)) attackerNetworkUpdates();
-        else if (clientPlayerType.equals(defender)) defenderNetworkUpdates();
+        EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
     }
     
     public static List<Integer> getBlockedPaths() {
@@ -228,7 +227,7 @@ public class GameController
      * When the defender receives a new packet from the attacker, if the attacker unblocked any paths,
      * this client needs to reflect that
      */
-    private static void defenderNetworkUpdates() {
+    public static void defenderNetworkUpdates() {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(i, true);
         }
@@ -256,7 +255,7 @@ public class GameController
     /**
      * Attacker has various updates it needs to perform whenever it receives a new packet from the defender
      */
-    private static void attackerNetworkUpdates() {
+    public static void attackerNetworkUpdates() {
         attackerPlaceTowers();
         attackerRemoveTowers();
         attackerUpdgradeDefender();

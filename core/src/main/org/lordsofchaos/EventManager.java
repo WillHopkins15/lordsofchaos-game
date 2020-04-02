@@ -4,6 +4,7 @@ import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.SerializableTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
+import org.lordsofchaos.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +37,26 @@ public class EventManager
      *
      * @param bpd the packet sent by the other client
      */
-    public static void recieveBuildPhaseData(BuildPhaseData bpd) {
-        unitBuildPlan = bpd.getUnitBuildPlan();
-        towerBuilds = bpd.getTowerBuildPlan();
-        defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
-        pathsUnblockedThisTurn = bpd.getPathsUnblockedThisTurn();
-        removedTowers = bpd.getRemovedTowers();
+    public static void recieveBuildPhaseData(BuildPhaseData bpd, Player clientPlayerType) {
+
+        // don't apply updates during play phase
+        if (GameController.getWaveState() == GameController.WaveState.Play) return;
+
+        if (clientPlayerType == null) return;
+
+        // if the client is defender, only update attacker information
+        if (clientPlayerType.equals(GameController.defender) && GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
+            unitBuildPlan = bpd.getUnitBuildPlan();
+            pathsUnblockedThisTurn = bpd.getPathsUnblockedThisTurn();
+            GameController.defenderNetworkUpdates();
+        }
+        // vice versa
+        else if (clientPlayerType.equals(GameController.attacker) && GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+            towerBuilds = bpd.getTowerBuildPlan();
+            defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
+            removedTowers = bpd.getRemovedTowers();
+            GameController.attackerNetworkUpdates();
+        }
     }
 
     /**
