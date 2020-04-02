@@ -7,10 +7,11 @@ public class MyTextInputListener implements Input.TextInputListener
 {
     @Override
     public void input(String text) {
-        GameController.setInputName(text);
+        GameController.setInputName(text, this);
     }
     
     @Override
     public void canceled() {
+        GameController.setInputName("", this);
     }
 }

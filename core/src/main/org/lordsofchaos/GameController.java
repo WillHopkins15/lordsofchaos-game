@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.database.Leaderboard;
+import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.*;
 import org.lordsofchaos.gameobjects.troops.Troop;
@@ -91,9 +92,16 @@ public class GameController
     
     private static String inputName;
     
-    public static void setInputName(String name) {
-        inputName = name;
-        waveState = WaveState.SubmitInput;
+    public static void setInputName(String name, MyTextInputListener listener) {
+        if (LeaderboardRow.verifyName(name))
+        {
+            inputName = name;
+            waveState = WaveState.SubmitInput;
+        }
+        else
+        {
+            Gdx.input.getTextInput(listener, "Congratulations, you won!", "", "Name must be at least one character!");
+        }
     }
     
     public static List<Projectile> getProjectiles() {
@@ -313,7 +321,7 @@ public class GameController
         {
             waveState = WaveState.WaitingForInput;
             MyTextInputListener listener = new MyTextInputListener();
-            Gdx.input.getTextInput(listener, "Type name", "", "Hint Value");
+            Gdx.input.getTextInput(listener, "Congratulations, you won!", "", "Type name");
         } else {
             waveState = WaveState.End;
         }
