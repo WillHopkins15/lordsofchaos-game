@@ -229,7 +229,7 @@ public class GameController
      */
     public static void defenderNetworkUpdates() {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
-            unblockPath(i, true);
+            unblockPath(EventManager.getPathsUnblockedThisTurn().get(i), true);
         }
     }
 
