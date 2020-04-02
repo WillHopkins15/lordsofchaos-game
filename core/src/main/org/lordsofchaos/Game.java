@@ -16,7 +16,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.database.Leaderboard;
+import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Projectile;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
@@ -89,7 +91,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private int currentbutton;
     private Sprite backgroundSprite;
     // leaderbaord
-    private String[][] leaderBoardTop;
+    private List<LeaderboardRow> leaderBoardTop;
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
@@ -215,7 +217,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public void setLeaderBoardTop(int count) throws SQLException, ClassNotFoundException {
-        leaderBoardTop = Leaderboard.getTop(count);
+        leaderBoardTop = DatabaseCommunication.getHighScores(count);
     }
     
     public void isometricPov() {
@@ -539,16 +541,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
         healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderboardRowSprites = new ArrayList<>();
         leaderBoardRowText = new BitmapFont();
         leaderBoardRowText.getData().setScale(2);
-        
-        int yOffset = 0;
-        for (int i = 0; i < 5; i++, yOffset -= 100) {
-            Sprite sprite = new Sprite(leaderboardRowTexture);
-            sprite.setPosition(Gdx.graphics.getWidth() / 2 - 500, Gdx.graphics.getHeight() / 2 + 100 + yOffset);
-            leaderboardRowSprites.add(sprite);
-        }
         
         currentScreen = Screen.MAIN_MENU;
         
@@ -576,10 +570,26 @@ public class Game extends ApplicationAdapter implements InputProcessor
             batch.end();
         } else if (currentScreen == Screen.LEADERBOARD) {
             batch.begin();
-            int i = 0;
+            try {
+                leaderBoardTop = DatabaseCommunication.getHighScores(5);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            leaderboardRowSprites = new ArrayList<>();
             int yOffset = 0;
+            for (int i = 0; i < leaderBoardTop.size(); i++, yOffset -= 100) {
+                Sprite sprite = new Sprite(leaderboardRowTexture);
+                sprite.setPosition(Gdx.graphics.getWidth() / 2 - 500, Gdx.graphics.getHeight() / 2 + 100 + yOffset);
+                leaderboardRowSprites.add(sprite);
+            }
+
+
+            int i = 0;
+            yOffset = 0;
             for (Sprite sprite : leaderboardRowSprites) {
-                String str = "name: " + leaderBoardTop[i][0] + ", waves: " + leaderBoardTop[i][1] + ", date:  " + leaderBoardTop[i][2];
+                String str = "name: " + leaderBoardTop.get(i).getName() + ", waves: " + leaderBoardTop.get(i).getWaves() + ", date:  " + leaderBoardTop.get(i).getDateTime();
                 
                 leaderBoardRowText.draw(batch, str, Gdx.graphics.getWidth() / 2 - 400, Gdx.graphics.getHeight() / 2 + 175 + yOffset);
                 sprite.draw(batch);
