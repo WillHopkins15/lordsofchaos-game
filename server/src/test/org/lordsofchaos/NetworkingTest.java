@@ -38,7 +38,7 @@ public class NetworkingTest
         //init game state
         int[][] units = new int[6][3];
         ArrayList<SerializableTower> tbp = new ArrayList<>();
-        BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>());
+        BuildPhaseData emptyGameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>(), "DefenderBuild", 100);
         
         //Connect both players to server
         new Thread(() -> player1.makeConnection()).start();
@@ -59,7 +59,7 @@ public class NetworkingTest
         
         //add things to player 1 game state
         tbp.add(new SerializableTower(TowerType.type1, new RealWorldCoordinates(12, 34)));
-        BuildPhaseData gameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>());
+        BuildPhaseData gameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>(), "DefenderBuild", 100);
         
         //update player1 game state
         player1.setGameState(gameState);

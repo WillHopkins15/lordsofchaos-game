@@ -45,13 +45,13 @@ public class EventManager
         if (clientPlayerType == null) return;
 
         // if the client is defender, only update attacker information
-        if (clientPlayerType.equals(GameController.defender) && GameController.getWaveState() == GameController.WaveState.AttackerBuild) {
+        if (clientPlayerType.equals(GameController.defender)){// && GameController.getWaveState()) == GameController.WaveState.AttackerBuild) {
             unitBuildPlan = bpd.getUnitBuildPlan();
             pathsUnblockedThisTurn = bpd.getPathsUnblockedThisTurn();
             GameController.defenderNetworkUpdates();
         }
         // vice versa
-        else if (clientPlayerType.equals(GameController.attacker) && GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+        else if (clientPlayerType.equals(GameController.attacker)){// && GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
             towerBuilds = bpd.getTowerBuildPlan();
             defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
             removedTowers = bpd.getRemovedTowers();

@@ -2,17 +2,19 @@ package org.lordsofchaos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.graphics.MapRenderer;
 import org.lordsofchaos.graphics.buttons.Button;
 import org.lordsofchaos.graphics.buttons.EditorButton;
 import org.lordsofchaos.graphics.buttons.ObstacleButton;
 import org.lordsofchaos.matrixobjects.*;
+import org.json.JSONObject;
 
 import java.util.*;
 
-public class LevelEditor
-{
+public class LevelEditor {
     
     private static final int MAX_SPAWNS = 4;
     private MapRenderer renderer;
@@ -33,10 +35,14 @@ public class LevelEditor
     private HashMap<EditorPhase, List<Button>> buttons = new HashMap<>();
     private List<MatrixCoordinates> pathEndpoints = new ArrayList<>(Arrays.asList(
             new MatrixCoordinates(18, 16), new MatrixCoordinates(16, 18)));
+    private HashMap<EditorPhase, String> instructions = new HashMap<>();
     private EditorButton continueButton;
+    private BitmapFont font;
+    private SpriteBatch batch;
     
-    public LevelEditor(MapRenderer renderer) {
+    public LevelEditor(MapRenderer renderer, SpriteBatch batch) {
         this.renderer = renderer;
+        this.batch = batch;
         renderer.setMap(MapGenerator.generateMap(20, 20, null, null));
         continueButton = new EditorButton("UI/NewArtMaybe/panel.png", Gdx.graphics.getWidth() - 320, 20, this);
         buttons.put(EditorPhase.OBSTACLES, new ArrayList<>(Arrays.asList(
@@ -45,7 +51,12 @@ public class LevelEditor
                 new ObstacleButton("UI/LevelEditor/rocks.png", 260, 20, this, ObstacleType.ROCK),
                 continueButton
         )));
+        instructions.put(EditorPhase.SPAWNS, "Place 1 to 4 spawns along the bottom edges.");
+        instructions.put(EditorPhase.PATHS, "Draw each path to one of the end points.");
+        instructions.put(EditorPhase.OBSTACLES, "Place some obstacles on the map. (Optional)");
         renderer.setLevelEditing(true);
+        font = new BitmapFont();
+        font.getData().setScale(1.25f);
     }
     
     public List<Button> getButtons() {
@@ -79,7 +90,7 @@ public class LevelEditor
                     }
                 } else if (placed && currentPhase == EditorPhase.OBSTACLES && hoveredTile instanceof Obstacle) {
                     Obstacle obstacle = (Obstacle) hoveredTile;
-                    obstacles.remove(obstacle);
+                    removeObstacleAt(mousePosition);
                     obstacles.add(obstacle);
                 }
                 placed = false;
@@ -128,6 +139,9 @@ public class LevelEditor
             renderer.setColourExceptions(exceptions);
         }
         renderer.render();
+        batch.begin();
+        font.draw(batch, instructions.get(currentPhase), 20, Gdx. graphics.getHeight() - 20);
+        batch.end();
     }
     
     public void darkenMap(HashMap<Integer, Color> exceptions) {
@@ -217,13 +231,27 @@ public class LevelEditor
         } else if (currentPhase == EditorPhase.PATHS) {
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
-            // Complete
-            System.out.println("Editing Complete.");
+            // Complete - Write to file
+            List<List<String>> pathStrings = new ArrayList<>();
+            for (List<Path> path: paths) {
+                List<String> P = new ArrayList<>();
+                for (Path p: path) P.add(p.getMatrixPosition().getX() + ":" + p.getMatrixPosition().getY());
+                pathStrings.add(P);
+            }
+            List<String> obstacleStrings = new ArrayList<>();
+            for (Obstacle obstacle: obstacles) {
+                MatrixCoordinates mc = obstacle.getMatrixPosition();
+                obstacleStrings.add(mc.getX() + ":" + mc.getY() + ":" + obstacle.toString());
+            }
+            HashMap<String, Object> object = new HashMap<>();
+            object.put("obstacles", obstacleStrings);
+            object.put("paths", pathStrings);
+            JSONObject json = new JSONObject(object);
+            System.out.println(json.toString());
         }
     }
     
     public boolean canRemoveAt(MatrixCoordinates mc) {
-        int x = mc.getX(), y = mc.getY();
         MatrixObject object = renderer.objectAt(mc);
         if (currentPhase == EditorPhase.SPAWNS) {
             if (object instanceof Path) return ((Path) object).isSpawn();
@@ -235,18 +263,21 @@ public class LevelEditor
         }
         return false;
     }
+
+    public void removeObstacleAt(MatrixCoordinates mc) {
+        obstacles.removeIf(obstacle -> mc.equals(obstacle.getMatrixPosition()));
+    }
     
-    @SuppressWarnings("SuspiciousMethodCalls")
     public void remove() {
         if (!canRemoveAt(mousePosition)) return;
         if (currentPhase == EditorPhase.SPAWNS) {
-            spawns.remove(renderer.objectAt(mousePosition));
+            spawns.removeIf(spawn -> mousePosition.equals(spawn.getMatrixPosition()));
         } else if (currentPhase == EditorPhase.PATHS) {
             List<Path> currentPath = paths.get(currentPathIndex);
             currentPath.remove(currentPath.size() - 1);
             lastPath = currentPath.get(currentPath.size() - ((currentPath.size() > 1) ? 2 : 1));
         } else if (currentPhase == EditorPhase.OBSTACLES) {
-            obstacles.remove(renderer.objectAt(mousePosition));
+            removeObstacleAt(mousePosition);
         }
         Tile tile = new Tile(mousePosition.getY(), mousePosition.getX(), null);
         hoveredTile = tile;
@@ -266,8 +297,7 @@ public class LevelEditor
         this.currentObstacleType = currentObstacleType;
     }
     
-    public enum EditorPhase
-    {
+    public enum EditorPhase {
         SPAWNS,
         PATHS,
         OBSTACLES

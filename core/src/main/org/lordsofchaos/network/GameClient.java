@@ -183,6 +183,13 @@ public class GameClient extends UDPSocket
     }
     
     /**
+     * Changes phase on both clients at the same time
+     */
+    public void changePhase() {
+        send("Change Phase");
+    }
+    
+    /**
      * @return Assigned player type - either Attacker or Defender
      */
     public String getPlayerType() {

@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GameController
-{
+public class GameController {
+
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
@@ -207,7 +207,7 @@ public class GameController
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
-                EventManager.getPathsUnblockedThisTurn());
+                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth());
         return bpd;
     }
 
@@ -231,7 +231,7 @@ public class GameController
      */
     public static void defenderNetworkUpdates() {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
-            unblockPath(i, true);
+            unblockPath(EventManager.getPathsUnblockedThisTurn().get(i), true);
         }
     }
 
@@ -242,8 +242,7 @@ public class GameController
      * @param isFree when true, attacker is not charged- used to initialise the first path and when defender applies path unblocking
      */
     public static void unblockPath(int index, boolean isFree) {
-        if (!isFree)
-            attacker.addMoney(-unblockPathCost);
+        if (!isFree) attacker.addMoney(-unblockPathCost);
         blockedPaths.remove(new Integer(index));
     }
 
@@ -319,7 +318,6 @@ public class GameController
      * game is moved on to the next phase
      */
     public static void endPhase() {
-        Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
             
@@ -360,6 +358,7 @@ public class GameController
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
         }
+        Game.newTurn();
     }
 
     /**
@@ -412,13 +411,21 @@ public class GameController
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
             if (buildTimer > buildTimeLimit) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
             }
         } else if (waveState == WaveState.AttackerBuild) {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
             }
         } else {
             // if defender health reaches zero, game over
@@ -427,7 +434,11 @@ public class GameController
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
                 addMoney();
                 
             } else {

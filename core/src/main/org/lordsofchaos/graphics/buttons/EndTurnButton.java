@@ -12,8 +12,8 @@ public class EndTurnButton extends Button
     
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
-        if (Game.getClient() != null) {
-            Game.getClient().send("Change Phase");
+        if (Game.multiplayer) {
+            Game.getClient().changePhase();
         } else {
             GameController.endPhase();
         }

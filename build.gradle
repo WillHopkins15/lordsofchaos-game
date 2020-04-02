@@ -53,6 +53,7 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile 'org.json:json:20190722'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         testCompile group: 'junit', name: 'junit', version: '4.12'
