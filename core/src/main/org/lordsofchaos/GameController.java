@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GameController
-{
+public class GameController {
+
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
@@ -240,8 +240,7 @@ public class GameController
      * @param isFree when true, attacker is not charged- used to initialise the first path and when defender applies path unblocking
      */
     public static void unblockPath(int index, boolean isFree) {
-        if (!isFree)
-            attacker.addMoney(-unblockPathCost);
+        if (!isFree) attacker.addMoney(-unblockPathCost);
         blockedPaths.remove(new Integer(index));
     }
 

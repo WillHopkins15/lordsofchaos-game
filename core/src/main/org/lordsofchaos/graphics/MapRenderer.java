@@ -20,8 +20,7 @@ import org.lordsofchaos.matrixobjects.Path;
 import java.io.File;
 import java.util.*;
 
-public class MapRenderer extends IsometricTiledMapRenderer
-{
+public class MapRenderer extends IsometricTiledMapRenderer {
     
     public static final int width = 20;
     public static final int height = 20;

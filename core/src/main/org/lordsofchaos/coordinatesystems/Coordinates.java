@@ -2,8 +2,8 @@ package org.lordsofchaos.coordinatesystems;
 
 import java.io.Serializable;
 
-public abstract class Coordinates implements Serializable
-{
+public abstract class Coordinates implements Serializable {
+
     private int x;
     private int y;
     

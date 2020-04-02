@@ -19,12 +19,12 @@ public abstract class MatrixObject implements Comparable<MatrixObject>
     public MatrixCoordinates getMatrixPosition() {
         return matrixPosition;
     }
-    
+
     @Override
     public int compareTo(MatrixObject o) {
         int thisSum = matrixPosition.getX() + matrixPosition.getY();
         int otherSum = o.matrixPosition.getX() + o.matrixPosition.getY();
-        return thisSum < otherSum ? 1 : thisSum > otherSum ? -1 : 0;
+        return Integer.compare(otherSum, thisSum);
     }
     
 }

@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.database.DatabaseCommunication;
-import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Projectile;
@@ -563,7 +562,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     button.getSprite().draw(batch);
             batch.end();
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
-            if (levelEditor == null) levelEditor = new LevelEditor(renderer);
+            if (levelEditor == null) levelEditor = new LevelEditor(renderer, batch);
             levelEditor.run(new MatrixCoordinates(snap(Gdx.input.getX(), Gdx.input.getY())), false);
             batch.begin();
             for (Button button : levelEditor.getButtons()) button.getSprite().draw(batch);
@@ -572,9 +571,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             batch.begin();
             try {
                 leaderBoardTop = DatabaseCommunication.getHighScores(5);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
             leaderboardRowSprites = new ArrayList<>();

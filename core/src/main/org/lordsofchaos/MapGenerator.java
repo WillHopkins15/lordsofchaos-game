@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapGenerator
-{
+public class MapGenerator {
     
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(
             Arrays.asList(new MatrixCoordinates(8, 0), new MatrixCoordinates(8, 1), new MatrixCoordinates(8, 2),
@@ -121,8 +120,7 @@ public class MapGenerator
         return paths;
     }
     
-    public static MatrixObject[][] generateMap(int width, int height, List<List<Path>> paths,
-                                               List<Obstacle> obstacles) {
+    public static MatrixObject[][] generateMap(int width, int height, List<List<Path>> paths, List<Obstacle> obstacles) {
         MatrixObject[][] map = new MatrixObject[width][height];
         
         //System.out.println(obstacles.contains(new MatrixCoordinates(3, 19)));
