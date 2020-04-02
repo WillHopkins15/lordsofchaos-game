@@ -317,7 +317,6 @@ public class GameController
      * game is moved on to the next phase
      */
     public static void endPhase() {
-        Game.newTurn();
         if (waveState == WaveState.DefenderBuild) {
             waveState = WaveState.AttackerBuild;
             
@@ -358,6 +357,7 @@ public class GameController
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
         }
+        Game.newTurn();
     }
 
     /**
