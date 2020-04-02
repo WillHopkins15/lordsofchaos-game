@@ -205,7 +205,7 @@ public class GameController
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
-                EventManager.getPathsUnblockedThisTurn());
+                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth());
         return bpd;
     }
 
@@ -410,13 +410,21 @@ public class GameController
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
             if (buildTimer > buildTimeLimit) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
             }
         } else if (waveState == WaveState.AttackerBuild) {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
             }
         } else {
             // if defender health reaches zero, game over
@@ -425,7 +433,11 @@ public class GameController
             }
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
-                endPhase();
+                if (Game.multiplayer) {
+                    Game.getClient().changePhase();
+                } else {
+                    endPhase();
+                }
                 addMoney();
                 
             } else {
