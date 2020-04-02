@@ -25,6 +25,7 @@ public class NetworkingTest
     @Before
     public void setup() throws InterruptedException {
         System.out.println("Initiating Setup...");
+        GameController.initialise();
         server = new GameServer();
         server.start();
         player1 = new GameClient();

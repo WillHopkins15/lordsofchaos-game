@@ -138,7 +138,7 @@ public class GameClient extends UDPSocket
      */
     @Override
     public void send(Object contents) {
-        sendObject(server, new NumberedPacket(contents));
+        sendObject(server, new TimestampedPacket(contents));
     }
     
     @Override
