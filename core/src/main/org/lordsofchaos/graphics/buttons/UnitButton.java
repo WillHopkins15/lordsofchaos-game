@@ -25,9 +25,9 @@ public class UnitButton extends HoverButton
     }
     
     public void leftButtonAction() {
-        System.out.println(Game.getCurrentPath() + "!!!!!!!!!");
+        //System.out.println(Game.getCurrentPath() + "!!!!!!!!!");
         unitPath = Game.getCurrentPath();
-        System.out.println(unitPath + ", " + troopType);
+        //System.out.println(unitPath + ", " + troopType);
         selectSound.play(0.75f);
         EventManager.buildPlanChange(troopType, unitPath, 1, false);
         

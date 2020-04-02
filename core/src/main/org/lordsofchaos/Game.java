@@ -424,7 +424,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     }
                     
                 } else {
-                    System.out.println("NONTEST");
+                    //System.out.println("NONTEST");
                     //buildMode = true;
                     for (int i = 0; i < buttonList.size(); i++) {
                         if (buttonList.get(i).checkClick(x, y) && buttonList.get(i).getScreenLocation() == currentScreen) {
@@ -640,9 +640,12 @@ public class Game extends ApplicationAdapter implements InputProcessor
             showUnitHealthBar();
             showTowerAttack();
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
-                    GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
-                String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
-                timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                    GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
+                    GameController.getWaveState() == GameController.WaveState.Play) {
+                if(GameController.getWaveState() != GameController.WaveState.Play) {
+                    String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
+                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                }
                 upgradeBarSprite[GameController.getDefenderUpgrade()].draw(batch);
             }
             for (Button button : buttonList) {
@@ -673,13 +676,12 @@ public class Game extends ApplicationAdapter implements InputProcessor
                                     soundTrack.setVolume(soundTrackVolume);
                                     System.out.println(soundTrackVolume);
                                 }
-                                //System.out.println("ELSE!!!!!");
                             }
                             //System.out.println(((SliderButton) button).getSoundType() + " "+ selectedSlider + " " + sliderClicked);
                         }
                     } else {
                         
-                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !sliderClicked) {
                             if (button.checkClick(x, y)) {
                                 button.leftButtonAction();
                                 setMenuOpen(false);

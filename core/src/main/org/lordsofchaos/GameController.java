@@ -497,7 +497,6 @@ public class GameController {
         if (unitSpawnTimer > unitSpawnTimeLimit) {
             // loop through each path and spawn a troop into each
             for (int path = 0; path < getPaths().size(); path++) {
-                System.out.println("Spawning on path - " + path);
                 int troop;
                 Troop newTroop = null;
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {

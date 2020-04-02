@@ -47,7 +47,7 @@ public class PathButton extends HoverButton
     }
 
     public void update(int x, int y, SpriteBatch batch) {
-        if (checkHover(x , y) || selected[pathNr]) {
+        if ((checkHover(x , y) || selected[pathNr]) && GameController.getWaveState() != GameController.WaveState.Play) {
             super.sprite.setColor(1, 1, 1, 1);
         } else {
             super.sprite.setColor(1, 1, 1, 0);
