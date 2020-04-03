@@ -231,15 +231,14 @@ public class LevelEditor {
         if (currentPhase == EditorPhase.SPAWNS) {
             for (Path spawn : spawns)
                 level.newPath(spawn);
-            lastPath = spawns.get(0);
+            lastPath = spawns.get(currentPathIndex);
             currentPhase = EditorPhase.PATHS;
         } else if (currentPhase == EditorPhase.PATHS) {
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
             // Complete - Write to file
 
-            JSONObject json = new JSONObject(level.toJSON());
-            System.out.println(json.toString());
+            System.out.println(level.toJSON());
         }
     }
     
