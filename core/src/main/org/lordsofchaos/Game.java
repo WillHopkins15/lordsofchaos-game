@@ -563,11 +563,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
        // fontParameterBoxy = new FreeTypeFontParameter();
        // font = fontGenerator.generateFont(fontParameterBoxy);
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
-        fontParameter = new FreeTypeFontParameter();
+        FreeTypeFontParameter fontParameter = new FreeTypeFontParameter();
         font = fontGenerator.generateFont(fontParameter);
         soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.setVolume(1.0f);
-        //soundTrack.play();
+        // soundTrack.play();
         soundTrack.setLooping(true);
 
         GameController.initialise();
