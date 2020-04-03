@@ -117,7 +117,7 @@ public class GameController {
         }
         return projectiles;
     }
-    
+    public static int getDefenderHealth(){return defender.getHealth();}
     public static float getBuildPhaseTimer() {
         return buildTimer;
     }
@@ -385,7 +385,7 @@ public class GameController {
      * The waveState becomes WaitingForInput so that update() is paused
      */
     private static void playerWins(Player player) {
-        if (clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
+        if (Game.getClient() != null && clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
         {
             waveState = WaveState.WaitingForInput;
             MyTextInputListener listener = new MyTextInputListener();

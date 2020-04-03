@@ -21,7 +21,7 @@ public class UnitButton extends HoverButton
         unitPath = Game.getCurrentPath();
         infoCardTexture = new Texture("UI/NewArtMaybe/panel.png");
         infoCardSprite = new Sprite(infoCardTexture);
-        infoCardSprite.setPosition(10,150);
+        infoCardSprite.setPosition(30,150);
     }
     
     public void leftButtonAction() {

@@ -49,10 +49,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static BitmapFont coinCounter;
     private static GameClient client;
     private static SpriteBatch batch;
-    private static float timerChangeTurn;
+    private static float timertmpDisplay;
     private static boolean changedTurn = false;
-    private static FreeTypeFontParameter fontParameter;
+    private static FreeTypeFontParameter fontParameterBoxy;
     private static FreeTypeFontGenerator fontGenerator;
+    private static FreeTypeFontParameter fontParameterArial;
     private static BitmapFont font;
     private static BitmapFont timerFont;
     private static ArrayList<Button> buttonList;
@@ -70,6 +71,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Sprite coinSprite;
     private float hpSpriteW;
     private BitmapFont unitNumber;
+    private BitmapFont matchConclusionFont;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -137,7 +139,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static void setMenuOpen(boolean bool) {
         menuOpen = bool;
     }
-
+    public static BitmapFont getFontArial(int size){
+        fontParameterBoxy.size = size;
+        return fontGenerator.generateFont(fontParameterBoxy);
+    }
     public static void playSound(String soundName){
         Sound tmpSound;
         float tmpVolume = 1;
@@ -219,14 +224,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static void defenderMaxLevel() {
         UpgradeButton.maxLevel = true;
     }
-    
-    public static void changeTurn(float targetTime, String currentPlayer) {
-        timerChangeTurn += Gdx.graphics.getDeltaTime();
-        if (timerChangeTurn < targetTime) {
+
+    public static void tmpDisplay(float targetTime, String currentPlayer) {
+        timertmpDisplay += Gdx.graphics.getDeltaTime();
+        if (timertmpDisplay < targetTime) {
             font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
         } else {
             changedTurn = false;
-            timerChangeTurn = 0;
+            timertmpDisplay = 0;
         }
     }
     
@@ -274,14 +279,34 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result, healthSprite.getHeight());
     }
-    
+
     public void generateFont() {
-        fontParameter.size = 30;
-        timerFont = fontGenerator.generateFont(fontParameter);
-        fontParameter.size = 40;
-        font = fontGenerator.generateFont(fontParameter);
+
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
+        fontParameterBoxy = new FreeTypeFontParameter();
+        fontParameterBoxy.size = 30;
+        timerFont = fontGenerator.generateFont(fontParameterBoxy);
+        fontParameterBoxy.size = 40;
+        font = fontGenerator.generateFont(fontParameterBoxy);
+        matchConclusionFont = fontGenerator.generateFont(fontParameterBoxy);
+        fontGenerator.dispose();
+        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/arial.ttf"));
+        fontParameterArial = new FreeTypeFontParameter();
+        fontParameterArial.size = 20;
+        leaderBoardRowText = fontGenerator.generateFont(fontParameterBoxy);
+
+        //fontGenerator.dispose();
     }
-    
+    public void createFonts(){
+        unitNumber = new BitmapFont();
+        unitNumber.setColor(Color.WHITE);
+        hpCounter = new BitmapFont();
+        hpCounter.setColor(Color.WHITE);
+        coinCounter = new BitmapFont();
+        coinCounter.setColor(Color.WHITE);
+        leaderBoardRowText = new BitmapFont();
+        matchConclusionFont = new BitmapFont();
+    }
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -357,6 +382,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     
     public void defenderPOV() {
+        if(GameController.getDefenderUpgrade() == 3){
+            tmpDisplay(2,"          You reached Tier 3" + '\n' + "Survive one more turn and you win");
+        }
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
                 if (button instanceof UpgradeButton) {
@@ -464,26 +492,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
             }
         }
-                /*if (towerButton.checkClick(x, y)) {
-                    //System.out.println("Clicked towerButton");
-                    selectSound.play(0.75f);
-                    if (!buildMode && GameController.canAffordTower(TowerType.type1)) {
-                        buildMode = true;
-                        // Pixmap tmpCursor = new Pixmap(Gdx.files.internal("UI/invisibleCursor.png"));
-                        // Gdx.graphics.setCursor(Gdx.graphics.newCursor(tmpCursor, 0, 0));
-                        // tmpCursor.dispose();
-                    }
-                } else if (endTurnButton.checkClick(x, y) && !buildMode && !changedTurn) {
-                    selectSound.play(0.75f);
-                    if (client != null) {
-                        client.send("Change Phase");
-                    } else {
-                        GameController.endPhase();
-                    }
-                    changedTurn = true;
-                }
-            }
-            */
+
         if (button == Buttons.RIGHT && buildMode) buildMode = false;
         
         
@@ -503,30 +512,26 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     @Override
     public void create() {
         instance = this;
+        createFonts();
+        generateFont();
+        createSound();
+        createButtons();
         menuOpen = false;
         selectedSlider = -1;
         sliderClicked = false;
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
-        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
-        fontParameter = new FreeTypeFontParameter();
-        font = fontGenerator.generateFont(fontParameter);
+        //fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
+       // fontParameterBoxy = new FreeTypeFontParameter();
+       // font = fontGenerator.generateFont(fontParameterBoxy);
         backgroundSprite = new Sprite(new Texture("maps/background.png"));
-        generateFont();
-        unitNumber = new BitmapFont();
-        unitNumber.setColor(Color.WHITE);
-        hpCounter = new BitmapFont();
-        hpCounter.setColor(Color.WHITE);
-        coinCounter = new BitmapFont();
-        coinCounter.setColor(Color.WHITE);
         renderer = new MapRenderer();
         OrthographicCamera camera = new OrthographicCamera(width * 2, height * 2);
         camera.position.set(width, 0, 10);
         camera.update();
         renderer.setView(camera);
-        createSound();
-        createButtons();
+
         Texture healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         healthBarSprite = new Sprite(healthBarTexture);
         Texture healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
@@ -540,9 +545,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
 
-        Texture menuTexture = new Texture(Gdx.files.internal("UI/menu_2.png"));
+        Texture menuTexture = new Texture(Gdx.files.internal("UI/menu_4.png"));
         menuSprite = new Sprite(menuTexture);
-        menuSprite.setPosition(Gdx.graphics.getWidth() / 3.2f, Gdx.graphics.getHeight() / 3);
+        menuSprite.setPosition(Gdx.graphics.getWidth() / 3.2f, Gdx.graphics.getHeight() / 3 - 10);
 
         GameController.initialise();
         renderer.setLevel(GameController.getLevel());
@@ -550,8 +555,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText = new BitmapFont();
-        leaderBoardRowText.getData().setScale(2);
+        //leaderBoardRowText.getData().setScale(2);
         
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
@@ -635,17 +639,36 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (changedTurn) {
                 switch (GameController.getWaveState()) {
                     case AttackerBuild:
-                        changeTurn(2, "Attacker's Turn");
+                        tmpDisplay(2, "Attacker's Turn");
                         break;
                     case DefenderBuild:
-                        changeTurn(2, "Defender's Turn");
+                        tmpDisplay(2, "Defender's Turn");
                         break;
                     case Play:
-                        changeTurn(2, "           Play     ");
+                        tmpDisplay(2, "           Play     ");
                 }
             }
             showUnitHealthBar();
             showTowerAttack();
+            upgradeBarSprite[GameController.getDefenderUpgrade()].draw(batch);
+
+            if(GameController.getWaveState() == GameController.WaveState.End ||
+                GameController.getWaveState() == GameController.WaveState.WaitingForInput||
+                    GameController.getWaveState() == GameController.WaveState.SubmitInput) {
+                if (GameController.getDefenderUpgrade() == 3) {
+                    if (player == 0) {
+                        matchConclusionFont.draw(batch, "You Won!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
+                    } else
+                        matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
+                } else {
+                    if (GameController.getDefenderHealth() == 0) {
+                        if (player == 1) {
+                            matchConclusionFont.draw(batch, "You Won!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
+                        } else
+                            matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
+                    }
+                }
+            }
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
                     GameController.getWaveState() == GameController.WaveState.Play) {
@@ -653,7 +676,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                     timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
                 }
-                upgradeBarSprite[GameController.getDefenderUpgrade()].draw(batch);
+
+
             }
             for (Button button : buttonList) {
                 if (button instanceof HoverButton && button.getScreenLocation() == currentScreen) {
@@ -716,7 +740,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         attackerButton.dispose();
         multiplayerButton.dispose();*/
         soundTrack.dispose();
-        fontGenerator.dispose();
+        if(fontGenerator!= null)
+            fontGenerator.dispose();
         timerFont.dispose();
         font.dispose();
     }

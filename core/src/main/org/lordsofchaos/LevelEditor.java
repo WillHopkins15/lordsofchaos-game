@@ -57,7 +57,7 @@ public class LevelEditor {
         instructions.put(EditorPhase.OBSTACLES, "Place some obstacles on the map. (Optional)");
         renderer.setLevelEditing(true);
         font = new BitmapFont();
-        font.getData().setScale(1.25f);
+        font = Game.getFontArial(20);
     }
     
     public List<Button> getButtons() {
