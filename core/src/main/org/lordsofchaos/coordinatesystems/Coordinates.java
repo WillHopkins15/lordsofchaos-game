@@ -1,6 +1,9 @@
 package org.lordsofchaos.coordinatesystems;
 
+import org.lordsofchaos.GameController;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class Coordinates implements Serializable {
 
@@ -32,7 +35,7 @@ public abstract class Coordinates implements Serializable {
         }
         return false;
     }
-    
+
     public boolean equals(Coordinates other) {
         return getX() == other.getX() && getY() == other.getY();
     }
@@ -40,4 +43,5 @@ public abstract class Coordinates implements Serializable {
     public String toString() {
         return String.format("(%d,%d)", this.x, this.y);
     }
+
 }

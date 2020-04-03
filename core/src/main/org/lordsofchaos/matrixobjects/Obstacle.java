@@ -4,8 +4,8 @@ public class Obstacle extends Tile {
     
     private ObstacleType type;
     
-    public Obstacle(int y, int x, ObstacleType type) {
-        super(y, x, null);
+    public Obstacle(int x, int y, ObstacleType type) {
+        super(x, y, null);
         this.type = type;
     }
     

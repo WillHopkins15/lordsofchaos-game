@@ -4,7 +4,7 @@ import org.lordsofchaos.GameController;
 
 public class RealWorldCoordinates extends Coordinates
 {
-    public RealWorldCoordinates(int y, int x) {
+    public RealWorldCoordinates(int x, int y) {
         setY(y);
         setX(x);
     }

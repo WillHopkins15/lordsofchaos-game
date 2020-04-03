@@ -11,7 +11,7 @@ public class DefenderTower extends GameObject
     private static DamageType damageType = DamageType.Light;
     
     public DefenderTower(int x, int y, boolean corner, boolean middle) {
-        super(middle ? "DefenderTowerMiddle" : corner ? "DefenderTowerCorner" : "DefenderTower", new RealWorldCoordinates(new MatrixCoordinates(y, x)));
+        super(middle ? "DefenderTowerMiddle" : corner ? "DefenderTowerCorner" : "DefenderTower", new RealWorldCoordinates(new MatrixCoordinates(x, y)));
     }
     
     

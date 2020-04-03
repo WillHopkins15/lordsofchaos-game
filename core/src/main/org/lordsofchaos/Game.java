@@ -35,8 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Game extends ApplicationAdapter implements InputProcessor
-{
+public class Game extends ApplicationAdapter implements InputProcessor {
     
     public static int player;
     public static Screen currentScreen;
@@ -44,12 +43,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     public static boolean multiplayer = false;
     private static boolean buildMode = false;
     private static boolean loading = true;
-    private static Texture healthBarTexture;
-    private static Texture healthTexture;
     private static Sprite healthBarSprite;
     private static Sprite healthSprite;
     private static BitmapFont hpCounter;
-    private static Texture coinTexture;
     private static BitmapFont coinCounter;
     private static GameClient client;
     private static SpriteBatch batch;
@@ -62,12 +58,9 @@ public class Game extends ApplicationAdapter implements InputProcessor
     private static ArrayList<Button> buttonList;
     private static ArrayList<Button> menuButtonList;
     private static int currentPath;
-    private static boolean mouseClicked;
     private static boolean menuOpen;
-    private static Texture menuTexture;
     private static Sprite menuSprite;
     private static Texture leaderboardRowTexture;
-    private static List<Sprite> leaderboardRowSprites;
     private static BitmapFont leaderBoardRowText;
     private static float soundTrackVolume = 1.0f;
     private static float soundEffectsVolume;
@@ -75,10 +68,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
     final int width = 1280;
     private MapRenderer renderer;
     private Sprite coinSprite;
-    private int lastTurnTime;
     private float hpSpriteW;
     private BitmapFont unitNumber;
-    private float elapsedTime;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -199,11 +190,8 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     public static void changeTurn(float targetTime, String currentPlayer) {
         timerChangeTurn += Gdx.graphics.getDeltaTime();
-        //System.out.println("target: " + targetTime + " current Time: " + timerChangeTurn);
         if (timerChangeTurn < targetTime) {
             font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
-            //endTurnFont.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 200, Gdx.graphics.getHeight() - 100);
-            //System.out.println("Printing text!");
         } else {
             changedTurn = false;
             timerChangeTurn = 0;
@@ -233,7 +221,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 Texture tmpTower = new Texture(Gdx.files.internal("towers/sprites/" + ghostTowerType.getSpriteName() + ".png"));
                 Sprite tmpSpriteTower = new Sprite(tmpTower);
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
-                
                 if (GameController.verifyTowerPlacement(ghostTowerType, rwc))
                     renderer.getBatch().setColor(0, 1, 0, 0.5f);
                 else renderer.getBatch().setColor(1, 0, 0, 0.5f);
@@ -338,8 +325,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
     }
     
     public void defenderPOV() {
-        
-        
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
                 if (button instanceof UpgradeButton) {
@@ -401,7 +386,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     public RealWorldCoordinates roundToCentreTile(RealWorldCoordinates rwc) {
         MatrixCoordinates matrixCoords = new MatrixCoordinates(rwc);
-        return new RealWorldCoordinates(32 + matrixCoords.getY() * 64, 32 + matrixCoords.getX() * 64);
+        return new RealWorldCoordinates(32 + matrixCoords.getX() * 64, 32 + matrixCoords.getY() * 64);
     }
     
     public RealWorldCoordinates snap(int x, int y) {
@@ -426,21 +411,23 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 } else {
                     //System.out.println("NONTEST");
                     //buildMode = true;
-                    for (int i = 0; i < buttonList.size(); i++) {
-                        if (buttonList.get(i).checkClick(x, y) && buttonList.get(i).getScreenLocation() == currentScreen) {
-                            buttonList.get(i).leftButtonAction();
+                    for (Button value : buttonList) {
+                        if (value.checkClick(x, y) && value.getScreenLocation() == currentScreen) {
+                            value.leftButtonAction();
                             buildMode = true;
-                            break;
+                            return;
                         }
                     }
                 }
             } else {
                 RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
                 MatrixCoordinates mc = new MatrixCoordinates(rwc);
-                if (renderer.objectAt(mc) instanceof Tile) {
-                    Tile t = (Tile) renderer.objectAt(mc);
-                    if (t.getTower() != null && !t.getTower().getIsCompleted())
+                if (renderer.getLevel().objectAt(mc) instanceof Tile) {
+                    Tile t = (Tile) renderer.getLevel().objectAt(mc);
+                    if (t.getTower() != null && !t.getTower().getIsCompleted() && !buildMode) {
                         EventManager.towerRemoved(t.getTower());
+                        return;
+                    }
                     //GameController.removeTower(new SerializableTower(t.getTower().getType(), rwc));
                 }
             }
@@ -501,11 +488,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
         soundTrack.setLooping(true);
         
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
-        /*
-        endTurnFont = new BitmapFont();
-        endTurnFont.setColor(255, 255, 255, 1f);
-        endTurnFont.getData().setScale(3f);
-        */
         backgroundSprite = new Sprite(new Texture("maps/background.png"));
         generateFont();
         unitNumber = new BitmapFont();
@@ -520,25 +502,25 @@ public class Game extends ApplicationAdapter implements InputProcessor
         camera.update();
         renderer.setView(camera);
         createButtons();
-        healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
+        Texture healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         healthBarSprite = new Sprite(healthBarTexture);
-        healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
+        Texture healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
         healthSprite = new Sprite(healthTexture);
         
         healthSprite.setScale(5);
         healthSprite.setPosition(210, Gdx.graphics.getHeight() - 64);
         healthBarSprite.setScale(5);
         healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
-        coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
+        Texture coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
         coinSprite = new Sprite(coinTexture);
         coinSprite.setScale(1.5f);
-        
-        menuTexture = new Texture(Gdx.files.internal("UI/menu_2.png"));
+
+        Texture menuTexture = new Texture(Gdx.files.internal("UI/menu_2.png"));
         menuSprite = new Sprite(menuTexture);
         menuSprite.setPosition(Gdx.graphics.getWidth() / 3.2f, Gdx.graphics.getHeight() / 3);
-        //endTurnTexture = new Texture(Gdx.files.internal("UI/"))
+
         GameController.initialise();
-        renderer.setMap(GameController.getMap());
+        renderer.setLevel(GameController.getLevel());
         hpSpriteW = healthSprite.getWidth();
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
@@ -586,7 +568,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
             } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            leaderboardRowSprites = new ArrayList<>();
+            List<Sprite> leaderboardRowSprites = new ArrayList<>();
             int yOffset = 0;
             for (int i = 0; i < leaderBoardTop.size(); i++, yOffset -= 100) {
                 Sprite sprite = new Sprite(leaderboardRowTexture);
@@ -618,7 +600,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
                     return;
                 }
             }
-            elapsedTime = Gdx.graphics.getDeltaTime();
+            float elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
             //System.out.println(currentPath );
             isometricPov();
@@ -727,24 +709,23 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 buildMode = false;
             }
 
-        }
-        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
+        } else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
              currentScreen = Screen.MAIN_MENU;
              GameController.initialise();
              currentPath = 0;
              for(Button button : buttonList)
-                 if(button instanceof PathButton){
-                     ((PathButton)button).resetSelected();
+                 if (button instanceof PathButton){
+                     PathButton.resetSelected();
                      break;
                  }
-             renderer.setMap(GameController.getMap());
+             renderer.setLevel(GameController.getLevel());
          }
 
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;
-            renderer.setMap(GameController.getMap());
+            renderer.setLevel(GameController.getLevel());
             renderer.setColourExceptions(new HashMap<>());
             renderer.setLevelEditing(false);
             levelEditor = null;
@@ -793,10 +774,7 @@ public class Game extends ApplicationAdapter implements InputProcessor
     
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (sliderClicked) {
-            sliderClicked = false;
-            //soundTrack.setVolume(soundTrackVolume,);
-        }
+        sliderClicked = false;
         return false;
     }
     

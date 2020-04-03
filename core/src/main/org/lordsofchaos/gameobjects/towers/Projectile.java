@@ -44,12 +44,12 @@ public class Projectile extends GameObject
      */
     public void update(float deltaTime) {
         float change = movementSpeed * deltaTime;
-        RealWorldCoordinates dir = new RealWorldCoordinates(targetPosition.getY() - getRealWorldCoordinates().getY(), targetPosition.getX() - getRealWorldCoordinates().getX());
+        RealWorldCoordinates dir = new RealWorldCoordinates(targetPosition.getX() - getRealWorldCoordinates().getX(), targetPosition.getY() - getRealWorldCoordinates().getY());
         // normalise vector
         double len = Math.sqrt(Math.pow(dir.getY(), 2) + Math.pow(dir.getX(), 2)) / 10; // need to divide by 10 otherwise you can get 0,0 when normalising, because not using floats
-        RealWorldCoordinates norm = new RealWorldCoordinates((int) (dir.getY() / len), (int) (dir.getX() / len));
-        RealWorldCoordinates movedBy = new RealWorldCoordinates((int) (norm.getY() * change), (int) (norm.getX() * change));
-        RealWorldCoordinates newPos = new RealWorldCoordinates((getRealWorldCoordinates().getY() + movedBy.getY()), getRealWorldCoordinates().getX() + movedBy.getX());
+        RealWorldCoordinates norm = new RealWorldCoordinates((int) (dir.getX() / len), (int) (dir.getY() / len));
+        RealWorldCoordinates movedBy = new RealWorldCoordinates((int) (norm.getX() * change), (int) (norm.getY() * change));
+        RealWorldCoordinates newPos = new RealWorldCoordinates(getRealWorldCoordinates().getX() + movedBy.getX(), (getRealWorldCoordinates().getY() + movedBy.getY()));
         setRealWorldCoordinates(newPos);
         
         if (distance(getRealWorldCoordinates(), targetPosition) < 20f) {
@@ -61,7 +61,7 @@ public class Projectile extends GameObject
      * Return the distance between two coordinates
      */
     private float distance(RealWorldCoordinates current, RealWorldCoordinates target) {
-        RealWorldCoordinates delta = new RealWorldCoordinates(current.getY() - target.getY(), current.getX() - target.getX());
+        RealWorldCoordinates delta = new RealWorldCoordinates(current.getX() - target.getX(), current.getY() - target.getY());
         return (float) Math.sqrt(Math.pow(delta.getY(), 2) + Math.pow(delta.getX(), 2));
     }
 }
