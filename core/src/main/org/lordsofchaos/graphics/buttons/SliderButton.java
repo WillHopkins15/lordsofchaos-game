@@ -13,28 +13,26 @@ public class SliderButton extends Button
     
     public SliderButton(String path, float buttonX1, float buttonY1, Screen screenLocation, int soundType) {
         super(path, buttonX1, buttonY1, screenLocation);
-        xMin = buttonX1 - 15;
+        xMin = super.buttonX1 - 15;
         xMax = xMin + 230;
-        System.out.println("!!!!buttonX1 " + buttonX1 + " buttonX2 " + buttonX2);
-        buttonX2 = buttonX2 - buttonX1 + xMax - 15;
-        buttonX1 = xMax - 15;
-        System.out.println("buttonX1 " + xMax + " buttonX2 " + buttonX2);
-        sprite.setPosition(buttonX1, buttonY1);
+        buttonX2 = buttonX2 - super.buttonX1 + xMax - 15;
+        super.buttonX1 = xMax - 15;
+        sprite.setPosition(super.buttonX1, buttonY1);
         this.soundType = soundType;
     }
     
     @Override
     public void leftButtonAction() {
         if (Game.getMenuOpen()) {
-            sprite.setPosition(buttonX1, buttonY1);
+            sprite.setPosition(super.buttonX1, buttonY1);
             //System.out.println("SliderClicked");
             float x = Gdx.input.getX() - 10;
             if (x > xMin + 215) x = xMin + 215;
             if (x < xMin + 15) x = xMin + 15;
-            deltaX = x - buttonX1;
+            deltaX = x - super.buttonX1;
             if (x > xMin && x < xMax) {
                 buttonX2 += deltaX;
-                buttonX1 = x;
+                super.buttonX1 = x;
                 float newVolume = (x - xMin) / (xMax - xMin);
                 if (newVolume < 0.07f) newVolume = 0;
                 if (newVolume > 0.9f) newVolume = 1;
@@ -42,7 +40,7 @@ public class SliderButton extends Button
                 if (soundType == 0)
                     Game.setSoundTrackVolume(newVolume);
                 else Game.setSoundEffectsVolume(newVolume);
-                //System.out.println("X: " + buttonX1);
+                //System.out.println("X: " + super.buttonX1);
             }
         }
     }

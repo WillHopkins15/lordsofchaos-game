@@ -40,7 +40,7 @@ public class Defender extends Player
         // int y = (GameController.getMap().length - mc.getY()) * sf;
         int y = temp.getY() * sf;
         int x = temp.getX() * sf;
-        RealWorldCoordinates coord = new RealWorldCoordinates(y + (sf / 2), x + (sf / 2));
+        RealWorldCoordinates coord = new RealWorldCoordinates(x + (sf / 2), y + (sf / 2));
         //System.out.println("defenders coords are :" + coord.getY() + "," + coord.getX());
         setCoordinates(coord);
         //System.out.println(getCoordinates());

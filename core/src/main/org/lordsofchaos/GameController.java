@@ -1,8 +1,12 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.Gdx;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
@@ -20,13 +24,15 @@ import org.lordsofchaos.player.Attacker;
 import org.lordsofchaos.player.Defender;
 import org.lordsofchaos.player.Player;
 
-import java.io.Serializable;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class GameController {
+
+    public static String levelJson; // by default this will be the level we created, but can load user maps
 
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
@@ -44,19 +50,13 @@ public class GameController {
     protected static List<Troop> troops = new ArrayList<>();
     // list of all towers in matrix
     protected static List<Tower> towers = new ArrayList<>();
-    protected static List<DefenderTower> defenderTowers = new ArrayList<>(
-            Arrays.asList(
-                    new DefenderTower(17, 19, true, false),
-                    new DefenderTower(17, 18, false, false),
-                    new DefenderTower(19, 17, true, false),
-                    new DefenderTower(18, 17, false, false),
-                    new DefenderTower(17, 17, true, false),
-                    new DefenderTower(18, 18, false, true),
-                    new DefenderTower(18, 19, false, false),
-                    new DefenderTower(19, 18, false, false),
-                    new DefenderTower(19, 19, true, false)
-            )
-    );
+    protected static List<DefenderTower> defenderTowers = new ArrayList<>(Arrays.asList(
+            new DefenderTower(17, 19, true, false), new DefenderTower(17, 18, false, false),
+            new DefenderTower(19, 17, true, false), new DefenderTower(18, 17, false, false),
+            new DefenderTower(17, 17, true, false), new DefenderTower(18, 18, false, true),
+            new DefenderTower(18, 19, false, false), new DefenderTower(19, 18, false, false),
+            new DefenderTower(19, 19, true, false)
+    ));
     //
     // this list gets iterated through at the end of build phase, each tower gets marked as completed, then the list clears
     protected static List<Tower> towersPlacedThisTurn = new ArrayList<Tower>();
@@ -82,11 +82,8 @@ public class GameController {
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
     private static List<Integer> blockedPaths;
-    // A list containing different lists that are have the co-ordinates of a paths
-    private static List<List<Path>> paths = new ArrayList<>();
-    private static List<Obstacle> obstacles = new ArrayList<>();
     // The 2 dimensional array to represent the map
-    private static MatrixObject[][] map;
+    private static Level level;
     
     private static List<Projectile> projectiles;
     
@@ -136,11 +133,11 @@ public class GameController {
     public static List<DefenderTower> getDefenderTowers() {
         return defenderTowers;
     }
-    
-    public static MatrixObject[][] getMap() {
-        return map;
+
+    public static Level getLevel() {
+        return level;
     }
-    
+
     public static List<Troop> getTroops() {
         return troops;
     }
@@ -150,9 +147,11 @@ public class GameController {
     }
     
     public static List<List<Path>> getPaths() {
-        return paths;
+        return level.getPaths();
     }
-    
+
+    public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
+
     public static void setPlayerType(Boolean type) {
         if (type)
             clientPlayerType = defender;
@@ -164,7 +163,7 @@ public class GameController {
      * Reset all values at the start of the game, and when a new game starts
      */
     public static void initialise() {
-        attacker= new Attacker(ATTACKERNAME);
+        attacker = new Attacker(ATTACKERNAME);
         defender = new Defender(DEFENDERNAME);
         defenderUpgradeLevel = 0;
         defenderMaxUpgradeLevel = 3;
@@ -185,12 +184,37 @@ public class GameController {
         height = 20;
         width = 20;
         wave = 1;
-        paths = MapGenerator.generatePaths();
-        obstacles = MapGenerator.getObstacles();
-        map = MapGenerator.generateMap(width, height, paths, obstacles);
-        
+
+        //map = MapGenerator.generateMap(width, height, paths, obstacles);
+        try {
+            boolean debug = false;
+            if (debug)
+            {
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(DatabaseCommunication.getMap(11).getJson());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                level = new Level(json);
+            }
+            else
+            {
+                FileInputStream inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+                JSONTokener tokener = new JSONTokener(inputStream);
+                JSONObject json = new JSONObject(tokener);
+                level = new Level(json);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error");
+            System.out.println(e.toString());
+        }
+        //if (inputStream == null) throw new NullPointerException("Cannot find JSON");
+
         blockedPaths = new ArrayList<>();
-        for (int i = 0; i < paths.size(); i++) {
+        for (int i = 0; i < level.getPaths().size(); i++) {
             blockedPaths.add(i);
         }
         unblockPath(0, true); // unblock the first pat
@@ -274,17 +298,14 @@ public class GameController {
      */
     private static void attackerPlaceTowers() {
         for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
-            boolean alreadyExists = false;
+            System.out.println("Attacker Placing tower " + i);
+            MatrixCoordinates mc = new MatrixCoordinates(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates());
+
+            if (((Tile) (getMatrixObject(mc.getY(), mc.getX()))).getTower() == null)
+                createTower(EventManager.getTowerBuilds().get(i));
             // check if tower has not already benn added
-            for (Tower tower : towersPlacedThisTurn) {
-                if (tower.getRealWorldCoordinates().equals(EventManager.getTowerBuilds().get(i).getRealWorldCoordinates())) {
-                    alreadyExists = true;
-                    break;
-                }
-            }
-            if (!alreadyExists)
-                towersPlacedThisTurn.add(createTower(EventManager.getTowerBuilds().get(i)));
         }
+        EventManager.getTowerBuilds().clear();
     }
 
     /**
@@ -495,7 +516,6 @@ public class GameController {
         if (unitSpawnTimer > unitSpawnTimeLimit) {
             // loop through each path and spawn a troop into each
             for (int path = 0; path < getPaths().size(); path++) {
-                System.out.println("Spawning on path - " + path);
                 int troop;
                 Troop newTroop = null;
                 if (EventManager.getUnitBuildPlan()[0][path] > 0) {
@@ -581,19 +601,7 @@ public class GameController {
         }
     }
     
-    public static void debugVisualiseMap() {
-        for (int y = height - 1; y > -1; y--) {
-            for (int x = 0; x < width; x++) {
-                if (map[y][x] instanceof Tile) {
-                    Tile t = (Tile) map[y][x];
-                    if (t.getTower() != null) System.out.println("T ");
-                    else System.out.print("- ");
-                } else if (map[y][x] instanceof Path) System.out.print("@ ");
-                else if (map[y][x] instanceof Obstacle) System.out.print("X ");
-                else System.out.print("!");
-            }
-        }
-    }
+
 
     /**
      * When a troops is killed, it needs to be removed from the path it was travelling along
@@ -601,9 +609,10 @@ public class GameController {
      * @param troop the troop that died
      */
     private static void troopDies(Troop troop) {
+
         if (troops.contains(troop)) {
             troops.remove(troop);
-            
+            Game.playSound("unitDies");
             // look through the path this troop is on and remove it from the Path it's
             // contained in
             for (int i = 0; i < troop.getPath().size(); i++) {
@@ -619,7 +628,7 @@ public class GameController {
     }
     
     public static MatrixObject getMatrixObject(int y, int x) {
-        return map[y][x];
+        return level.objectAt(x, y);
     }
 
     /**
@@ -637,10 +646,11 @@ public class GameController {
             temp = troop.getCurrentHealth() - tower.getDamage();
             
         }
-        
+        //Game.playSound("projectileHit");
         troop.setCurrentHealth(temp);
         
         if (troop.getCurrentHealth() <= 0) {
+
             troopDies(troop);
         }
         
@@ -658,6 +668,7 @@ public class GameController {
     public static void shootTroop(Tower tower, Troop troop) {
         Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
         projectiles.add(projectile);
+        Game.playSound("projectileStart");
     }
 
     /**
@@ -686,7 +697,7 @@ public class GameController {
         
         MatrixCoordinates mc = new MatrixCoordinates(tbp.getRealWorldCoordinates());
         
-        Tile tile = (Tile) map[mc.getY()][mc.getX()];
+        Tile tile = (Tile) level.objectAt(mc);
         switch (tbp.getTowerType()) {
             case type1:
                 tower = new TowerType1(tbp.getRealWorldCoordinates());
@@ -747,7 +758,7 @@ public class GameController {
             towers.remove(tower);
             towersPlacedThisTurn.remove(tower);
             MatrixCoordinates mc = new MatrixCoordinates(tower.getRealWorldCoordinates());
-            Tile tile = (Tile) map[mc.getY()][mc.getX()];
+            Tile tile = (Tile) level.objectAt(mc);
             tile.setTower(null);
             defender.addMoney(tower.getCost());
             System.out.println("Tower removed at " + tower.getRealWorldCoordinates().getY() + "," + tower.getRealWorldCoordinates().getX());
@@ -851,7 +862,7 @@ public class GameController {
         }
         
         // check if this matrix position is legal
-        MatrixObject mo = map[mc.getY()][mc.getX()];
+        MatrixObject mo = level.objectAt(mc);
         if (mo instanceof Path || mo instanceof Obstacle) {
             return false; // cannot place towers on path
         } else if (mo instanceof Tile) {

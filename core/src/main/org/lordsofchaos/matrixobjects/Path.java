@@ -5,14 +5,13 @@ import org.lordsofchaos.gameobjects.troops.Troop;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path extends MatrixObject
-{
+public class Path extends MatrixObject {
     
     private List<Troop> troops;
     private boolean isSpawn = false;
     
-    public Path(int y, int x) {
-        super(y, x);
+    public Path(int x, int y) {
+        super(x, y);
         //setTroops(troops);
     }
     

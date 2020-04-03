@@ -6,8 +6,8 @@ public class Tile extends MatrixObject
 {
     private Tower tower;
 
-    public Tile(int y, int x, Tower tower) {
-        super(y, x);
+    public Tile(int x, int y, Tower tower) {
+        super(x, y);
         setTower(tower);
     }
     

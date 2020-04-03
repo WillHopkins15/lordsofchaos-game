@@ -57,7 +57,7 @@ public class NetworkingTest
         player2.setGameState(emptyGameState);
         
         //add things to player 1 game state
-        tbp.add(new SerializableTower(TowerType.type1, new RealWorldCoordinates(12, 34)));
+        tbp.add(new SerializableTower(TowerType.type1, new RealWorldCoordinates(34, 12)));
         BuildPhaseData gameState = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>(), "DefenderBuild", 100);
         
         //update player1 game state

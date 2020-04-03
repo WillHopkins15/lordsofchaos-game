@@ -147,7 +147,7 @@ public class Tower extends InteractiveObject
                     if (GameController.inBounds(a, b)) {
                         
                         if (GameController.getMatrixObject(a, b) instanceof Path) {
-                            tempco = new MatrixCoordinates(a, b);
+                            tempco = new MatrixCoordinates(b, a);
                             
                             ydistance = defenderbase.getY() - tempco.getY();
                             xdistance = defenderbase.getX() - tempco.getX();
@@ -180,13 +180,20 @@ public class Tower extends InteractiveObject
             }
             
             for (int i = 0; i < count; i++) {
-                //System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
+                System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
             }
             
         }
         
     }
-    
+
+    /**
+     * this functions is part of the quicksort algorithm
+     * @param tiles
+     * @param l
+     * @param h
+     * @return
+     */
     public int partition(Pair[] tiles, int l, int h) {
         
         double pivot = (double) tiles[h].getValue();
@@ -209,12 +216,17 @@ public class Tower extends InteractiveObject
         
         return i + 1;
     }
-    
+
+    /**
+     * this function is about of the quicksort algorithm used to sort the tiles by their distance to the defender's base
+     * @param tiles
+     * @param l
+     * @param h
+     */
     public void sort(Pair[] tiles, int l, int h) {
         if (l < h) {
             
             int part = partition(tiles, l, h);
-            
             sort(tiles, l, part - 1);
             sort(tiles, part + 1, h);
         }
@@ -232,14 +244,14 @@ public class Tower extends InteractiveObject
             while (count < inRange.size()) {
                 //System.out.println("this is the current tile path" + inRange.get(count).getMatrixPosition());
                 if ((inRange.get(count).getTroops()).isEmpty()) {
-                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
+                    MatrixCoordinates hi = new MatrixCoordinates(5, 8);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
                         // System.out.println("fucking knew it was this bitch ass tile");
                     }
                     count++;
                     
                 } else {
-                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
+                    MatrixCoordinates hi = new MatrixCoordinates(5, 8);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
                         // System.out.println("fucking knew it was this bitch ass tile pt 2");
                     }
