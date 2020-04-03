@@ -277,7 +277,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         List<Troop> tmpUnits = GameController.getTroops();
         if (tmpUnits.size() > 0) unitsSprite = new ArrayList<>();
         for (TroopSprite troopSprite : unitsSprite) troopSprite.dispose();
-        
     }
     
     public void showTowerAttack() {

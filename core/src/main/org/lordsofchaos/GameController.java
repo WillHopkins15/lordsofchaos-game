@@ -929,8 +929,7 @@ public class GameController {
         }
     }
     
-    public enum WaveState implements Serializable
-    {
+    public enum WaveState implements Serializable {
         DefenderBuild, AttackerBuild, Play, WaitingForInput, SubmitInput, End
     }
 }

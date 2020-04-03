@@ -10,7 +10,6 @@ import org.lordsofchaos.graphics.buttons.Button;
 import org.lordsofchaos.graphics.buttons.EditorButton;
 import org.lordsofchaos.graphics.buttons.ObstacleButton;
 import org.lordsofchaos.matrixobjects.*;
-import org.json.JSONObject;
 
 import java.util.*;
 
@@ -160,23 +159,23 @@ public class LevelEditor {
         int x = matrixCoordinates.getX(), y = matrixCoordinates.getY();
         if (pathEndpoints.contains(matrixCoordinates)) return placeableCoordinates;
         for (int i = 0; i < 4; i++) {
-            int testX = 0, testY = 0;
+            int xOffset = 0, yOffset = 0;
             switch (i) {
                 case 0:
-                    testX = 0;
-                    testY = 1;
+                    xOffset = 0;
+                    yOffset = 1;
                     break;
                 case 1:
-                    testX = 0;
-                    testY = -1;
+                    xOffset = 0;
+                    yOffset = -1;
                     break;
                 case 2:
-                    testX = 1;
-                    testY = 0;
+                    xOffset = 1;
+                    yOffset = 0;
                     break;
                 case 3:
-                    testX = -1;
-                    testY = 0;
+                    xOffset = -1;
+                    yOffset = 0;
                     break;
             }
             List<String> adjacentPaths = new ArrayList<>();
@@ -186,14 +185,14 @@ public class LevelEditor {
             List<String> cornerSE = new ArrayList<>(Arrays.asList("S", "SE", "E"));
             List<String> cornerSW = new ArrayList<>(Arrays.asList("S", "SW", "W"));
             for (String orientation : adjacentOrientations)
-                if (renderer.adjacentTileIs(x + testX, y + testY, orientation, "Path"))
+                if (renderer.adjacentTileIs(x + xOffset, y + yOffset, orientation, "Path"))
                     adjacentPaths.add(orientation);
             if (!adjacentPaths.containsAll(cornerNE) && !adjacentPaths.containsAll(cornerNW) &&
                     !adjacentPaths.containsAll(cornerSE) && !adjacentPaths.containsAll(cornerSW) &&
-                    isPlaceable(x + testX, y + testY) && x + testX > 0 && y + testY > 0 &&
-                    !(x + testX == this.lastPath.getMatrixPosition().getX() &&
-                            y + testY == this.lastPath.getMatrixPosition().getY())) {
-                placeableCoordinates.add(level.index(x + testX, y + testY));
+                    isPlaceable(x + xOffset, y + yOffset) && x + xOffset > 0 &&
+                    y + yOffset > 0 && !(x + xOffset == this.lastPath.getMatrixPosition().getX() &&
+                            y + yOffset == this.lastPath.getMatrixPosition().getY())) {
+                placeableCoordinates.add(level.index(x + xOffset, y + yOffset));
             }
         }
         return placeableCoordinates;
@@ -229,7 +228,7 @@ public class LevelEditor {
     
     public void nextStep() {
         if (currentPhase == EditorPhase.SPAWNS) {
-            for (Path spawn : spawns)
+            for (Path spawn: spawns)
                 level.newPath(spawn);
             lastPath = spawns.get(currentPathIndex);
             currentPhase = EditorPhase.PATHS;
@@ -237,7 +236,6 @@ public class LevelEditor {
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
             // Complete - Write to file
-
             System.out.println(level.toJSON());
         }
     }
