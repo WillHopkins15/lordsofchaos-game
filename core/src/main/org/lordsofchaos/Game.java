@@ -891,13 +891,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
              renderer.setLevel(GameController.getLevel());
          }
 
-        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
-            currentScreen = Screen.MAIN_MENU;
-         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_SELECT) {
-             GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
+        else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD || currentScreen == Screen.LEVEL_SELECT) {
+             //GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
              currentScreen = Screen.MAIN_MENU;
-             renderer.setLevel(GameController.getLevel());
-             updatePathHighlighting();
+             //renderer.setLevel(GameController.getLevel());
          }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;
@@ -916,6 +913,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
         currentScreen = Screen.MAIN_MENU;
         renderer.setLevel(GameController.getLevel());
+        updatePathHighlighting();
     }
 
     @Override
