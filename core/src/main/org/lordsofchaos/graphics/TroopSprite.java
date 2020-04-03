@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import org.lordsofchaos.gameobjects.troops.Troop;
 
-public class TroopSprite
-{
-    
+public class TroopSprite {
+
     private float x;
     private float y;
     private Texture healthBarTextureBase;

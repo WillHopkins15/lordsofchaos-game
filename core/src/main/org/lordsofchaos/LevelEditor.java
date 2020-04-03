@@ -244,9 +244,7 @@ public class LevelEditor {
             org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map("Created map" , level.toJSON(), true);
             try {
                 DatabaseCommunication.addMap(map);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

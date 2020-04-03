@@ -6,19 +6,10 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.matrixobjects.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class Level {
-
-    private static final ArrayList<Obstacle> baseObstacles = new ArrayList<>(Arrays.asList(
-            new Obstacle(17, 19, ObstacleType.BASE), new Obstacle(18, 19, ObstacleType.BASE),
-            new Obstacle(19, 19, ObstacleType.BASE), new Obstacle(17, 18, ObstacleType.BASE),
-            new Obstacle(18, 18, ObstacleType.BASE), new Obstacle(19, 18, ObstacleType.BASE),
-            new Obstacle(17, 17, ObstacleType.BASE), new Obstacle(18, 17, ObstacleType.BASE),
-            new Obstacle(19, 17, ObstacleType.BASE)
-    ));
 
     private final int width;
     private final int height;
@@ -87,7 +78,9 @@ public class Level {
         MatrixObject[] matrix = new MatrixObject[width * height];
         for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
             matrix[index(x, y)] = new Tile(x, y, null);
-        baseObstacles.forEach(o -> matrix[index(o.getMatrixPosition())] = o);
+        for (int i = width - 1; i >= width - 3; i--)
+            for (int j = height - 1; j >= height - 3 ; j--)
+                matrix[index(i, j)] = new Obstacle(i, j, ObstacleType.BASE);
         return matrix;
     }
 
@@ -114,15 +107,19 @@ public class Level {
     }
 
     public void visualise() {
-        for (int y = height - 1; y > -1; y--)
-            for (int x = 0; x < width; x++)
-                if (objectAt(x, y) instanceof Tile) {
+        for (int y = height - 1; y > -1; y--) {
+            System.out.println();
+            for (int x = 0; x < width; x++) {
+                if (objectAt(x, y) instanceof Obstacle) System.out.print("X ");
+                else if (objectAt(x, y) instanceof Path) System.out.print("@ ");
+                else if (objectAt(x, y) instanceof Tile) {
                     Tile t = (Tile) objectAt(x, y);
-                    if (t.getTower() != null) System.out.println("T ");
+                    if (t.getTower() != null) System.out.print("T ");
                     else System.out.print("- ");
-                } else if (objectAt(x, y) instanceof Path) System.out.print("@ ");
-                else if (objectAt(x, y) instanceof Obstacle) System.out.print("X ");
-                else System.out.print("!");
+                }
+            }
+        }
+        System.out.println();
     }
 
     public int index(MatrixCoordinates mc) {

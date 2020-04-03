@@ -26,6 +26,7 @@ import org.lordsofchaos.gameobjects.towers.TowerType3;
 import org.lordsofchaos.gameobjects.troops.Troop;
 import org.lordsofchaos.graphics.*;
 import org.lordsofchaos.graphics.buttons.*;
+import org.lordsofchaos.matrixobjects.Path;
 import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
@@ -169,9 +170,19 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
         //attacker path buttons
         //TO DO: Get starting locations for paths
-        buttonList.add(new PathButton("UI/pathHighlight.png", 343, 169, Screen.ATTACKER_SCREEN, 0));
-        buttonList.add(new PathButton("UI/pathHighlight.png", 759, 121, Screen.ATTACKER_SCREEN, 1));
-        buttonList.add(new PathButton("UI/pathHighlight.png", 1079, 281, Screen.ATTACKER_SCREEN, 2));
+
+        List<Path> paths = new ArrayList<>();
+        for (List<Path> path: GameController.getLevel().getPaths()) paths.add(path.get(0));
+        for (int i = 0; i < paths.size(); i++) {
+            MatrixCoordinates mc  = paths.get(i).getMatrixPosition();
+            RealWorldCoordinates rwc = new RealWorldCoordinates(mc.getX() * GameController.getScaleFactor(), mc.getY() * GameController.getScaleFactor());
+            Vector2 screenPos = Conversions.realWorldCoordinatesToScreenPosition(rwc);
+            buttonList.add(new PathButton("UI/pathHighlight.png", screenPos.x - 41, screenPos.y - 18, Screen.ATTACKER_SCREEN, i));
+
+        }
+        //buttonList.add(new PathButton("UI/pathHighlight.png", 343, 169, Screen.ATTACKER_SCREEN, 0));
+        //buttonList.add(new PathButton("UI/pathHighlight.png", 759, 121, Screen.ATTACKER_SCREEN, 1));
+        //buttonList.add(new PathButton("UI/pathHighlight.png", 1079, 281, Screen.ATTACKER_SCREEN, 2));
         
         //menu buttons
         menuButtonList = new ArrayList<Button>();
@@ -485,7 +496,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         soundTrack.setVolume(1.0f);
         //soundTrack.play();
         soundTrack.setLooping(true);
-        
+
+        GameController.initialise();
+
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
         backgroundSprite = new Sprite(new Texture("maps/background.png"));
         generateFont();
@@ -518,7 +531,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuSprite = new Sprite(menuTexture);
         menuSprite.setPosition(Gdx.graphics.getWidth() / 3.2f, Gdx.graphics.getHeight() / 3);
 
-        GameController.initialise();
         renderer.setLevel(GameController.getLevel());
         hpSpriteW = healthSprite.getWidth();
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);

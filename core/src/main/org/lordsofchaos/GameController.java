@@ -1,7 +1,6 @@
 package org.lordsofchaos;
 
 import com.badlogic.gdx.Gdx;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -186,20 +185,15 @@ public class GameController {
         //map = MapGenerator.generateMap(width, height, paths, obstacles);
         try {
             boolean debug = true;
-            if (debug)
-            {
+            if (debug) {
                 JSONObject json = null;
                 try {
                     json = new JSONObject(DatabaseCommunication.getMap(11).getJson());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 level = new Level(json);
-            }
-            else
-            {
+            } else {
                 FileInputStream inputStream = new FileInputStream("core/assets/maps/MainMap.json");
                 JSONTokener tokener = new JSONTokener(inputStream);
                 JSONObject json = new JSONObject(tokener);

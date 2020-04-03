@@ -7,8 +7,8 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class PathButton extends HoverButton
-{
+public class PathButton extends HoverButton {
+
     private static boolean[] selected;
     private int pathNr;
     private boolean justSelected;
