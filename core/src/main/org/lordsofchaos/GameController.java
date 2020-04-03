@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
-import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
@@ -80,7 +79,6 @@ public class GameController {
     private static int healthUpgrade = 0;
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
-    private static List<Integer> blockedPaths;
     // The 2 dimensional array to represent the map
     private static Level level;
     
@@ -207,10 +205,6 @@ public class GameController {
 
         //if (inputStream == null) throw new NullPointerException("Cannot find JSON");
 
-        blockedPaths = new ArrayList<>();
-        for (int i = 0; i < level.getPaths().size(); i++) {
-            blockedPaths.add(i);
-        }
         unblockPath(0, true); // unblock the first pat
 
         EventManager.initialise(3, getPaths().size());
@@ -238,7 +232,7 @@ public class GameController {
     }
     
     public static List<Integer> getBlockedPaths() {
-        return blockedPaths;
+        return level.getBlockedPaths();
     }
 
     /**
@@ -259,7 +253,7 @@ public class GameController {
      */
     public static void unblockPath(int index, boolean isFree) {
         if (!isFree) attacker.addMoney(-unblockPathCost);
-        blockedPaths.remove(new Integer(index));
+        level.unblockPath(index);
     }
 
     /**

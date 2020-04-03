@@ -14,10 +14,6 @@ public class EditorLevel extends Level {
         super(width, height);
     }
 
-    public List<Path> getPath(int i) {
-        return paths.get(i);
-    }
-
     public void newPath(Path spawn) {
         paths.add(new ArrayList<>(Collections.singletonList(spawn)));
     }

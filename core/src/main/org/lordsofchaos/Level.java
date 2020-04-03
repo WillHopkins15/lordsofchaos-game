@@ -8,6 +8,7 @@ import org.lordsofchaos.matrixobjects.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class Level {
 
@@ -15,6 +16,7 @@ public class Level {
     private final int height;
     private MatrixObject[] objects;
     private boolean isUpdated = true;
+    private List<Integer> blockedPaths;
 
     protected List<List<Path>> paths;
     protected List<Obstacle> obstacles;
@@ -71,6 +73,11 @@ public class Level {
             addObject(o);
             obstacles.add(o);
         }
+
+        blockedPaths = new ArrayList<>();
+        if (paths.size() > 1)
+            for (int i = 1; i < paths.size(); i++)
+                blockPath(i);
 
     }
 
@@ -157,6 +164,32 @@ public class Level {
 
     public List<List<Path>> getPaths() {
         return paths;
+    }
+
+    public List<Path> getPath(int i) {
+        return paths.get(i);
+    }
+
+    public List<Integer> getBlockedPaths() {
+        return blockedPaths;
+    }
+
+    public void blockPath(int i) {
+        MatrixCoordinates mc = getPath(i).get(0).getMatrixPosition();
+        MatrixCoordinates mc1 = getPath(i).get(1).getMatrixPosition();
+        MatrixCoordinates mc2 = getPath(i).get(2).getMatrixPosition();
+        addObject(new Obstacle(mc.getX(), mc.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
+        addObject(new Obstacle(mc1.getX(), mc1.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
+        addObject(new Obstacle(mc2.getX(), mc2.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
+        blockedPaths.add(i);
+    }
+
+    public void unblockPath(int i) {
+        List<Path> path = getPath(i);
+        addObject(path.get(0));
+        addObject(path.get(1));
+        addObject(path.get(2));
+        blockedPaths.remove((Integer) i);
     }
 
     public boolean isUpdated() {
