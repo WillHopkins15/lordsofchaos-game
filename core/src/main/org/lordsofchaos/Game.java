@@ -49,7 +49,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static int previousSelectPage = 0; // only need to reload page if the current page != previous
     public static int levelsToShow = 5; // how many levels to display per page on the level select screen
     private static Texture levelSelectRowTexture;
-    private static BitmapFont levelSelectRowText;
 
     public static int player;
     public static Screen currentScreen;
@@ -67,7 +66,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static boolean changedTurn = false;
     private static FreeTypeFontParameter fontParameterBoxy;
     private static FreeTypeFontGenerator fontGenerator;
-    private static FreeTypeFontParameter fontParameterArial;
     private static BitmapFont font;
     private static BitmapFont timerFont;
     private static ArrayList<Button> buttonList;
@@ -104,8 +102,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
-    private Texture upgradeBarTexture[];
-    private Sprite upgradeBarSprite[];
+    private Sprite[] upgradeBarSprite;
 
     public static void main(String[] args) {
         setupClient();
@@ -234,9 +231,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         //Setting up soundtrack
         soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
         soundTrack.setVolume(1.0f);
-        soundTrack.play();
+        // soundTrack.play();
         soundTrack.setLooping(true);
         soundTrackVolume = 1.0f;
+
+
+
         //Setting up sounds
         soundEffectsVolume = 1.0f;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -329,7 +329,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         matchConclusionFont = fontGenerator.generateFont(fontParameterBoxy);
         fontGenerator.dispose();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/arial.ttf"));
-        fontParameterArial = new FreeTypeFontParameter();
+        FreeTypeFontParameter fontParameterArial = new FreeTypeFontParameter();
         fontParameterArial.size = 20;
         leaderBoardRowText = fontGenerator.generateFont(fontParameterBoxy);
 
@@ -559,17 +559,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
-        //fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
-       // fontParameterBoxy = new FreeTypeFontParameter();
-       // font = fontGenerator.generateFont(fontParameterBoxy);
-        fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
-        FreeTypeFontParameter fontParameter = new FreeTypeFontParameter();
-        font = fontGenerator.generateFont(fontParameter);
-        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        soundTrack.setVolume(1.0f);
-        // soundTrack.play();
-        soundTrack.setLooping(true);
-
         GameController.initialise();
 
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -612,7 +601,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
         upgradeBarSprite =  new Sprite[4];
-        upgradeBarTexture = new Texture[4];
+        Texture[] upgradeBarTexture = new Texture[4];
         for(int i = 0; i < 4; i++){
             upgradeBarTexture[i] = new Texture("UI/" + i + "Upgrade.png");
             upgradeBarSprite[i] = new Sprite(upgradeBarTexture[i]);
