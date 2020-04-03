@@ -158,8 +158,7 @@ public class GameController {
             clientPlayerType = attacker;
     }
 
-    public static void levelSelected(String json)
-    {
+    public static void levelSelected(String json) {
         levelJson = json;
     }
 

@@ -193,15 +193,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         //attacker path buttons
         //TO DO: Get starting locations for paths
 
-        List<Path> paths = new ArrayList<>();
-        for (List<Path> path: GameController.getLevel().getPaths()) paths.add(path.get(0));
-        for (int i = 0; i < paths.size(); i++) {
-            MatrixCoordinates mc  = paths.get(i).getMatrixPosition();
-            RealWorldCoordinates rwc = new RealWorldCoordinates(mc.getX() * GameController.getScaleFactor(), mc.getY() * GameController.getScaleFactor());
-            Vector2 screenPos = Conversions.realWorldCoordinatesToScreenPosition(rwc);
-            buttonList.add(new PathButton("UI/pathHighlight.png", screenPos.x - 41, screenPos.y - 18, Screen.ATTACKER_SCREEN, i));
-
-        }
+        updatePathHighlighting();
         //buttonList.add(new PathButton("UI/pathHighlight.png", 343, 169, Screen.ATTACKER_SCREEN, 0));
         //buttonList.add(new PathButton("UI/pathHighlight.png", 759, 121, Screen.ATTACKER_SCREEN, 1));
         //buttonList.add(new PathButton("UI/pathHighlight.png", 1079, 281, Screen.ATTACKER_SCREEN, 2));
@@ -215,7 +207,19 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuButtonList.add(new MenuButton("UI/returnToGameTmp.png", 510, 470, Screen.MENU));
         menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.CHOOSE_FACTION));
     }
-    
+
+    public static void updatePathHighlighting() {
+        List<Path> paths = new ArrayList<>();
+        buttonList.removeIf(button -> button instanceof PathButton);
+        for (List<Path> path: GameController.getLevel().getPaths()) paths.add(path.get(0));
+        for (int i = 0; i < paths.size(); i++) {
+            MatrixCoordinates mc  = paths.get(i).getMatrixPosition();
+            RealWorldCoordinates rwc = new RealWorldCoordinates(mc.getX() * GameController.getScaleFactor(), mc.getY() * GameController.getScaleFactor());
+            Vector2 screenPos = Conversions.realWorldCoordinatesToScreenPosition(rwc);
+            buttonList.add(new PathButton("UI/pathHighlight.png", screenPos.x - 41, screenPos.y - 18, Screen.ATTACKER_SCREEN, i));
+        }
+    }
+
     // need to hide button once defender has bought all upgrades
     public static void defenderMaxLevel() {
         UpgradeButton.maxLevel = true;
@@ -753,8 +757,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             // Remove any old load from the button list, so they can be re-added with new jsons
             for(int i = 0; i < buttonList.size(); i++)
             {
-                if (buttonList.get(i) instanceof LoadLevelButton)
-                {
+                if (buttonList.get(i) instanceof LoadLevelButton) {
                     System.out.println("Removing load button");
                     Button button = buttonList.get(i);
                     buttonList.remove(i);
@@ -860,6 +863,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
              GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
              currentScreen = Screen.MAIN_MENU;
              renderer.setLevel(GameController.getLevel());
+             updatePathHighlighting();
          }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;
