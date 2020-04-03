@@ -102,6 +102,48 @@ public class DatabaseCommunication
     }
 
     /**
+     * Return a list of maps from the maps table, starting from index 'start' and ending at index 'end'
+     */
+    public static List<Map> getMaps(int start, int end) throws SQLException, ClassNotFoundException {
+        connectToDB();
+        String query = "select * from " + dbName + ".maps "; // get all maps
+        ResultSet rs = executeQuery(conn, query);
+        int size = numberOfMaps();
+        if (start >= size) // if the start index is bigger than the number of rows, return null
+            return null;
+        List<Map> maps = new ArrayList<>();
+        int count = 0;
+        while (rs.next()) {
+            if (count >= start && count < end) {
+                int foundID = rs.getInt(1);
+                String foundJson = rs.getString(2);
+                int foundUser_generated = rs.getInt(3);
+                boolean userGenerated = false;
+                if (foundUser_generated == 1) userGenerated = true;
+                String foundMapName = rs.getString(4);
+                Map map = new Map(foundID, foundMapName, foundJson, userGenerated);
+                maps.add(map);
+            } else if (count >= end) {
+                break;
+            }
+            count++;
+        }
+        return maps;
+    }
+
+    public static int numberOfMaps() throws SQLException, ClassNotFoundException {
+        connectToDB();
+        String query = "select * from " + dbName + ".maps "; // get all maps
+        ResultSet rs = executeQuery(conn, query);
+        int size = 0;
+        if (rs != null) {
+            rs.last();
+            size = rs.getRow();
+        }
+        return size;
+    }
+
+    /**
      * Given a LeaderBoardRow, take the information out and add it to a new entity in the database
      *
      * @param row the row to add

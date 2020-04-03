@@ -47,6 +47,7 @@ public class Level {
         HashMap<String, Path> pathCache = new HashMap<>();
         JSONArray pathsArray = json.getJSONArray("paths");
         for (int i = 0; i < pathsArray.length(); i++) {
+            System.out.println("Path len "+pathsArray.length());
             paths.add(new ArrayList<>());
             JSONArray P = pathsArray.getJSONArray(i);
             for (int j = 0; j < P.length(); j++) {

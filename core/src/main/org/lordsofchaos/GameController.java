@@ -32,7 +32,7 @@ import java.util.List;
 
 public class GameController {
 
-    public static String levelJson; // by default this will be the level we created, but can load user maps
+    public static String levelJson = ""; // by default this will be the level we created, but can load user maps
 
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
@@ -159,6 +159,11 @@ public class GameController {
             clientPlayerType = attacker;
     }
 
+    public static void levelSelected(String json)
+    {
+        levelJson = json;
+    }
+
     /**
      * Reset all values at the start of the game, and when a new game starts
      */
@@ -185,32 +190,23 @@ public class GameController {
         width = 20;
         wave = 1;
 
-        //map = MapGenerator.generateMap(width, height, paths, obstacles);
-        try {
-            boolean debug = false;
-            if (debug)
-            {
-                JSONObject json = null;
-                try {
-                    json = new JSONObject(DatabaseCommunication.getMap(11).getJson());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                level = new Level(json);
+        // if no level selected, load the default level
+        if (levelJson == "") {
+            FileInputStream inputStream = null;
+            try {
+                inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
-            else
-            {
-                FileInputStream inputStream = new FileInputStream("core/assets/maps/MainMap.json");
-                JSONTokener tokener = new JSONTokener(inputStream);
-                JSONObject json = new JSONObject(tokener);
-                level = new Level(json);
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error");
-            System.out.println(e.toString());
+            JSONTokener tokener = new JSONTokener(inputStream);
+            JSONObject json = new JSONObject(tokener);
+            level = new Level(json);
+
+        } else {
+            JSONObject json = new JSONObject(levelJson);
+            level = new Level(json);
         }
+
         //if (inputStream == null) throw new NullPointerException("Cannot find JSON");
 
         blockedPaths = new ArrayList<>();
@@ -218,7 +214,7 @@ public class GameController {
             blockedPaths.add(i);
         }
         unblockPath(0, true); // unblock the first pat
-        
+
         EventManager.initialise(3, getPaths().size());
         //debugVisualiseMap();
     }
