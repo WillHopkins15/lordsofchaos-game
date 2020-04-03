@@ -8,7 +8,7 @@ public class TowerType2 extends Tower
 {
     private static String spriteName = "TowerType2";
     private static int cost = 20;
-    private static int damage = 6;
+    private static int damage = 12;
     private static int range = 2;
     private static DamageType damageType = DamageType.Normal;
     

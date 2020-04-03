@@ -19,7 +19,7 @@ public abstract class UDPSocket extends Thread
     protected volatile boolean running = true;
     protected volatile BuildPhaseData gameState = null;
     protected DatagramSocket socket;
-    private byte[] buffer = new byte[1024*16]; //Needs to be big enough to hold the game state object
+    private byte[] buffer = new byte[1024 * 16]; //Needs to be big enough to hold the game state object
     private int timeoutCount = 0;
     
     /**
@@ -40,10 +40,7 @@ public abstract class UDPSocket extends Thread
     @SneakyThrows
     protected void sendObject(ConnectionPoint recipient, Object contents) {
         if (!socket.isClosed()) {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ObjectOutputStream oout = new ObjectOutputStream(bout);
-            oout.writeObject(contents);
-            byte[] bytes = bout.toByteArray();
+            byte[] bytes = objectToByteArray(contents);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(), recipient.getPort());
             socket.send(packet);
         } else {
@@ -52,31 +49,13 @@ public abstract class UDPSocket extends Thread
     }
     
     /**
-     * De-serializes byte array back into an object. Byte array must have been
-     * serialized by an ObjectOutputStream.
+     * Listens on the open socket for a Datagram packet. Closes the socket if it times out
+     * 10 times in a row.
      *
-     * @param bytes Byte array to convert
-     * @return Resulting deserialized object
+     * @return received packet
      */
     @SneakyThrows
-    protected Object getObjectFromBytes(byte[] bytes) {
-        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-        ObjectInputStream oin = new ObjectInputStream(bin);
-        Object obj = null;
-        try {
-            obj = oin.readObject();
-        } catch (EOFException ex) {
-            System.out.println("EOF");
-        }
-        return obj;
-    }
-    
-    /**
-     * Listens on the open socket for a packet containing serialized object data, and
-     * parses the object depending on which object was received.
-     */
-    @SneakyThrows
-    protected DatagramPacket receiveObject() {
+    protected DatagramPacket receive() {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         
         try {
@@ -98,12 +77,46 @@ public abstract class UDPSocket extends Thread
     }
     
     /**
+     * Serializes an object into a byte array.
+     *
+     * @param object Object to be serialized
+     * @return Resulting bytes
+     */
+    @SneakyThrows
+    public byte[] objectToByteArray(Object object) {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ObjectOutputStream oout = new ObjectOutputStream(bout);
+        oout.writeObject(object);
+        return bout.toByteArray();
+    }
+    
+    /**
+     * De-serializes byte array back into an object. Byte array must have been
+     * serialized by an ObjectOutputStream.
+     *
+     * @param bytes Byte array to convert
+     * @return Resulting deserialized object
+     */
+    @SneakyThrows
+    public Object getObjectFromBytes(byte[] bytes) {
+        ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+        ObjectInputStream oin = new ObjectInputStream(bin);
+        Object obj = null;
+        try {
+            obj = oin.readObject();
+        } catch (EOFException ex) {
+            System.out.println("EOF");
+        }
+        return obj;
+    }
+    
+    /**
      * Creates a thread for listening for Datagram packets and processing the data within.
      */
     protected void createInputThread() {
         new Thread(() -> {
             while (running) {
-                DatagramPacket packet = receiveObject();
+                DatagramPacket packet = receive();
                 if (packet != null) {
                     parsePacket(packet);
                 }

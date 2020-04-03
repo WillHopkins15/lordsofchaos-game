@@ -14,3 +14,16 @@ task server(dependsOn: classes, type: JavaExec) {
     description = "Runs the server"
     classpath = sourceSets.main.runtimeClasspath
 }
+
+task serverJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+serverJar.dependsOn classes

@@ -10,7 +10,6 @@ import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.server.GameServer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertNotNull;
