@@ -114,7 +114,7 @@ public class GameController {
         }
         return projectiles;
     }
-    
+    public static int getDefenderHealth(){return defender.getHealth();}
     public static float getBuildPhaseTimer() {
         return buildTimer;
     }
@@ -373,7 +373,7 @@ public class GameController {
      * The waveState becomes WaitingForInput so that update() is paused
      */
     private static void playerWins(Player player) {
-        if (clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
+        if (Game.getClient() != null && clientPlayerType.equals(player)) // if player is attacker, they should enter name to get added to leaderboard
         {
             waveState = WaveState.WaitingForInput;
             MyTextInputListener listener = new MyTextInputListener();
@@ -597,9 +597,10 @@ public class GameController {
      * @param troop the troop that died
      */
     private static void troopDies(Troop troop) {
+
         if (troops.contains(troop)) {
             troops.remove(troop);
-            
+            Game.playSound("unitDies");
             // look through the path this troop is on and remove it from the Path it's
             // contained in
             for (int i = 0; i < troop.getPath().size(); i++) {
@@ -633,10 +634,11 @@ public class GameController {
             temp = troop.getCurrentHealth() - tower.getDamage();
             
         }
-        
+        //Game.playSound("projectileHit");
         troop.setCurrentHealth(temp);
         
         if (troop.getCurrentHealth() <= 0) {
+
             troopDies(troop);
         }
         
@@ -654,6 +656,7 @@ public class GameController {
     public static void shootTroop(Tower tower, Troop troop) {
         Projectile projectile = new Projectile(tower.getRealWorldCoordinates(), troop, tower);
         projectiles.add(projectile);
+        Game.playSound("projectileStart");
     }
 
     /**

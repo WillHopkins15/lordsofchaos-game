@@ -16,9 +16,9 @@ public class TowerButton extends HoverButton
     public TowerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, TowerType towerType) {
         super(path, buttonX1, buttonY1, screenLocation);
         this.towerType = towerType;
-        infoCardTexture = new Texture("UI/NewArtMaybe/panel.png");
+        infoCardTexture = new Texture("UI/InfoCards/infoPanelTower" + towerType + ".png");
         infoCardSprite = new Sprite(infoCardTexture);
-        infoCardSprite.setPosition(10,150);
+        infoCardSprite.setPosition(30,150);
     }
     
     public void leftButtonAction() {
