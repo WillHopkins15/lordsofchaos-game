@@ -64,13 +64,16 @@ public class DatabaseCommunication
      */
     public static void addMap(Map map) throws SQLException, ClassNotFoundException {
         String query;
+        int userGenerated = 0;
+        if (map.getUserGenerated()) userGenerated = 1;
+
         // if id is -1, let the db auto generate an id
         if (map.getID() == -1) {
-            String values = "('" +map.getJson() + "', '" + map.getUserGenerated() + "', '" + map.getMapName() + "')";
-            query = "INSERT INTO " + dbName + ".maps (json, user_generated, map_name) VALUES " + values;
+            String values = "('" +map.getJson() + "', '" + userGenerated + "', '" + map.getMapName() + "')";
+            query = "INSERT INTO " + dbName + ".maps (json_string, user_generated, map_name) VALUES " + values;
         } else {
-            String values = "('" +map.getID() + "', '" +map.getJson() + "', '" + map.getUserGenerated() + "', '" + map.getMapName() + "')";
-            query = "INSERT INTO " + dbName + ".maps (id, json, user_generated, map_name) VALUES " + values;
+            String values = "('" +map.getID() + "', '" +map.getJson() + "', '" + userGenerated + "', '" + map.getMapName() + "')";
+            query = "INSERT INTO " + dbName + ".maps (id, json_string, user_generated, map_name) VALUES " + values;
         }
         System.out.println(query);
         connectToDB();
@@ -85,16 +88,17 @@ public class DatabaseCommunication
      */
     public static Map getMap(int id) throws SQLException, ClassNotFoundException {
         connectToDB();
-        String query = "select * from " + dbName + ".maps" + "WHERE id = " + id;
+        String query = "select * from " + dbName + ".maps " + "WHERE id = " + id;
         ResultSet rs = executeQuery(conn, query);
         rs.next();
 
         int foundID = rs.getInt(1);
         String foundJson = rs.getString(2);
-        boolean foundUser_generated = rs.getBoolean(3);
+        int foundUser_generated = rs.getInt(3);
+        boolean userGenerated = false;
+        if (foundUser_generated == 1) userGenerated = true;
         String foundMapName = rs.getString(4);
-
-        return new Map(foundID, foundMapName, foundJson, foundUser_generated);
+        return new Map(foundID, foundMapName, foundJson, userGenerated);
     }
 
     /**
@@ -149,13 +153,14 @@ public class DatabaseCommunication
      * Debug function, prints rows to the console
      */
     private static void printOutTable() throws SQLException, ClassNotFoundException {
-        Map map = new Map("test_map", new Json(),false );
-        addMap(map);
+        //Map map = new Map(10,"test_map", "testJson",false );
+        //addMap(map);
+        Map map = getMap(3);
         //List<LeaderboardRow> rows = getHighScores(3);//getRows(0, true);
         //for (int i = 0; i < rows.size(); i++) {
         //    System.out.println(rows.get(i).ToString());
         //}
-        System.out.println(getMap(map.getID()));
+        System.out.println(map.getMapName());
     }
 
     public static void main(String args[]) throws SQLException, ClassNotFoundException {

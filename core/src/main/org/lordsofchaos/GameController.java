@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
+import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.database.Leaderboard;
 import org.lordsofchaos.database.LeaderboardRow;
 import org.lordsofchaos.gameobjects.TowerType;
@@ -184,10 +185,26 @@ public class GameController {
 
         //map = MapGenerator.generateMap(width, height, paths, obstacles);
         try {
-            FileInputStream inputStream = new FileInputStream("core/assets/maps/MainMap.json");
-            JSONTokener tokener = new JSONTokener(inputStream);
-            JSONObject json = new JSONObject(tokener);
-            level = new Level(json);
+            boolean debug = true;
+            if (debug)
+            {
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(DatabaseCommunication.getMap(11).getJson());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                level = new Level(json);
+            }
+            else
+            {
+                FileInputStream inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+                JSONTokener tokener = new JSONTokener(inputStream);
+                JSONObject json = new JSONObject(tokener);
+                level = new Level(json);
+            }
         } catch (FileNotFoundException e) {
             System.out.println("Error");
             System.out.println(e.toString());

@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.graphics.MapRenderer;
 import org.lordsofchaos.graphics.buttons.Button;
 import org.lordsofchaos.graphics.buttons.EditorButton;
 import org.lordsofchaos.graphics.buttons.ObstacleButton;
 import org.lordsofchaos.matrixobjects.*;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class LevelEditor {
@@ -236,7 +238,17 @@ public class LevelEditor {
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
             // Complete - Write to file
-            System.out.println(level.toJSON());
+
+            System.out.println(level.toJSON().length());
+
+            org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map("Created map" , level.toJSON(), true);
+            try {
+                DatabaseCommunication.addMap(map);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
     
