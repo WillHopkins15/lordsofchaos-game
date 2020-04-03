@@ -32,6 +32,8 @@ import java.util.List;
 
 public class GameController {
 
+    public static String levelJson; // by default this will be the level we created, but can load user maps
+
     public final static float DAMAGEBONUS = 1.5f; // towers do this much times damage against corresponding troop type
     protected final static String ATTACKERNAME = "blank";
     protected final static String DEFENDERNAME = "blank";
@@ -185,7 +187,7 @@ public class GameController {
 
         //map = MapGenerator.generateMap(width, height, paths, obstacles);
         try {
-            boolean debug = true;
+            boolean debug = false;
             if (debug)
             {
                 JSONObject json = null;
