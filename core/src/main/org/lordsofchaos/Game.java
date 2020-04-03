@@ -234,7 +234,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             timerChangeTurn = 0;
         }
     }
-    
+
     public void buildTrue() {
         buildMode = true;
     }
@@ -751,6 +751,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     private static void selectLevelScreen() throws FileNotFoundException, SQLException, ClassNotFoundException {
+        int pagesNeeded =  (int) Math.ceil((double)(DatabaseCommunication.numberOfMaps()+1) / levelsToShow);
+
         // if changed page, remove old load buttons
         if (previousSelectPage != levelSelectPage)
         {
@@ -764,6 +766,37 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     button = null;
                     i--;
                 }
+                if (buttonList.get(i) instanceof ChangePageButton)
+                {
+                    System.out.println("Removing change page button");
+                    Button button = buttonList.get(i);
+                    buttonList.remove(i);
+                    button = null;
+                    i--;
+                }
+            }
+
+            // don't need any change page buttons
+            if (pagesNeeded < 2) { System.out.println("HERE1");}
+            // if need multiple pages, and are currently on first page, only need a forward button
+            else if (levelSelectPage == 0) {
+                System.out.println("HERE2");
+                buttonList.add(new ChangePageButton("UI/NewArtMaybe/forwardPage.png",
+                        Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, 1));
+            }
+            // if need multiple pages, and are on the last page, only need a back button
+            else if (levelSelectPage == pagesNeeded-1) {
+                System.out.println("HERE3");
+                buttonList.add(new ChangePageButton("UI/NewArtMaybe/backwardPage.png",
+                        Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, -1));
+            }
+            // otherwise, need both forward and backward buttons
+            else {
+                System.out.println("HERE4");
+                buttonList.add(new ChangePageButton("UI/NewArtMaybe/forwardPage.png",
+                        Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, 1));
+                buttonList.add(new ChangePageButton("UI/NewArtMaybe/backwardPage.png",
+                        Gdx.graphics.getWidth() / 2 + 300, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, -1));
             }
         }
 
@@ -784,6 +817,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             maps.add(map);
         }
         else {
+            endIndex--;
             startIndex--;
         }
         maps.addAll(DatabaseCommunication.getMaps(startIndex, endIndex));
@@ -802,7 +836,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (previousSelectPage != levelSelectPage) {
                 System.out.println("Added button " + i);
                 buttonList.add(new LoadLevelButton("UI/NewArtMaybe/loadButton.png",
-                        Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2 + 100 + yOffset, Screen.LEVEL_SELECT, maps.get(i).getJson()));
+                        Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 100 + yOffset, Screen.LEVEL_SELECT, maps.get(i).getJson()));
             }
         }
 
@@ -875,7 +909,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         return false;
     }
-    
+
+    // called by the load level buttons on the level select
+    public void levelSelected(String mapJson)  {
+        GameController.levelSelected(mapJson);
+        GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
+        currentScreen = Screen.MAIN_MENU;
+        renderer.setLevel(GameController.getLevel());
+    }
+
     @Override
     public boolean keyUp(int keycode) {
         return false;

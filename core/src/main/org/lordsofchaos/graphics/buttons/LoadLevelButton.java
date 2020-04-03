@@ -1,5 +1,6 @@
 package org.lordsofchaos.graphics.buttons;
 
+import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
@@ -14,7 +15,7 @@ public class LoadLevelButton extends Button {
 
     @Override
     public void leftButtonAction() {
-        GameController.levelSelected(mapJson);
+        Game.instance.levelSelected(mapJson);
     }
 
     @Override
