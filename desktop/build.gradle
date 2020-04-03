@@ -10,17 +10,18 @@ project.ext.mainClassName = "org.lordsofchaos.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 task rungame(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
     group = "Execution"
     description = "Runs the game"
+    main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
+    workingDir = project.assetsDir
 }
 
 task debug(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
     workingDir = project.assetsDir
+    standardInput = System.in
     ignoreExitValue = true
     debug = true
 }
