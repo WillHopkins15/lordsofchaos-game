@@ -592,7 +592,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         leaderBoardRowText.getData().setScale(2);
 
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        BitmapFont levelSelectRowText = new BitmapFont();
         leaderBoardRowText.getData().setScale(2);
         
         currentScreen = Screen.MAIN_MENU;
@@ -855,7 +854,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             endIndex--;
             FileInputStream inputStream = null;
 
-            inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+            inputStream = new FileInputStream("maps/MainMap.json");
 
             JSONTokener tokener = new JSONTokener(inputStream);
             JSONObject json = new JSONObject(tokener);

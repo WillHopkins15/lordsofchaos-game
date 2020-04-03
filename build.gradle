@@ -37,7 +37,7 @@ project(":desktop") {
     apply plugin: "idea"
 
     dependencies {
-        implementation project(":core")
+        compile project(":core")
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

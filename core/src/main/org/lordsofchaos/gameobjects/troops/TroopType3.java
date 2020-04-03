@@ -11,7 +11,7 @@ public class TroopType3 extends Troop
     private static float movementSpeed = 80;
     private static int maxHealth = 100;
     private static DamageType armourType = DamageType.Heavy;
-    private static int cost = 10;
+    private static int cost = 20;
     private static int damage = 10;
     
     public TroopType3(List<Path> path) {

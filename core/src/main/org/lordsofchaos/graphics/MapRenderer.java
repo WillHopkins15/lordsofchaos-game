@@ -35,19 +35,19 @@ public class MapRenderer extends IsometricTiledMapRenderer {
 
     public MapRenderer() {
         super(new TmxMapLoader().load("maps/BlankMap.tmx"));
-        File tileDirectory = new File("core/assets/maps/tiles");
+        File tileDirectory = new File("maps/tiles");
         File[] tileFiles = tileDirectory.listFiles();
         assert tileFiles != null;
         for (File file : tileFiles)
             if (!file.isHidden())
                 textures.put(file.getName(), new Texture(Gdx.files.internal("maps/tiles/" + file.getName())));
-        File towerDirectory = new File("core/assets/towers/sprites");
+        File towerDirectory = new File("towers/sprites");
         File[] towerFiles = towerDirectory.listFiles();
         assert towerFiles != null;
         for (File file : towerFiles)
             if (!file.isHidden())
                 textures.put(file.getName(), new Texture(Gdx.files.internal("towers/sprites/" + file.getName())));
-        File troopDirectory = new File("core/assets/troops/");
+        File troopDirectory = new File("troops/");
         File[] troopFiles = troopDirectory.listFiles();
         assert troopFiles != null;
         for (File file : troopFiles)
