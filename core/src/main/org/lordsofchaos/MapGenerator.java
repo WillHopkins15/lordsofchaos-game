@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MapGenerator {
-    
+
     private static ArrayList<Coordinates> path1 = new ArrayList<Coordinates>(
             Arrays.asList(new MatrixCoordinates(8, 0), new MatrixCoordinates(8, 1), new MatrixCoordinates(8, 2),
                     new MatrixCoordinates(8, 3), new MatrixCoordinates(8, 4), new MatrixCoordinates(8, 5),
@@ -22,7 +22,7 @@ public class MapGenerator {
                     new MatrixCoordinates(10, 18), new MatrixCoordinates(11, 18), new MatrixCoordinates(12, 18),
                     new MatrixCoordinates(13, 18), new MatrixCoordinates(14, 18), new MatrixCoordinates(15, 18),
                     new MatrixCoordinates(16, 18)));
-    
+
     private static ArrayList<Coordinates> path2 = new ArrayList<Coordinates>(Arrays.asList(new MatrixCoordinates(0, 5),
             new MatrixCoordinates(1, 5), new MatrixCoordinates(2, 5), new MatrixCoordinates(3, 5),
             new MatrixCoordinates(4, 5), new MatrixCoordinates(5, 5), new MatrixCoordinates(6, 5),
@@ -35,7 +35,7 @@ public class MapGenerator {
             new MatrixCoordinates(14, 14), new MatrixCoordinates(14, 15), new MatrixCoordinates(14, 16),
             new MatrixCoordinates(14, 17), new MatrixCoordinates(14, 18), new MatrixCoordinates(15, 18),
             new MatrixCoordinates(16, 18)));
-    
+
     private static ArrayList<Coordinates> path3 = new ArrayList<Coordinates>(Arrays.asList(new MatrixCoordinates(0, 15),
             new MatrixCoordinates(1, 15), new MatrixCoordinates(2, 15), new MatrixCoordinates(3, 15),
             new MatrixCoordinates(4, 15), new MatrixCoordinates(5, 15), new MatrixCoordinates(6, 15),
@@ -48,7 +48,7 @@ public class MapGenerator {
             new MatrixCoordinates(18, 10), new MatrixCoordinates(18, 11), new MatrixCoordinates(18, 12),
             new MatrixCoordinates(18, 13), new MatrixCoordinates(18, 14), new MatrixCoordinates(18, 15),
             new MatrixCoordinates(18, 16)));
-    
+
     private static ArrayList<Obstacle> baseObstacles = new ArrayList<Obstacle>(
             Arrays.asList(
                     new Obstacle(19, 17, ObstacleType.BASE), new Obstacle(19, 18, ObstacleType.BASE), new Obstacle(19, 19, ObstacleType.BASE),
@@ -56,7 +56,7 @@ public class MapGenerator {
                     new Obstacle(17, 17, ObstacleType.BASE), new Obstacle(17, 18, ObstacleType.BASE), new Obstacle(17, 19, ObstacleType.BASE)
             )
     );
-    
+
     private static ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>(
             Arrays.asList(
                     // River vvv
@@ -90,25 +90,25 @@ public class MapGenerator {
                     new Obstacle(2, 10, ObstacleType.TREE), new Obstacle(2, 11, ObstacleType.TREE), new Obstacle(2, 12, ObstacleType.ROCK),
                     new Obstacle(3, 8, ObstacleType.ROCK), new Obstacle(3, 9, ObstacleType.TREE), new Obstacle(4, 9, ObstacleType.TREE)
             ));
-    
+
     public static List<List<Path>> generatePaths() {
         // to generate one path, must provide a list of matrixPositions (Coordinates)
-        
+
         List<List<Coordinates>> coordinatesLists = new ArrayList<List<Coordinates>>();
         List<List<Path>> paths = new ArrayList<List<Path>>();
-        
+
         coordinatesLists.add(path1); // can add as many paths as needed here
         coordinatesLists.add(path2);
         coordinatesLists.add(path3);
-        
+
         // loop through each list of coordinates
         for (int listIndex = 0; listIndex < coordinatesLists.size(); listIndex++) {
             List<Coordinates> currentList = coordinatesLists.get(listIndex);
-            
+
             // instantiate a path list and add it to the return list of paths
             List<Path> path = new ArrayList<Path>();
             paths.add(path);
-            
+
             // within each list, loop through each pair of coordinates and create a new Path
             // object
             for (Coordinates coords : currentList)
@@ -118,6 +118,11 @@ public class MapGenerator {
         paths.get(1).get(0).setSpawn(true);
         paths.get(2).get(0).setSpawn(true);
         return paths;
+    }
+
+    private static void AddPathTile(Path pathTile)
+    {
+
     }
     
     public static MatrixObject[][] generateMap(int width, int height, List<List<Path>> paths, List<Obstacle> obstacles) {

@@ -109,7 +109,9 @@ public class Troop extends InteractiveObject
         // move along set path
         
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
-        
+
+        System.out.println(currentco.toString());
+
         MatrixObject foundPath = GameController.getMatrixObject(currentco.getY(), currentco.getX());
         
         int index = -1;

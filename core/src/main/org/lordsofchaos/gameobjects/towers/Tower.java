@@ -180,7 +180,7 @@ public class Tower extends InteractiveObject
             }
             
             for (int i = 0; i < count; i++) {
-                //System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
+                System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
             }
             
         }

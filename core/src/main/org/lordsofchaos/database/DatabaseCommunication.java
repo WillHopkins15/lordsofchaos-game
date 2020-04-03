@@ -1,5 +1,7 @@
 package org.lordsofchaos.database;
 
+import com.badlogic.gdx.utils.Json;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,46 @@ public class DatabaseCommunication
     }
 
     /**
+     * Add a map to the maps table
+     *
+     * @param map map to add
+     */
+    public static void addMap(Map map) throws SQLException, ClassNotFoundException {
+        String query;
+        // if id is -1, let the db auto generate an id
+        if (map.getID() == -1) {
+            String values = "('" +map.getJson() + "', '" + map.getUserGenerated() + "', '" + map.getMapName() + "')";
+            query = "INSERT INTO " + dbName + ".maps (json, user_generated, map_name) VALUES " + values;
+        } else {
+            String values = "('" +map.getID() + "', '" +map.getJson() + "', '" + map.getUserGenerated() + "', '" + map.getMapName() + "')";
+            query = "INSERT INTO " + dbName + ".maps (id, json, user_generated, map_name) VALUES " + values;
+        }
+        System.out.println(query);
+        connectToDB();
+        Statement myStmt = conn.createStatement();
+        myStmt.execute(query);
+    }
+
+    /**
+     * Return the map with primary key 'id' from the maps table
+     *
+     * @param id primary key to search for
+     */
+    public static Map getMap(int id) throws SQLException, ClassNotFoundException {
+        connectToDB();
+        String query = "select * from " + dbName + ".maps" + "WHERE id = " + id;
+        ResultSet rs = executeQuery(conn, query);
+        rs.next();
+
+        int foundID = rs.getInt(1);
+        String foundJson = rs.getString(2);
+        boolean foundUser_generated = rs.getBoolean(3);
+        String foundMapName = rs.getString(4);
+
+        return new Map(foundID, foundMapName, foundJson, foundUser_generated);
+    }
+
+    /**
      * Given a LeaderBoardRow, take the information out and add it to a new entity in the database
      *
      * @param row the row to add
@@ -63,10 +105,10 @@ public class DatabaseCommunication
     public static void addRow(LeaderboardRow row) throws SQLException, ClassNotFoundException {
         String query;
         if (row.getID() == -1) { // no id specified so auto-inc
-            String values = "('" + row.getName() + "', " + row.getWaves() + ", '" + row.getDateTime() + "')";
+            String values = "('" + row.getName() + "', '" + row.getWaves() + "', '" + row.getDateTime() + "')";
             query = "INSERT INTO " + dbName + ".leaderboard (name, waves, date) VALUES " + values;
         } else {
-            String values = "(" + row.getID() + ", '" + row.getName() + "', " + row.getWaves() + ", '" + row.getDateTime() + "')";
+            String values = "('" + row.getID() + "', '" + row.getName() + "', '" + row.getWaves() + "', '" + row.getDateTime() + "')";
             query = "INSERT INTO " + dbName + ".leaderboard (id, name, waves, date) VALUES " + values;
         }
         connectToDB();
@@ -75,10 +117,11 @@ public class DatabaseCommunication
     }
 
     /**
-     * @param id the primary key of an entity to delete from the database
+     * @param id the primary key of an entity to delete from the specified table
+     * @param table the table to drop from
      */
-    public static void deleteRow(int id) throws SQLException, ClassNotFoundException {
-        String query = "DELETE FROM " + dbName + ".leaderboard WHERE id = " + id;
+    public static void deleteRow(int id, String table) throws SQLException, ClassNotFoundException {
+        String query = "DELETE FROM " + dbName + "."+table+" WHERE id = " + id;
         connectToDB();
         Statement myStmt = conn.createStatement();
         myStmt.execute(query);
@@ -106,9 +149,16 @@ public class DatabaseCommunication
      * Debug function, prints rows to the console
      */
     private static void printOutTable() throws SQLException, ClassNotFoundException {
-        List<LeaderboardRow> rows = getHighScores(3);//getRows(0, true);
-        for (int i = 0; i < rows.size(); i++) {
-            System.out.println(rows.get(i).ToString());
-        }
+        Map map = new Map("test_map", new Json(),false );
+        addMap(map);
+        //List<LeaderboardRow> rows = getHighScores(3);//getRows(0, true);
+        //for (int i = 0; i < rows.size(); i++) {
+        //    System.out.println(rows.get(i).ToString());
+        //}
+        System.out.println(getMap(map.getID()));
+    }
+
+    public static void main(String args[]) throws SQLException, ClassNotFoundException {
+        printOutTable();
     }
 }
