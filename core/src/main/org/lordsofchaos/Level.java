@@ -15,7 +15,7 @@ public class Level {
     private final int width;
     private final int height;
     private MatrixObject[] objects;
-    private boolean isUpdated = true;
+    private List<MatrixCoordinates> updatedCoordinates = new ArrayList<>();
     private List<Integer> blockedPaths;
 
     protected List<List<Path>> paths;
@@ -83,8 +83,11 @@ public class Level {
 
     public MatrixObject[] blankMatrix(int width, int height) {
         MatrixObject[] matrix = new MatrixObject[width * height];
-        for (int x = 0; x < width; x++) for (int y = 0; y < height; y++)
-            matrix[index(x, y)] = new Tile(x, y, null);
+        for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) {
+            Tile t = new Tile(x, y, null);
+            matrix[index(x, y)] = t;
+            updatedCoordinates.add(t.getMatrixPosition());
+        }
         for (int i = width - 1; i >= width - 3; i--)
             for (int j = height - 1; j >= height - 3 ; j--)
                 matrix[index(i, j)] = new Obstacle(i, j, ObstacleType.BASE);
@@ -147,7 +150,7 @@ public class Level {
 
     public void addObject(MatrixObject object) {
         objects[index(object.getMatrixPosition())] = object;
-        isUpdated = true;
+        updatedCoordinates.add(object.getMatrixPosition());
     }
 
     public int getWidth() {
@@ -175,26 +178,28 @@ public class Level {
     }
 
     public void blockPath(int i) {
-        MatrixCoordinates mc = getPath(i).get(0).getMatrixPosition();
-        MatrixCoordinates mc1 = getPath(i).get(1).getMatrixPosition();
-        MatrixCoordinates mc2 = getPath(i).get(2).getMatrixPosition();
+        MatrixCoordinates mc = getPath(i).get(1).getMatrixPosition();
+        MatrixCoordinates mc1 = getPath(i).get(2).getMatrixPosition();
         addObject(new Obstacle(mc.getX(), mc.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
         addObject(new Obstacle(mc1.getX(), mc1.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
-        addObject(new Obstacle(mc2.getX(), mc2.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
         blockedPaths.add(i);
     }
 
     public void unblockPath(int i) {
         List<Path> path = getPath(i);
-        addObject(path.get(0));
         addObject(path.get(1));
         addObject(path.get(2));
         blockedPaths.remove((Integer) i);
+        System.out.println(path.get(1).getMatrixPosition().toString());
+        System.out.println(objects[index(path.get(1).getMatrixPosition())].toString());
     }
 
-    public boolean isUpdated() {
-        final boolean updated = isUpdated;
-        isUpdated = false;
-        return updated;
+    public List<MatrixCoordinates> getUpdatedCoordinates() {
+        return updatedCoordinates;
     }
+
+    public void resetUpdatedCoordinates() {
+        updatedCoordinates = new ArrayList<>();
+    }
+
 }

@@ -210,17 +210,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         // defender upgrade button
         buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262 + 86, 50, Screen.DEFENDER_SCREEN));
         
-        //attacker path buttons
-        //TO DO: Get starting locations for paths
+        // attacker path buttons
+        // TO DO: Get starting locations for paths
 
         updatePathHighlighting();
-        //buttonList.add(new PathButton("UI/pathHighlight.png", 343, 169, Screen.ATTACKER_SCREEN, 0));
-        //buttonList.add(new PathButton("UI/pathHighlight.png", 759, 121, Screen.ATTACKER_SCREEN, 1));
-        //buttonList.add(new PathButton("UI/pathHighlight.png", 1079, 281, Screen.ATTACKER_SCREEN, 2));
         
-        //menu buttons
+        // menu buttons
         menuButtonList = new ArrayList<Button>();
-        //slider buttons
+        // slider buttons
         menuButtonList.add(new SliderButton("UI/slider.png", 557, 410, Screen.MENU, 0));
         menuButtonList.add(new SliderButton("UI/slider.png", 557, 360, Screen.MENU, 1));
         
@@ -595,7 +592,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         leaderBoardRowText.getData().setScale(2);
 
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        levelSelectRowText = new BitmapFont();
+        BitmapFont levelSelectRowText = new BitmapFont();
         leaderBoardRowText.getData().setScale(2);
         
         currentScreen = Screen.MAIN_MENU;

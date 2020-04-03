@@ -74,11 +74,14 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     public void render() {
         super.render();
 
-        if (sortedObjects == null || level.isUpdated()) {
+        List<MatrixCoordinates> updatedCoordinates = level.getUpdatedCoordinates();
+        if (!updatedCoordinates.isEmpty()) {
             sortedObjects = level.getObjects().clone();
             Arrays.sort(sortedObjects);
+            for (MatrixCoordinates coordinate: updatedCoordinates)
+                refreshSprite(coordinate);
+            level.resetUpdatedCoordinates();
         }
-
 
         getBatch().begin();
         

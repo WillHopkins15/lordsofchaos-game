@@ -68,7 +68,7 @@ public class LevelEditor {
         if (this.mousePosition == null || !this.mousePosition.equals(mousePosition) || placed || force) {
             int x = mousePosition.getX(), y = mousePosition.getY();
             if (hoveredTile != null && !placed) {
-                addObject(hoveredTile);
+                level.addObject(hoveredTile);
                 hoveredTile = level.objectAt(x, y);
             } else {
                 hoveredTile = level.objectAt(x, y);
@@ -109,7 +109,7 @@ public class LevelEditor {
                 if (canPlaceAt(x, y)) {
                     Path path = new Path(x, y);
                     path.setSpawn(true);
-                    addObject(path);
+                    level.addObject(path);
                     exceptions.remove(level.index(x, y));
                 } else exceptions.put(level.index(x, y), CANT_PLACE);
             } else if (currentPhase == EditorPhase.PATHS) {
@@ -122,7 +122,7 @@ public class LevelEditor {
                         exceptions.put(level.index(coordinates), CAN_PLACE_ENDPOINT);
                     else exceptions.put(level.index(coordinates), PATH_ENDPOINT);
                 if (placable.contains(level.index(x, y))) {
-                    addObject(new Path(x, y));
+                    level.addObject(new Path(x, y));
                     exceptions.remove(level.index(x, y));
                 }
             } else if (currentPhase == EditorPhase.OBSTACLES) {
@@ -131,7 +131,7 @@ public class LevelEditor {
                         exceptions.put(level.index(path.getMatrixPosition()), CAN_PLACE);
                 if (canPlaceAt(x, y)) {
                     Obstacle obstacle = new Obstacle(x, y, currentObstacleType);
-                    addObject(obstacle);
+                    level.addObject(obstacle);
                     //exceptions.remove(renderer.index(x, y));
                 }
             }
@@ -143,11 +143,6 @@ public class LevelEditor {
         batch.end();
     }
 
-    public void addObject(MatrixObject object) {
-        level.addObject(object);
-        renderer.refreshSprite(object.getMatrixPosition());
-    }
-    
     public void darkenMap(HashMap<Integer, Color> exceptions) {
         for (int i = 0; i < level.getWidth() * level.getHeight(); i++)
             exceptions.put(i, CANT_PLACE);
@@ -275,7 +270,7 @@ public class LevelEditor {
             } else {
                 if (currentPath.size() == 1) {
                     Path p = level.removePath(--currentPathIndex);
-                    addObject(new Tile(p.getMatrixPosition().getX(), p.getMatrixPosition().getY(), null));
+                    level.addObject(new Tile(p.getMatrixPosition().getX(), p.getMatrixPosition().getY(), null));
                     currentPath = level.getPath(currentPathIndex);
                 }
                 lastPath = currentPath.get(currentPath.size() - 2);
@@ -285,7 +280,7 @@ public class LevelEditor {
         }
         Tile tile = new Tile(mousePosition.getX(), mousePosition.getY(), null);
         hoveredTile = tile;
-        addObject(tile);
+        level.addObject(tile);
         run(mousePosition, true);
     }
     
