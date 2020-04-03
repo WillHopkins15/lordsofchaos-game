@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import org.lordsofchaos.GameController;
+import org.lordsofchaos.Level;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.towers.DefenderTower;
@@ -18,21 +19,18 @@ import java.io.File;
 import java.util.*;
 
 public class MapRenderer extends IsometricTiledMapRenderer {
-    
-    public static final int width = 20;
-    public static final int height = 20;
+
     private static final int tileOffsetX = -256;
     private static final int tileOffsetY = -170;
     private static final int tileWidth = 512;
     private static final int tileHeight = 512;
 
-    private MatrixObject[] map = new MatrixObject[400];
-    private MatrixObject[] sortedMap = new MatrixObject[400];
+    private Level level;
+    private MatrixObject[] sortedObjects = new MatrixObject[400];
     private HashMap<String, Texture> textures = new HashMap<>();
     private HashMap<Integer, Sprite> cachedTiles = new HashMap<>();
     private HashMap<GameObject, Sprite> cachedSprites = new HashMap<>();
     private HashMap<Integer, Color> colourExceptions = new HashMap<>();
-    private boolean mapUpdated = true;
     private boolean levelEditing = false;
 
     public MapRenderer() {
@@ -57,58 +55,39 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                 textures.put(file.getName(), new Texture(Gdx.files.internal("troops/" + file.getName())));
     }
     
-    public void setMap(MatrixObject[][] map) {
-        for (int y = height - 1; y > -1; y--)
-            for (int x = 0; x < width; x++)
-                this.map[index(x, y)] = map[y][x];
+    public void setLevel(Level level) {
+        this.level = level;
         cachedTiles.clear();
-        mapUpdated = true;
+        sortedObjects = null;
     }
+
     
-    public MatrixObject objectAt(MatrixCoordinates mc) {
-        return objectAt(mc.getX(), mc.getY());
-    }
-    
-    public MatrixObject objectAt(int x, int y) {
-        return map[index(x, y)];
-    }
-    
-    public int index(int x, int y) {
-        return x + width * y;
-    }
-    
-    public void addObject(MatrixObject object) {
-        int x = object.getMatrixPosition().getX(), y = object.getMatrixPosition().getY();
-        refreshSprite(x, y);
-        map[index(x, y)] = object;
-        mapUpdated = true;
-    }
-    
-    public void refreshSprite(int x, int y) {
+    public void refreshSprite(MatrixCoordinates mc) {
+        int x = mc.getX(), y = mc.getY();
         for (int i = x - 1; i < x + 2; i++)
             for (int j = y - 1; j < y + 2; j++)
-                if (index(i, j) >= 0 && index(i, j) < map.length)
-                    cachedTiles.remove(index(i, j));
+                if (i >= 0 && i < level.getWidth() && j >= 0 && j < level.getHeight())
+                    cachedTiles.remove(level.index(i, j));
     }
     
     @Override
     public void render() {
         super.render();
 
-        if (mapUpdated) {
-            sortedMap = map.clone();
-            Arrays.sort(sortedMap);
-            mapUpdated = false;
+        if (sortedObjects == null || level.isUpdated()) {
+            sortedObjects = level.getObjects().clone();
+            Arrays.sort(sortedObjects);
         }
+
 
         getBatch().begin();
         
-        for (MatrixObject object : sortedMap) {
+        for (MatrixObject object : sortedObjects) {
             MatrixCoordinates matrixCoordinates = object.getMatrixPosition();
             Vector2 coordinates = Conversions.matrixCooridinateToIsometric(matrixCoordinates);
             getBatch().setColor(Color.WHITE);
-            int i = index(matrixCoordinates.getX(), matrixCoordinates.getY());
-            if (colourExceptions.containsKey(i)) getBatch().setColor(colourExceptions.get(i));
+            if (colourExceptions.containsKey(level.index(matrixCoordinates)))
+                getBatch().setColor(colourExceptions.get(level.index(matrixCoordinates)));
             getBatch().draw(sprite(object), coordinates.x + tileOffsetX, coordinates.y + tileOffsetY, tileWidth, tileHeight);
         }
         
@@ -142,23 +121,24 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     
     public boolean adjacentTileIs(int x, int y, String direction, String type) {
         MatrixObject tile = null;
+        int width = level.getWidth(), height = level.getHeight();
         if (x < 0 || y < 0 || x >= width || y >= height) return false;
         if ("N".equals(direction)) {
-            if (y < height - 1) tile = map[index(x, y + 1)];
+            if (y < height - 1) tile = level.objectAt(x, y + 1);
         } else if ("S".equals(direction)) {
-            if (y > 0) tile = map[index(x, y - 1)];
+            if (y > 0) tile = level.objectAt(x, y - 1);
         } else if ("E".equals(direction)) {
-            if (x < width - 1) tile = map[index(x + 1, y)];
+            if (x < width - 1) tile = level.objectAt(x + 1, y);
         } else if ("W".equals(direction)) {
-            if (x > 0) tile = map[index(x - 1, y)];
+            if (x > 0) tile = level.objectAt(x - 1, y);
         } else if ("NE".equals(direction)) {
-            if (y < height - 1 && x < width - 1) tile = map[index(x + 1, y + 1)];
+            if (y < height - 1 && x < width - 1) tile = level.objectAt(x + 1, y + 1);
         } else if ("NW".equals(direction)) {
-            if (y < height - 1 && x > 0) tile = map[index(x - 1, y + 1)];
+            if (y < height - 1 && x > 0) tile = level.objectAt(x - 1, y + 1);
         } else if ("SE".equals(direction)) {
-            if (y > 0 && x < width - 1) tile = map[index(x + 1, y - 1)];
+            if (y > 0 && x < width - 1) tile = level.objectAt(x + 1, y - 1);
         } else if ("SW".equals(direction)) {
-            if (y > 0 && x > 0) tile = map[index(x - 1, y - 1)];
+            if (y > 0 && x > 0) tile = level.objectAt(x - 1, y - 1);
         } else return false;
         if (tile == null) return false;
         switch (type) {
@@ -197,10 +177,10 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     }
     
     private Sprite sprite(MatrixObject object) {
-        int index = index(object.getMatrixPosition().getX(), object.getMatrixPosition().getY());
-        if (cachedTiles.containsKey(index)) return cachedTiles.get(index);
+        if (cachedTiles.containsKey(level.index(object.getMatrixPosition())))
+            return cachedTiles.get(level.index(object.getMatrixPosition()));
         Sprite sprite = new Sprite(textures.get(spriteName(object) + ".png"));
-        cachedTiles.put(index, sprite);
+        cachedTiles.put(level.index(object.getMatrixPosition()), sprite);
         return sprite;
     }
     
@@ -248,5 +228,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     public void setColourExceptions(HashMap<Integer, Color> colourExceptions) {
         this.colourExceptions = colourExceptions;
     }
-    
+
+    public Level getLevel() {
+        return level;
+    }
 }

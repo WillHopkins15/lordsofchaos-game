@@ -15,8 +15,8 @@ import org.lordsofchaos.matrixobjects.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Troop extends InteractiveObject
-{
+public class Troop extends InteractiveObject {
+
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;

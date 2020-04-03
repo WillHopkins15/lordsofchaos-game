@@ -12,7 +12,7 @@ public class SerializationTest
 {
     @Test
     public void testRealWorldCoordinatesAreSerializable() throws IOException, ClassNotFoundException {
-        RealWorldCoordinates rwc = new RealWorldCoordinates(12, 34);
+        RealWorldCoordinates rwc = new RealWorldCoordinates(34, 12);
         
         //Serialize Object
         ByteArrayOutputStream bout = new ByteArrayOutputStream();

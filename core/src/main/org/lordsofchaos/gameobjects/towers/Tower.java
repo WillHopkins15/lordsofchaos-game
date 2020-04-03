@@ -147,7 +147,7 @@ public class Tower extends InteractiveObject
                     if (GameController.inBounds(a, b)) {
                         
                         if (GameController.getMatrixObject(a, b) instanceof Path) {
-                            tempco = new MatrixCoordinates(a, b);
+                            tempco = new MatrixCoordinates(b, a);
                             
                             ydistance = defenderbase.getY() - tempco.getY();
                             xdistance = defenderbase.getX() - tempco.getX();
@@ -232,14 +232,14 @@ public class Tower extends InteractiveObject
             while (count < inRange.size()) {
                 //System.out.println("this is the current tile path" + inRange.get(count).getMatrixPosition());
                 if ((inRange.get(count).getTroops()).isEmpty()) {
-                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
+                    MatrixCoordinates hi = new MatrixCoordinates(5, 8);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
                         // System.out.println("fucking knew it was this bitch ass tile");
                     }
                     count++;
                     
                 } else {
-                    MatrixCoordinates hi = new MatrixCoordinates(8, 5);
+                    MatrixCoordinates hi = new MatrixCoordinates(5, 8);
                     if (inRange.get(count).getMatrixPosition().equals(hi)) {
                         // System.out.println("fucking knew it was this bitch ass tile pt 2");
                     }
