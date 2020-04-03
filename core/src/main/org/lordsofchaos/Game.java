@@ -73,8 +73,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
-    private Music soundTrack;
-    private Sound selectSound;
+    private static Music soundTrack;
+    private static Sound selectSound;
+    private static Sound projectileStartSound;
+    private static Sound projectileHitSound;
+    private static Sound unitDiesSound;
     private LevelEditor levelEditor;
     private TowerType ghostTowerType;
     // leaderboard
@@ -135,6 +138,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuOpen = bool;
     }
 
+    public static void playSound(String soundName){
+        Sound tmpSound;
+        float tmpVolume = 1;
+        if(soundName.equals("projectileHit"))
+            tmpSound = projectileHitSound;
+        else if(soundName.equals("projectileStart"))
+            tmpSound = projectileStartSound;
+        else if(soundName.equals("unitDies")) {
+            tmpSound = unitDiesSound;
+            tmpVolume = 0.7f;
+        }
+        else return;
+        tmpSound.play(soundEffectsVolume * tmpVolume);
+    }
+
     public static void setBuildMode(boolean bool){buildMode = bool; }
     public static void createButtons() {
         buttonList = new ArrayList<Button>();
@@ -182,7 +200,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuButtonList.add(new MenuButton("UI/returnToGameTmp.png", 510, 470, Screen.MENU));
         menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.CHOOSE_FACTION));
     }
-    
+    public static void createSound(){
+        //Setting up soundtrack
+        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
+        soundTrack.setVolume(1.0f);
+        soundTrack.play();
+        soundTrack.setLooping(true);
+        soundTrackVolume = 1.0f;
+        //Setting up sounds
+        soundEffectsVolume = 1.0f;
+        selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
+        projectileStartSound =  Gdx.audio.newSound(Gdx.files.internal("sound/projectileStart.wav"));
+        projectileHitSound = Gdx.audio.newSound(Gdx.files.internal("sound/projectileHit.ogg"));
+        unitDiesSound = Gdx.audio.newSound(Gdx.files.internal("sound/unitDies.wav"));
+
+    }
     // need to hide button once defender has bought all upgrades
     public static void defenderMaxLevel() {
         UpgradeButton.maxLevel = true;
@@ -403,7 +435,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     //mouseClicked = true;
                     RealWorldCoordinates rwc = snap(Gdx.input.getX(), Gdx.input.getY());
                     if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
-                        selectSound.play(0.75f);
+                        selectSound.play(soundEffectsVolume);
                         EventManager.towerPlaced(ghostTowerType, rwc);
                         buildMode = false;
                     }
@@ -472,8 +504,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void create() {
         instance = this;
         menuOpen = false;
-        soundEffectsVolume = 1.0f;
-        soundTrackVolume = 1.0f;
         selectedSlider = -1;
         sliderClicked = false;
         currentPath = 0;
@@ -482,12 +512,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameter = new FreeTypeFontParameter();
         font = fontGenerator.generateFont(fontParameter);
-        soundTrack = Gdx.audio.newMusic(Gdx.files.internal("sound/RGA-GT - Being Cool Doesn`t Make Me Fool.mp3"));
-        soundTrack.setVolume(1.0f);
-        //soundTrack.play();
-        soundTrack.setLooping(true);
-        
-        selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
         backgroundSprite = new Sprite(new Texture("maps/background.png"));
         generateFont();
         unitNumber = new BitmapFont();
@@ -501,6 +525,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         camera.position.set(width, 0, 10);
         camera.update();
         renderer.setView(camera);
+        createSound();
         createButtons();
         Texture healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
         healthBarSprite = new Sprite(healthBarTexture);
