@@ -9,9 +9,7 @@ import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 abstract public class Conversions {
     
     public static Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
-        System.out.println(rwc.toString());
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);
-        System.out.println(isometric.toString());
         return new Vector2(isometric.x / 2, (Gdx.graphics.getHeight() + isometric.y) / 2);
     }
     

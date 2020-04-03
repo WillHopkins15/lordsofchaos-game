@@ -8,5 +8,6 @@ public enum Screen
     ATTACKER_SCREEN,
     LEVEL_EDITOR,
     LEADERBOARD,
-    MENU
+    MENU,
+    LEVEL_SELECT
 }

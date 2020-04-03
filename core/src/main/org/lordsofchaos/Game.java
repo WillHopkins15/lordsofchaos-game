@@ -14,10 +14,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.database.LeaderboardRow;
+import org.lordsofchaos.database.Map;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.gameobjects.towers.Projectile;
 import org.lordsofchaos.gameobjects.towers.TowerType1;
@@ -31,13 +35,22 @@ import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
+import javax.script.ScriptEngine;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Game extends ApplicationAdapter implements InputProcessor {
-    
+
+    public static int levelSelectPage = 0;
+    public static int previousSelectPage = 0; // only need to reload page if the current page != previous
+    public static int levelsToShow = 5; // how many levels to display per page on the level select screen
+    private static Texture levelSelectRowTexture;
+    private static BitmapFont levelSelectRowText;
+
     public static int player;
     public static Screen currentScreen;
     public static Game instance;
@@ -144,15 +157,24 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new TowerButton("UI/NewArtMaybe/towerType3Button.png", 242, 50, Screen.DEFENDER_SCREEN, TowerType.type3));
         // main menu
         buttonList.add(new MainMenuButton("UI/NewArtMaybe/playLocalButton.png",
-                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 55, Screen.MAIN_MENU, Screen.CHOOSE_FACTION));
-        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
-                Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 + 160, Screen.MAIN_MENU, player == 1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
-        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 55, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
-        buttonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
-                Gdx.graphics.getHeight() / 2 - 160 - 105, Screen.MAIN_MENU, null));
+                Gdx.graphics.getHeight() / 2 + 105, Screen.MAIN_MENU, Screen.CHOOSE_FACTION));
+
+        buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
+                Gdx.graphics.getWidth() / 2 - 150,
+                Gdx.graphics.getHeight() / 2 + 210, Screen.MAIN_MENU, player == 1 ? Screen.ATTACKER_SCREEN : Screen.DEFENDER_SCREEN));
+
+        buttonList.add(new LevelSelectButton("UI/NewArtMaybe/selectALevelButton.png", Gdx.graphics.getWidth() / 2 - 150,
+                Gdx.graphics.getHeight() / 2 - 5, Screen.MAIN_MENU, Screen.LEVEL_SELECT));
+
+        buttonList.add(new LevelEditorButton("UI/NewArtMaybe/levelEditorButton.png", Gdx.graphics.getWidth() / 2 - 150,
+                Gdx.graphics.getHeight() / 2 - 110, Screen.MAIN_MENU, Screen.LEVEL_EDITOR));
+
+        buttonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png",Gdx.graphics.getWidth() / 2 - 150,
+                Gdx.graphics.getHeight() / 2 -320, Screen.MAIN_MENU, null));
         
-        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() / 2 - 160, Screen.MAIN_MENU, Screen.LEADERBOARD));
+        buttonList.add(new LeaderBoardButton("UI/NewArtMaybe/leaderboardButton.png", Gdx.graphics.getWidth() / 2 - 150,
+                Gdx.graphics.getHeight() / 2 -215, Screen.MAIN_MENU, Screen.LEADERBOARD));
         
         // troop buttons
         buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50, Screen.ATTACKER_SCREEN, 0));
@@ -538,6 +560,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
         leaderBoardRowText = new BitmapFont();
         leaderBoardRowText.getData().setScale(2);
+
+        levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
+        levelSelectRowText = new BitmapFont();
+        leaderBoardRowText.getData().setScale(2);
         
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
@@ -600,6 +626,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 i++;
             }
             batch.end();
+        } else if (currentScreen == Screen.LEVEL_SELECT) {
+            try {
+                selectLevelScreen();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         } else {
             if (loading)
             {
@@ -690,6 +726,92 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         
     }
+
+    public static void changeScreen(int change)
+    {
+        levelSelectPage+= change;
+        if (levelSelectPage < 0)
+            levelSelectPage = 0;
+        else {
+            try {
+                if (levelSelectPage > (DatabaseCommunication.numberOfMaps() / levelsToShow))
+                {
+                    levelSelectPage = (DatabaseCommunication.numberOfMaps() / levelsToShow);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void selectLevelScreen() throws FileNotFoundException, SQLException, ClassNotFoundException {
+        // if changed page, remove old load buttons
+        if (previousSelectPage != levelSelectPage)
+        {
+            // Remove any old load from the button list, so they can be re-added with new jsons
+            for(int i = 0; i < buttonList.size(); i++)
+            {
+                if (buttonList.get(i) instanceof LoadLevelButton)
+                {
+                    System.out.println("Removing load button");
+                    Button button = buttonList.get(i);
+                    buttonList.remove(i);
+                    button = null;
+                    i--;
+                }
+            }
+        }
+
+        List<Map> maps = new ArrayList<>();
+        int startIndex = levelSelectPage * levelsToShow;
+        int endIndex = (levelSelectPage + 1) * levelsToShow;
+
+        // if on first page, first map is default map, so return levelsToShow-1
+        if (levelSelectPage == 0) {
+            endIndex--;
+            FileInputStream inputStream = null;
+
+            inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+
+            JSONTokener tokener = new JSONTokener(inputStream);
+            JSONObject json = new JSONObject(tokener);
+            Map map = new Map("Level One", json.toString(), false);
+            maps.add(map);
+        }
+        else {
+            startIndex--;
+        }
+        maps.addAll(DatabaseCommunication.getMaps(startIndex, endIndex));
+        batch.begin();
+
+        List<Sprite> levelSelectSprites = new ArrayList<>();
+        int yOffset = 0;
+        for (int i = 0; i < maps.size(); i++, yOffset -= 100) {
+            Sprite sprite = new Sprite(levelSelectRowTexture);
+            sprite.setPosition(Gdx.graphics.getWidth() / 2 - 500, Gdx.graphics.getHeight() / 2 + 100 + yOffset);
+            levelSelectSprites.add(sprite);
+            String str = "Name: " + maps.get(i).getMapName();
+            sprite.draw(batch);
+            leaderBoardRowText.draw(batch, str, Gdx.graphics.getWidth() / 2 - 400, Gdx.graphics.getHeight() / 2 + 175 + yOffset);
+
+            if (previousSelectPage != levelSelectPage) {
+                System.out.println("Added button " + i);
+                buttonList.add(new LoadLevelButton("UI/NewArtMaybe/loadButton.png",
+                        Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2 + 100 + yOffset, Screen.LEVEL_SELECT, maps.get(i).getJson()));
+            }
+        }
+
+        // render the load level buttons
+        for (Button button : buttonList)
+        {
+            if (button.getScreenLocation() == currentScreen)
+                button.getSprite().draw(batch);
+        }
+        previousSelectPage = levelSelectPage;
+        batch.end();
+    }
     
     @Override
     public void dispose() {
@@ -734,6 +856,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEADERBOARD)
             currentScreen = Screen.MAIN_MENU;
+         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_SELECT) {
+             GameController.initialise(); // need to re-initialise to load in the new level that was selected (if one was selected)
+             currentScreen = Screen.MAIN_MENU;
+             renderer.setLevel(GameController.getLevel());
+         }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
             currentScreen = Screen.MAIN_MENU;
             renderer.setLevel(GameController.getLevel());
@@ -759,14 +886,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         currentbutton = button;
         int y = Gdx.graphics.getHeight() - screenY;
-        if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION)) {
+        if (button == Buttons.LEFT && (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION
+                || currentScreen == Screen.LEVEL_SELECT)) {
             for (Button value : buttonList)
                 if (value.checkClick(screenX, y) && value.getScreenLocation() == currentScreen) {
                     value.leftButtonAction();
                     return false;
                 }
         }
-        
+
         if (currentScreen == Screen.DEFENDER_SCREEN || currentScreen == Screen.ATTACKER_SCREEN) {
             if (player == 1 && !menuOpen) attackerTouchDown(screenX, y, pointer, button);
             else if (player == 0 && !menuOpen) defenderTouchDown(screenX, y, button);
