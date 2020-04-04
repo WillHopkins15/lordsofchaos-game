@@ -62,7 +62,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static BitmapFont coinCounter;
     private static GameClient client;
     private static SpriteBatch batch;
-    private static float timertmpDisplay;
+    private static float timershowAlert;
     private static boolean changedTurn = false;
     private static FreeTypeFontParameter fontParameterBoxy;
     private static FreeTypeFontGenerator fontGenerator;
@@ -103,7 +103,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private boolean sliderClicked;
     private int selectedSlider;
     private Sprite[] upgradeBarSprite;
-
+    // alert list
+    private  static List<Alert> alertList;
+    private static boolean doOnceDefender;
+    private static boolean doOnceAttacker;
     public static void main(String[] args) {
         setupClient();
     }
@@ -197,9 +200,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 Gdx.graphics.getHeight() / 2 -215, Screen.MAIN_MENU, Screen.LEADERBOARD));
         
         // troop buttons
-        buttonList.add(new UnitButton("UI/ufoButton.png", 50, 50, Screen.ATTACKER_SCREEN, 0));
-        buttonList.add(new UnitButton("UI/ufo3Button.png", 156, 50, Screen.ATTACKER_SCREEN, 1));
-        buttonList.add(new UnitButton("UI/ufo2Button.png", 262, 50, Screen.ATTACKER_SCREEN, 2));
+        buttonList.add(new UnitButton("UI/ufoButton.png", 30, 50, Screen.ATTACKER_SCREEN, 0));
+        buttonList.add(new UnitButton("UI/ufo3Button.png", 136, 50, Screen.ATTACKER_SCREEN, 1));
+        buttonList.add(new UnitButton("UI/ufo2Button.png", 242, 50, Screen.ATTACKER_SCREEN, 2));
         // select attacker/defender buttons
         buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.DEFENDER_SCREEN, 0));
         buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.ATTACKER_SCREEN, 1));
@@ -260,16 +263,33 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         UpgradeButton.maxLevel = true;
     }
 
-    public static void tmpDisplay(float targetTime, String currentPlayer) {
-        timertmpDisplay += Gdx.graphics.getDeltaTime();
-        if (timertmpDisplay < targetTime) {
-            font.draw(batch, currentPlayer, Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100);
+    /*public static void showAlert(float targetTime, String currentPlayer,int x, int y) {
+        timershowAlert += Gdx.graphics.getDeltaTime();
+        if (timershowAlert < targetTime) {
+            font.draw(batch, currentPlayer, x,y);
         } else {
             changedTurn = false;
-            timertmpDisplay = 0;
+            timershowAlert = 0;
+        }
+    }*/
+    public static void createAlert(float targetTime, BitmapFont font,String text,int x, int y, Screen alertScreen){
+        alertList.add(new Alert(targetTime,font,text,x,y,alertScreen));
+    }
+    public static void showAlert() {
+        if (!alertList.isEmpty()) {
+            /*for(int i = 0; i < alertList.size(); i++ ) {
+                System.out.println("Alert Name: " + alertList.get(0).getText() +"DeleteStatus: " + alertList.get(i).getDeleteStatus() + " AlertList Size: " + alertList.size());
+            }
+            */
+            alertList.get(0).update(Gdx.graphics.getDeltaTime(), batch,currentScreen);
+            if (alertList.get(0).getDeleteStatus()) {
+                //System.out.println("DeletedAlert!!!!");
+                //alertList.get(0).dispose();
+                alertList.remove(0);
+            }
+
         }
     }
-
     public void buildTrue() {
         buildMode = true;
     }
@@ -416,9 +436,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     
     public void defenderPOV() {
-        if(GameController.getDefenderUpgrade() == 3){
-            tmpDisplay(2,"          You reached Tier 3" + '\n' + "Survive one more turn and you win");
+        if(GameController.getDefenderUpgrade() == 3 && doOnceDefender){
+            //changedTurn = true;
+            doOnceDefender = false;
+            createAlert(10,font,"You reached Tier 3" + '\n' + "  Survive this turn!",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,Screen.DEFENDER_SCREEN);
+            //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
+
         }
+        showAlert();
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.DEFENDER_SCREEN) {
                 if (button instanceof UpgradeButton) {
@@ -446,6 +471,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     
     public void attackerPOV() {
+        if(GameController.getDefenderUpgrade() == 3 && doOnceAttacker && player == 1){
+            //changedTurn = true;
+            doOnceAttacker = false;
+            createAlert(10,font,"  You reached Tier 3" + '\n' + "Destroy the castle now!",Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() - 100,Screen.ATTACKER_SCREEN);
+            //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
+
+        }
+        showAlert();
         for (Button button : buttonList)
             if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton))
                 button.getSprite().draw(batch);
@@ -550,6 +583,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
         sliderClicked = false;
@@ -557,7 +591,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         player = 2;
         batch = new SpriteBatch();
         GameController.initialise();
-
+        doOnceDefender = true;
+        doOnceAttacker = true;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
         backgroundSprite = new Sprite(new Texture("maps/background.png"));
         renderer = new MapRenderer();
@@ -686,14 +721,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (changedTurn) {
                 switch (GameController.getWaveState()) {
                     case AttackerBuild:
-                        tmpDisplay(2, "Attacker's Turn");
+                        createAlert(2, font,"Attacker's Turn",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,null);
                         break;
                     case DefenderBuild:
-                        tmpDisplay(2, "Defender's Turn");
+                        createAlert(2, font,"Defender's Turn",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,null);
                         break;
                     case Play:
-                        tmpDisplay(2, "           Play     ");
+                        createAlert(2,font, "           Play     ",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,null);
+                        break;
                 }
+                changedTurn = false;
             }
             showUnitHealthBar();
             showTowerAttack();
@@ -731,6 +768,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     ((HoverButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
                 }
             }
+            if(!alertList.isEmpty())
+                showAlert();
             if (menuOpen) {
                 int x = Gdx.input.getX();
                 int y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -928,6 +967,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         } else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
              currentScreen = Screen.MAIN_MENU;
              GameController.initialise();
+             doOnceDefender = true;
+             doOnceAttacker = true;
              currentPath = 0;
              for(Button button : buttonList)
                  if (button instanceof PathButton){
