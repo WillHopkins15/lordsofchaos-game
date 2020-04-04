@@ -19,7 +19,7 @@ public class UnitButton extends HoverButton
         //this.unitPath = unitPath;
         this.troopType = troopType;
         unitPath = Game.getCurrentPath();
-        infoCardTexture = new Texture("UI/NewArtMaybe/panel.png");
+        infoCardTexture = new Texture("UI/InfoCards/infoPanelUnit"+ (troopType + 1) + ".png");
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30,150);
     }
