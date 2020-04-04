@@ -190,7 +190,7 @@ public class GameController {
         if (levelJson.equals("")) {
             FileInputStream inputStream = null;
             try {
-                inputStream = new FileInputStream("maps/MainMap.json");
+                inputStream = new FileInputStream("core/assets/maps/MainMap.json");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
