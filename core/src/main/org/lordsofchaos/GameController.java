@@ -187,10 +187,10 @@ public class GameController {
         wave = 1;
 
         // if no level selected, load the default level
-        if (levelJson == "") {
+        if (levelJson.equals("")) {
             FileInputStream inputStream = null;
             try {
-                inputStream = new FileInputStream("core/assets/maps/MainMap.json");
+                inputStream = new FileInputStream("maps/MainMap.json");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
