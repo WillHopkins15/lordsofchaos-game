@@ -329,8 +329,8 @@ public class GameController {
 
             // add money to both players if not on first wave
             if (wave > 0) {
-                defender.addMoney();
-                attacker.addMoney();
+               // System.out.println("here");
+
             }
 
             waveState = WaveState.AttackerBuild;
@@ -348,6 +348,10 @@ public class GameController {
             wave++;
             resetBuildTimer();
         } else {
+
+            defender.addMoney();
+            attacker.addMoney();
+
             removeAllProjectiles();
             
             waveState = WaveState.DefenderBuild;
@@ -370,6 +374,7 @@ public class GameController {
             resetUnitSpawnTimer();
         }
         Game.newTurn();
+        System.out.println("New state " + waveState);
     }
 
     /**
@@ -422,7 +427,7 @@ public class GameController {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
             if (buildTimer > buildTimeLimit) {
-                if (Game.multiplayer) {
+                if (Game.multiplayer && clientPlayerType.equals(defender)) {
                     Game.getClient().changePhase();
                 } else {
                     endPhase();
@@ -432,7 +437,7 @@ public class GameController {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                if (Game.multiplayer) {
+                if (Game.multiplayer && clientPlayerType.equals(attacker)) {
                     Game.getClient().changePhase();
                 } else {
                     endPhase();
@@ -446,11 +451,13 @@ public class GameController {
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
                 if (Game.multiplayer) {
-                    Game.getClient().changePhase();
+                    // only one player should end the phase, so just use the attacker
+                    if (clientPlayerType.equals(attacker)) {
+                        Game.getClient().changePhase();
+                    }
                 } else {
                     endPhase();
                 }
-                //addMoney();
                 
             } else {
                 shootTroops(deltaTime);
