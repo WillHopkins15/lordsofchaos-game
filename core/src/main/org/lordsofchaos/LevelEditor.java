@@ -49,7 +49,8 @@ public class LevelEditor {
                 new ObstacleButton("UI/LevelEditor/river.png", 20, 20, this, ObstacleType.RIVER),
                 new ObstacleButton("UI/LevelEditor/trees.png", 140, 20, this, ObstacleType.TREE),
                 new ObstacleButton("UI/LevelEditor/rocks.png", 260, 20, this, ObstacleType.ROCK),
-                continueButton
+                // Finish Button
+                new EditorButton("UI/NewArtMaybe/panel.png", Gdx.graphics.getWidth() - 320, 20, this)
         )));
         instructions.put(EditorPhase.SPAWNS, "Place 1 to 4 spawns along the bottom edges.");
         instructions.put(EditorPhase.PATHS, "Draw each path to one of the end points.");
@@ -157,23 +158,14 @@ public class LevelEditor {
         if (pathEndpoints.contains(matrixCoordinates)) return placeableCoordinates;
         for (int i = 0; i < 4; i++) {
             int xOffset = 0, yOffset = 0;
-            switch (i) {
-                case 0:
-                    xOffset = 0;
-                    yOffset = 1;
-                    break;
-                case 1:
-                    xOffset = 0;
-                    yOffset = -1;
-                    break;
-                case 2:
-                    xOffset = 1;
-                    yOffset = 0;
-                    break;
-                case 3:
-                    xOffset = -1;
-                    yOffset = 0;
-                    break;
+            if (i == 0) {
+                yOffset = 1;
+            } else if (i == 1) {
+                yOffset = -1;
+            } else if (i == 2) {
+                xOffset = 1;
+            } else {
+                xOffset = -1;
             }
             List<String> adjacentPaths = new ArrayList<>();
             String[] adjacentOrientations = {"N", "S", "E", "W", "NE", "NW", "SE", "SW"};

@@ -290,6 +290,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         }
     }
+
     public void buildTrue() {
         buildMode = true;
     }
