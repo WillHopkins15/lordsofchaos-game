@@ -894,7 +894,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             endIndex--;
             FileInputStream inputStream = null;
 
-            inputStream = new FileInputStream("maps/MainMap.json");
+            inputStream = new FileInputStream("core/assets/maps/MainMap.json");
 
             JSONTokener tokener = new JSONTokener(inputStream);
             JSONObject json = new JSONObject(tokener);

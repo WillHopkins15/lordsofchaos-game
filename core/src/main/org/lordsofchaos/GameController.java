@@ -326,16 +326,21 @@ public class GameController {
      */
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
+
+            // add money to both players if not on first wave
+            if (wave > 0) {
+               // System.out.println("here");
+
+            }
+
             waveState = WaveState.AttackerBuild;
-            
+
             // mark all placed towers as complete
             for (Tower tower : towersPlacedThisTurn) {
                 tower.setIsCompleted();
             }
             towersPlacedThisTurn.clear();
-            
-            System.out.println("Attacker build phase begins");
-            
+
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
             waveState = WaveState.Play;
@@ -343,11 +348,14 @@ public class GameController {
             wave++;
             resetBuildTimer();
         } else {
+
+            defender.addMoney();
+            attacker.addMoney();
+
             removeAllProjectiles();
             
             waveState = WaveState.DefenderBuild;
             
-            System.out.println("Defender build phase begins");
             // check here rather than in update, because defender only wins if they survive a round at max level
             if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
                 playerWins(defender);
@@ -366,6 +374,7 @@ public class GameController {
             resetUnitSpawnTimer();
         }
         Game.newTurn();
+        System.out.println("New state " + waveState);
     }
 
     /**
@@ -418,7 +427,7 @@ public class GameController {
             buildTimer += deltaTime;
             // if time elapsed, change state to attackerBuild
             if (buildTimer > buildTimeLimit) {
-                if (Game.multiplayer) {
+                if (Game.multiplayer && clientPlayerType.equals(defender)) {
                     Game.getClient().changePhase();
                 } else {
                     endPhase();
@@ -428,7 +437,7 @@ public class GameController {
             buildTimer += deltaTime;
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
-                if (Game.multiplayer) {
+                if (Game.multiplayer && clientPlayerType.equals(attacker)) {
                     Game.getClient().changePhase();
                 } else {
                     endPhase();
@@ -442,11 +451,13 @@ public class GameController {
             // if no troops on screen and none in the spawn queue
             else if (GameController.troops.isEmpty() && unitBuildPlanEmpty()) {
                 if (Game.multiplayer) {
-                    Game.getClient().changePhase();
+                    // only one player should end the phase, so just use the attacker
+                    if (clientPlayerType.equals(attacker)) {
+                        Game.getClient().changePhase();
+                    }
                 } else {
                     endPhase();
                 }
-                addMoney();
                 
             } else {
                 shootTroops(deltaTime);
@@ -460,20 +471,6 @@ public class GameController {
     private static void moveProjectiles(float deltaTime) {
         for (int i = 0; i < getProjectiles().size(); i++) {
             getProjectiles().get(i).update(deltaTime);
-        }
-    }
-    
-    private static void addMoney() {
-        attacker.addMoney();
-        defender.addMoney();
-    }
-    
-    private static void addMoney(float deltaTime) {
-        addMoneyTimer += deltaTime;
-        if (addMoneyTimer > addMoneyTimeLimit) {
-            attacker.addMoney();
-            defender.addMoney();
-            resetAddMoneyTimer();
         }
     }
 
