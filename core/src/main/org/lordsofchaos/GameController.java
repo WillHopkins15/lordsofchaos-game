@@ -326,8 +326,15 @@ public class GameController {
      */
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
+
+            // add money to both players if not on first wave
+            if (wave > 0) {
+                defender.addMoney();
+                attacker.addMoney();
+            }
+
             waveState = WaveState.AttackerBuild;
-            attacker.addMoney();
+
             // mark all placed towers as complete
             for (Tower tower : towersPlacedThisTurn) {
                 tower.setIsCompleted();
@@ -336,7 +343,6 @@ public class GameController {
 
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
-            defender.addMoney();
             waveState = WaveState.Play;
             System.out.println("Play begins");
             wave++;
