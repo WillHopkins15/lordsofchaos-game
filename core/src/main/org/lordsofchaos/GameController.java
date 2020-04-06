@@ -260,8 +260,14 @@ public class GameController {
     /**
      * Does the attacker have enough money to unblock a path
      */
-    public static boolean canAttackerUnblockPath() {
-        return attacker.getCurrentMoney() >= unblockPathCost;
+    public static boolean canAttackerUnblockPath()
+    {
+        boolean canAfford = attacker.getCurrentMoney() >= unblockPathCost;
+        if (!canAfford)
+        {
+            Game.playSound("ErrorSound");
+        }
+        return canAfford;
     }
 
     /**
@@ -516,6 +522,7 @@ public class GameController {
                 } else {
                     continue;
                 }
+                troopsMade++;
                 //calls upgrade troop function
                 upgradeTroops();
                 //creates new troop
@@ -530,7 +537,7 @@ public class GameController {
                 // add troop to on screen troops
                 GameController.troops.add(newTroop);
                 //updates number of troops made
-                troopsMade++;
+
                 // remove from build plan
                 EventManager.buildPlanChange(troop, path, -1, true);
                 
@@ -799,14 +806,20 @@ public class GameController {
      * Called by EventManager when a the attacker attempts to add a troop to the build plan
      */
     public static boolean canAffordTroop(int troopType) {
-        return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+        boolean canAfford = attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+        if (!canAfford)
+        {
+            Game.playSound("ErrorSound");
+        }
+        return canAfford;
     }
 
     /**
      * Called by EventManager when a tower is attempted to be placed
      */
     public static boolean canAffordTower(TowerType towerType) {
-        return defender.getCurrentMoney() >= getTowerTypeCost(towerType);
+        boolean canAfford = defender.getCurrentMoney() >= getTowerTypeCost(towerType);
+        return canAfford;
     }
     
     /**
@@ -843,7 +856,6 @@ public class GameController {
         }
         
         if (!canAffordTower(towerType)) {
-            System.out.println("Can't afford tower type " + towerType + "!");
             return false;
         }
         
@@ -865,7 +877,6 @@ public class GameController {
         if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
             upgradeNo = upgradeNo + 1;
             int type = upgradeNo % 3;
-            
             switch (type) {
                 //upgrades health
                 case 0:
@@ -908,6 +919,7 @@ public class GameController {
      */
     public static boolean canDefenderCanUpgrade() {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+            Game.playSound("ErrorSound");
             System.out.print("Max level");
             return false;
         }
@@ -917,6 +929,7 @@ public class GameController {
             defender.addMoney(-cost);
             return true;
         } else {
+            Game.playSound("ErrorSound");
             System.out.println("Can't afford upgrade");
             return false;
         }

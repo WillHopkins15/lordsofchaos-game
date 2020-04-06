@@ -184,6 +184,7 @@ public class EventManager
             if (GameController.canAffordTroop(unitType)) {
                 GameController.troopPurchased(unitType);
             } else {
+                Game.playSound("ErrorSound");
                 System.out.print("Can't afford troop type " + unitType + "!");
                 return;
             }
