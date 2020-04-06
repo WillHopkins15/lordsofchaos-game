@@ -1,5 +1,6 @@
 package org.lordsofchaos.graphics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -17,22 +18,22 @@ public class UnitUpgradeSprite {
         this.x = x;
         this.y = y;
         currentUpgrade = 1;
-        texture = new Texture(path + currentUpgrade + ".png");
+        texture = new Texture(Gdx.files.internal(path + currentUpgrade + ".png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x,y);
 
     }
     public void update(SpriteBatch batch){
         if(GameController.getUnitUpgradeLevel() != currentUpgrade) {
-            createSprite(path + currentUpgrade + ".png");
             currentUpgrade = GameController.getUnitUpgradeLevel();
+            createSprite(path);
         }
         //System.out.println(currentUpgrade);
         sprite.draw(batch);
     }
     private void createSprite(String path){
         texture.dispose();
-        texture = new Texture(path);
+        texture = new Texture(Gdx.files.internal(path + currentUpgrade + ".png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x,y);
     }

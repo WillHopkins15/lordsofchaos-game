@@ -100,6 +100,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
+    private static Sound errorSound;
     private Sprite[] upgradeBarSprite;
     // alert list
     private  static List<Alert> alertList;
@@ -166,6 +167,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         else if(soundName.equals("unitDies")) {
             tmpSound = unitDiesSound;
             tmpVolume = 0.7f;
+        }
+        else if(soundName.equals("ErrorSound")){
+            tmpSound = errorSound;
         }
         else return;
         tmpSound.play(soundEffectsVolume * tmpVolume);
@@ -242,7 +246,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         projectileStartSound =  Gdx.audio.newSound(Gdx.files.internal("sound/projectileStart.wav"));
         projectileHitSound = Gdx.audio.newSound(Gdx.files.internal("sound/projectileHit.ogg"));
         unitDiesSound = Gdx.audio.newSound(Gdx.files.internal("sound/unitDies.wav"));
-
+        errorSound = Gdx.audio.newSound(Gdx.files.internal("sound/ErrorSound.wav"));
     }
 
     public static void updatePathHighlighting() {
@@ -632,11 +636,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText = new BitmapFont();
-        leaderBoardRowText.getData().setScale(2);
-
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText.getData().setScale(2);
+
         
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
