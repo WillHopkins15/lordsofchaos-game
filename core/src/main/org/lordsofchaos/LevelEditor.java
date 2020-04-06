@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.database.DatabaseCommunication;
 import org.lordsofchaos.graphics.MapRenderer;
+import org.lordsofchaos.graphics.MyTextInputListener;
 import org.lordsofchaos.graphics.buttons.Button;
 import org.lordsofchaos.graphics.buttons.EditorButton;
 import org.lordsofchaos.graphics.buttons.ObstacleButton;
@@ -131,8 +132,7 @@ public class LevelEditor {
                     for (Path path : fullPath)
                         exceptions.put(level.index(path.getMatrixPosition()), CAN_PLACE);
                 if (canPlaceAt(x, y)) {
-                    Obstacle obstacle = new Obstacle(x, y, currentObstacleType);
-                    level.addObject(obstacle);
+                    level.addObject(new Obstacle(x, y, currentObstacleType));
                     //exceptions.remove(renderer.index(x, y));
                 }
             }
@@ -225,17 +225,21 @@ public class LevelEditor {
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
             // Complete - Write to file
-
             System.out.println(level.toJSON().length());
-
-            org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map("Created map" , level.toJSON(), true);
-            try {
-                DatabaseCommunication.addMap(map);
-            } catch (SQLException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            MyTextInputListener listener = new MyTextInputListener(this);
+            Gdx.input.getTextInput(listener, "Name your level", "", "Type name");
         }
     }
+
+    public void returnName(String name) {
+        org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map(name, level.toJSON(), true);
+        try {
+            DatabaseCommunication.addMap(map);
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     
     public boolean canRemoveAt(MatrixCoordinates mc) {
         MatrixObject object = level.objectAt(mc);

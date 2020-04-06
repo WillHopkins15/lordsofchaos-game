@@ -95,8 +95,7 @@ public class GameController {
      * @param listener the textbox object that is calling this function
      */
     public static void setInputName(String name, MyTextInputListener listener) {
-        if (LeaderboardRow.verifyName(name))
-        {
+        if (LeaderboardRow.verifyName(name)) {
             inputName = name;
             waveState = WaveState.SubmitInput;
         }
