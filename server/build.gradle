@@ -6,7 +6,6 @@ sourceSets.main.java.srcDirs = ["src/main"]
 sourceSets.test.java.srcDirs = ["src/test"]
 
 project.ext.mainClassName = "org.lordsofchaos.server.GameServer"
-project.ext.assetsDir = new File("../core/assets")
 
 test.workingDir = new File("../")
 
@@ -15,10 +14,9 @@ task server(dependsOn: classes, type: JavaExec) {
     description = "Runs the game"
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
-    workingDir = project.assetsDir
 }
 
-task serverJar(type: Jar) {
+task serverJar(dependsOn: classes, type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
@@ -28,5 +26,3 @@ task serverJar(type: Jar) {
     }
     with jar
 }
-
-serverJar.dependsOn classes
