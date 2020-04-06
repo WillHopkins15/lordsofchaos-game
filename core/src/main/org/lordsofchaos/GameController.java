@@ -868,15 +868,15 @@ public class GameController {
             int type = upgradeNo % 3;
             switch (type) {
                 //upgrades health
-                case 1:
+                case 0:
                     healthUpgrade = healthUpgrade + 5;
                     break;
                 //upgrades speed
-                case 2:
+                case 1:
                     speedUpgrade = speedUpgrade + 0.5f;
                     break;
                 //upgrades damage
-                case 3:
+                case 2:
                     damageUpgrade = damageUpgrade + 3;
                     break;
             }
@@ -885,15 +885,15 @@ public class GameController {
                 for (int i = 0; i < troops.size(); i++) {
                     switch (type) {
                         //upgrades health
-                        case 1:
+                        case 0:
                             troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
                             break;
                         //upgrades speed
-                        case 2:
+                        case 1:
                             troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
                             break;
                         //upgrades damage
-                        case 3:
+                        case 2:
                             troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
                             break;
                     }

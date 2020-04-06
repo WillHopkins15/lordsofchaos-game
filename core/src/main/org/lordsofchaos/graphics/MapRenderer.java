@@ -54,14 +54,25 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             if (!file.isHidden())
                 textures.put(file.getName(), new Texture(Gdx.files.internal("troops/" + file.getName())));
     }
-    
+
+    /**
+     *
+     * Sets the level that the renderer should render
+     *
+     * @param level The level to be rendered
+     */
     public void setLevel(Level level) {
         this.level = level;
         cachedTiles.clear();
         sortedObjects = null;
     }
 
-    
+    /**
+     *
+     * Updates the cached sprite and surrounding sprites for a given coordinate
+     *
+     * @param mc The coordinate to refresh
+     */
     public void refreshSprite(MatrixCoordinates mc) {
         int x = mc.getX(), y = mc.getY();
         for (int i = x - 1; i < x + 2; i++)
@@ -69,7 +80,12 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                 if (i >= 0 && i < level.getWidth() && j >= 0 && j < level.getHeight())
                     cachedTiles.remove(level.index(i, j));
     }
-    
+
+    /**
+     *
+     * The method called frequently to render the level
+     *
+     */
     @Override
     public void render() {
         super.render();
@@ -121,7 +137,17 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         getBatch().end();
 
     }
-    
+
+    /**
+     *
+     * Determines whether the adjacent tile to a certain coordinate in a certain direction is of a specified type.
+     *
+     * @param x The x coordinate of the tile to check adjacent to
+     * @param y The y coordinate of the tile to check adjacent to
+     * @param direction The direction of the adjacent tile to check
+     * @param type The type against which to test the adjacent tile
+     * @return A boolean dictating whether the adjacent tile is the specified type
+     */
     public boolean adjacentTileIs(int x, int y, String direction, String type) {
         MatrixObject tile = null;
         int width = level.getWidth(), height = level.getHeight();
@@ -171,14 +197,31 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                 return false;
         }
     }
-    
+
+
+    /**
+     *
+     * Retrieves a sprite for a given game object (Troop, Tower).
+     * Ideally from cache, otherwise a new sprite is generated
+     *
+     * @param object The GameObject for which to retrieve the sprite
+     * @return The sprite, either from cache or created
+     */
     public Sprite sprite(GameObject object) {
         if (cachedSprites.containsKey(object)) return cachedSprites.get(object);
         Sprite sprite = new Sprite(textures.get(object.getSpriteName() + ".png"));
         cachedSprites.put(object, sprite);
         return sprite;
     }
-    
+
+    /**
+     *
+     * Retrieves a sprite for a given game object (Tile).
+     * Ideally from cache, otherwise a new sprite is generated
+     *
+     * @param object The MatrixObject for which to retrieve the sprite
+     * @return The sprite, either from cache or created
+     */
     private Sprite sprite(MatrixObject object) {
         if (cachedTiles.containsKey(level.index(object.getMatrixPosition())))
             return cachedTiles.get(level.index(object.getMatrixPosition()));
@@ -186,7 +229,14 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         cachedTiles.put(level.index(object.getMatrixPosition()), sprite);
         return sprite;
     }
-    
+
+    /**
+     *
+     * Calculates the filename of a sprite base on the MatrixObject (Tile) and its surrounding tiles that determine its variation
+     *
+     * @param object The matrix object for which to retrieve the sprite name
+     * @return The sprite filename
+     */
     private String spriteName(MatrixObject object) {
         String s = "blank";
         int x = object.getMatrixPosition().getX(), y = object.getMatrixPosition().getY();
