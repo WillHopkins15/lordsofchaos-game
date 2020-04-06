@@ -516,6 +516,7 @@ public class GameController {
                 } else {
                     continue;
                 }
+                troopsMade++;
                 //calls upgrade troop function
                 upgradeTroops();
                 //creates new troop
@@ -530,7 +531,7 @@ public class GameController {
                 // add troop to on screen troops
                 GameController.troops.add(newTroop);
                 //updates number of troops made
-                troopsMade++;
+
                 // remove from build plan
                 EventManager.buildPlanChange(troop, path, -1, true);
                 
@@ -865,7 +866,6 @@ public class GameController {
         if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
             upgradeNo = upgradeNo + 1;
             int type = upgradeNo % 3;
-            
             switch (type) {
                 //upgrades health
                 case 1:
