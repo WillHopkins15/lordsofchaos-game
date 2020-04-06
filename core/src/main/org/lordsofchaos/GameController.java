@@ -809,7 +809,7 @@ public class GameController {
         boolean canAfford = attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
         if (!canAfford)
         {
-            Game.playSound("ErrorSound");
+            //Game.playSound("ErrorSound");
         }
         return canAfford;
     }

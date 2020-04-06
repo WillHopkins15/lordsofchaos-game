@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.EventManager;
 import org.lordsofchaos.Game;
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 import org.lordsofchaos.graphics.buttons.Button;
 
@@ -25,12 +26,12 @@ public class UnitButton extends HoverButton
     }
     
     public void leftButtonAction() {
-        //System.out.println(Game.getCurrentPath() + "!!!!!!!!!");
-        unitPath = Game.getCurrentPath();
-        //System.out.println(unitPath + ", " + troopType);
-        selectSound.play(0.75f);
-        EventManager.buildPlanChange(troopType, unitPath, 1, false);
-        
+        if(GameController.canAffordTroop(troopType)) {
+            unitPath = Game.getCurrentPath();
+            selectSound.play(0.75f);
+            EventManager.buildPlanChange(troopType, unitPath, 1, false);
+        }
+        else Game.playSound("ErrorSound");
     }
     
     public void rightButtonAction() {
