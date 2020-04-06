@@ -18,6 +18,12 @@ import java.util.*;
 
 public class LevelEditor {
 
+    public enum EditorPhase {
+        SPAWNS,
+        PATHS,
+        OBSTACLES
+    }
+
     private static final Color CANT_PLACE = new Color(0.4f, 0.4f, 0.4f, 1f);
     private static final Color CAN_PLACE = new Color(0.6f, 1f, 0.6f, 1f);
     private static final Color CAN_PLACE_ENDPOINT = new Color(0.6f, 1f, 1f, 1f);
@@ -39,7 +45,14 @@ public class LevelEditor {
     private EditorButton continueButton;
     private BitmapFont font;
     private SpriteBatch batch;
-    
+
+    /**
+     *
+     * Create and initialise new LevelEditor instance
+     *
+     * @param renderer The renderer to use for the level's rendering
+     * @param batch The batch to use to display the buttons and UI
+     */
     public LevelEditor(MapRenderer renderer, SpriteBatch batch) {
         this.renderer = renderer;
         this.batch = batch;
@@ -60,12 +73,14 @@ public class LevelEditor {
         font = new BitmapFont();
         font = Game.getFontArial(20);
     }
-    
-    public List<Button> getButtons() {
-        if (buttons.containsKey(currentPhase)) return buttons.get(currentPhase);
-        return new ArrayList<>();
-    }
 
+    /**
+     *
+     * The loop called repeatedly by the Game instance, used to adjust what is to be rendered based on the mouse position
+     *
+     * @param mousePosition The coordinate of the tile the user's mouse is over
+     * @param force Whether the rendering should be updated despite no change in mouse position. Used by other internal methods
+     */
     public void run(MatrixCoordinates mousePosition, boolean force) {
         if (this.mousePosition == null || !this.mousePosition.equals(mousePosition) || placed || force) {
             int x = mousePosition.getX(), y = mousePosition.getY();
@@ -144,11 +159,24 @@ public class LevelEditor {
         batch.end();
     }
 
+    /**
+     *
+     * Darkens the entire map to indicate where tiles cannot be placed
+     *
+     * @param exceptions The exceptions HashMap to write to
+     */
     public void darkenMap(HashMap<Integer, Color> exceptions) {
         for (int i = 0; i < level.getWidth() * level.getHeight(); i++)
             exceptions.put(i, CANT_PLACE);
     }
-    
+
+    /**
+     *
+     * Calculates the tiles around the last placed Path tile where the user can place the next one.
+     * Used during phase 2, the placing of the paths
+     *
+     * @return The list of indexes where the next Path can be placed
+     */
     public List<Integer> surroundingPlacable() {
         List<Integer> placeableCoordinates = new ArrayList<>();
         List<Path> currentPath = level.getPath(currentPathIndex);
@@ -186,7 +214,15 @@ public class LevelEditor {
         }
         return placeableCoordinates;
     }
-    
+
+    /**
+     *
+     * Determines whether the tile at a given coordinate is part of the placeable map
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @return The resulting boolean
+     */
     public boolean isPlaceable(int x, int y) {
         if (x < 0 || y < 0 || x >= level.getWidth() || y >= level.getHeight())
             return false;
@@ -194,7 +230,15 @@ public class LevelEditor {
             return ((Obstacle) level.objectAt(x, y)).getType() != ObstacleType.BASE;
         return true;
     }
-    
+
+    /**
+     *
+     * Determines whether an spawn, path or obstacle cna be placed at the given coordinate
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @return The resulting boolean
+     */
     public boolean canPlaceAt(int x, int y) {
         if (!isPlaceable(x, y)) return false;
         if (currentPhase == EditorPhase.SPAWNS) {
@@ -214,7 +258,12 @@ public class LevelEditor {
         }
         return true;
     }
-    
+
+    /**
+     *
+     * Continues the editor to the next stage
+     *
+     */
     public void nextStep() {
         if (currentPhase == EditorPhase.SPAWNS) {
             for (Path spawn: spawns)
@@ -231,6 +280,12 @@ public class LevelEditor {
         }
     }
 
+    /**
+     *
+     * The name of the level when received from the text input listener
+     *
+     * @param name The name of the level
+     */
     public void returnName(String name) {
         org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map(name, level.toJSON(), true);
         try {
@@ -240,7 +295,13 @@ public class LevelEditor {
         }
     }
 
-    
+    /**
+     *
+     * Determines whether the object at the given coordinate can be removed
+     *
+     * @param mc The coordinate
+     * @return The boolean stating whether it can be removed
+     */
     public boolean canRemoveAt(MatrixCoordinates mc) {
         MatrixObject object = level.objectAt(mc);
         if (currentPhase == EditorPhase.SPAWNS) {
@@ -253,7 +314,12 @@ public class LevelEditor {
         }
         return false;
     }
-    
+
+    /**
+     *
+     * Removes a spawn, path or obstacle at the current mouse porition
+     *
+     */
     public void remove() {
         if (!canRemoveAt(mousePosition)) return;
         if (currentPhase == EditorPhase.SPAWNS) {
@@ -279,9 +345,14 @@ public class LevelEditor {
         level.addObject(tile);
         run(mousePosition, true);
     }
-    
-    public void setPlaced(boolean placed) {
-        this.placed = placed && canPlaceAt(mousePosition.getX(), mousePosition.getY());
+
+    /**
+     *
+     *
+     *
+     */
+    public void setPlaced() {
+        this.placed = canPlaceAt(mousePosition.getX(), mousePosition.getY());
     }
     
     public MatrixCoordinates getMousePosition() {
@@ -291,10 +362,10 @@ public class LevelEditor {
     public void setCurrentObstacleType(ObstacleType currentObstacleType) {
         this.currentObstacleType = currentObstacleType;
     }
-    
-    public enum EditorPhase {
-        SPAWNS,
-        PATHS,
-        OBSTACLES
+
+    public List<Button> getButtons() {
+        if (buttons.containsKey(currentPhase)) return buttons.get(currentPhase);
+        return new ArrayList<>();
     }
+
 }
