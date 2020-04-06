@@ -148,6 +148,8 @@ public class GameController {
 
     public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
 
+    public static int getUnitUpgradeLevel(){return upgradeNo;}
+
     public static void setPlayerType(Boolean type) {
         if (type)
             clientPlayerType = defender;

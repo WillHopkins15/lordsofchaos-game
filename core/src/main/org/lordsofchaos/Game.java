@@ -107,6 +107,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private  static List<Alert> alertList;
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
+    private UnitUpgradeSprite unitUpgradeSprite;
     public static void main(String[] args) {
         setupClient();
     }
@@ -541,7 +542,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(soundEffectsVolume);
                         EventManager.towerPlaced(ghostTowerType, rwc);
-                        buildMode = false;
+                        if(!(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)))
+                            buildMode = false;
                     }
                     
                 } else {
@@ -592,6 +594,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        unitUpgradeSprite = new UnitUpgradeSprite("UI/NewArtMaybe/unitsTier", 1100,500);
         alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
@@ -761,6 +764,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                             matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
                     }
                 }
+                unitUpgradeSprite.update(batch);
             }
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
@@ -769,7 +773,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                     timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
                 }
-
+                unitUpgradeSprite.update(batch);
 
             }
             for (Button button : buttonList) {
@@ -818,6 +822,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 
             }
+            System.out.println(GameController.getUnitUpgradeLevel());
             batch.end();
             disposeTMP();
         }
