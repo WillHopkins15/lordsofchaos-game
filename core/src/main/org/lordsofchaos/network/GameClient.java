@@ -33,18 +33,23 @@ public class GameClient extends UDPSocket
      * Filters through the knownhosts file to find an online server. Fails if
      * no servers are online. When a connection is made to a server, the method
      * blocks until the server pairs this client with another. Intended to be used
-     * when the user chooses to look for a match.
+     * when the user chooses to look for a match. All System.out calls in this
+     * method are redirected to a local Stream. The logged messages can be retrieved
+     * as an ArrayList via the <code>getLogMessages</code> method.
      *
      * @return true if connection made successfully, false otherwise
      */
     @SneakyThrows
     public boolean makeConnection() {
+        // Do not reconnect if already connected
         if (connected) {
             return false;
         }
-        String failureMsg = "No Servers Online";
+        // Redirect stdout
         PrintStream defaultOut = System.out;
         System.setOut(new PrintStream(outputStream));
+    
+        String failureMsg = "No Servers Online";
         socket.setSoTimeout(5000);
         DatagramPacket packet;
         for (String item : HostManager.getHosts()) {
@@ -84,6 +89,7 @@ public class GameClient extends UDPSocket
             break;
         }
         if (!connected) System.out.printf("Failed to connect. Reason: %s\n", failureMsg);
+        // Set stdout back to default
         System.setOut(defaultOut);
         return connected;
     }
@@ -91,6 +97,7 @@ public class GameClient extends UDPSocket
     /**
      * Returns a list of messages from stdout that have been redirected to this instances
      * ByteArrayOutputStream.
+     *
      * @return Array list of messages
      */
     @SneakyThrows
