@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Json;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -35,7 +34,6 @@ import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
-import javax.script.ScriptEngine;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -602,7 +600,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
-        GameController.initialise();
         doOnceDefender = true;
         doOnceAttacker = true;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -1047,7 +1044,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         b.leftButtonAction();
                     return false;
                 }
-            if (button == Buttons.LEFT) levelEditor.setPlaced(true);
+            if (button == Buttons.LEFT) levelEditor.setPlaced();
             else if (button == Buttons.RIGHT) levelEditor.remove();
         }
         return false;
@@ -1062,7 +1059,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null && (currentbutton == Buttons.LEFT))
-            levelEditor.setPlaced(true);
+            levelEditor.setPlaced();
         return false;
     }
     
