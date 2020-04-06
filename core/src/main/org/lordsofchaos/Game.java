@@ -635,11 +635,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText = new BitmapFont();
-        leaderBoardRowText.getData().setScale(2);
-
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText.getData().setScale(2);
+
         
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
