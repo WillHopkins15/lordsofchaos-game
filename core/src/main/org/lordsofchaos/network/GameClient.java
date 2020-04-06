@@ -4,10 +4,9 @@ import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 import org.lordsofchaos.GameController;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
  * Client which periodically sends game data over UDP to a server running a game
@@ -21,6 +20,7 @@ public class GameClient extends UDPSocket
     private byte[] buffer = new byte[256];
     private String playerType = "";
     private boolean connected = false;
+    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     
     /**
      * Creates a UDP Datagram socket on an available port.
@@ -42,6 +42,9 @@ public class GameClient extends UDPSocket
         if (connected) {
             return false;
         }
+        String failureMsg = "No Servers Online";
+        PrintStream defaultOut = System.out;
+        System.setOut(new PrintStream(outputStream));
         socket.setSoTimeout(5000);
         DatagramPacket packet;
         for (String item : HostManager.getHosts()) {
@@ -69,19 +72,38 @@ public class GameClient extends UDPSocket
             try {
                 socket.receive(packet);
             } catch (SocketTimeoutException e) {
-                System.out.println("Failure to connect to opponent.");
-                return false;
+                failureMsg = "Failure to connect to opponent.";
+                break;
             }
             
             if (getObjectFromBytes(packet.getData()).equals("mismatched maps")) {
-                System.out.println("Client maps are mismatched.");
-                return false;
+                failureMsg = "Client maps are mismatched.";
+                break;
             }
             connected = true;
-            return true;
+            break;
         }
-        System.out.println("No Servers Online.");
-        return false;
+        if (!connected) System.out.printf("Failed to connect. Reason: %s\n", failureMsg);
+        System.setOut(defaultOut);
+        return connected;
+    }
+    
+    /**
+     * Returns a list of messages from stdout that have been redirected to this instances
+     * ByteArrayOutputStream.
+     * @return Array list of messages
+     */
+    @SneakyThrows
+    public ArrayList<String> getLogMessages() {
+        ArrayList<String> list = new ArrayList<>();
+        InputStream bin = new DataInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+        BufferedReader messages = new BufferedReader(new InputStreamReader(bin));
+        String line;
+        while ((line = messages.readLine()) != null) {
+            list.add(line);
+        }
+        outputStream.reset();
+        return list;
     }
     
     /**
