@@ -14,16 +14,7 @@ task rungame(dependsOn: classes, type: JavaExec) {
     description = "Runs the game"
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
-    workingDir = project.assetsDir
-}
-
-task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = project.assetsDir
-    standardInput = System.in
-    ignoreExitValue = true
-    debug = true
+    workingDir = new File("../")
 }
 
 task gameJar(type: Jar) {

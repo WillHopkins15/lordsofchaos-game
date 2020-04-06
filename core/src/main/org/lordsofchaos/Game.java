@@ -105,6 +105,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private  static List<Alert> alertList;
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
+    private UnitUpgradeSprite unitUpgradeSprite;
     public static void main(String[] args) {
         setupClient();
     }
@@ -275,15 +276,23 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     public static void showAlert() {
         if (!alertList.isEmpty()) {
+            int i = 0;
             /*for(int i = 0; i < alertList.size(); i++ ) {
                 System.out.println("Alert Name: " + alertList.get(0).getText() +"DeleteStatus: " + alertList.get(i).getDeleteStatus() + " AlertList Size: " + alertList.size());
             }
             */
-            alertList.get(0).update(Gdx.graphics.getDeltaTime(), batch,currentScreen);
-            if (alertList.get(0).getDeleteStatus()) {
+            while(i < alertList.size()) {
+                if (!(alertList.get(i).getCurrentScreen() == currentScreen || alertList.get(i).getCurrentScreen() == null))
+                    i++;
+                else break;
+            }
+            if(i == alertList.size())
+                return;
+            alertList.get(i).update(Gdx.graphics.getDeltaTime(), batch,currentScreen);
+            if (alertList.get(i).getDeleteStatus()) {
                 //System.out.println("DeletedAlert!!!!");
                 //alertList.get(0).dispose();
-                alertList.remove(0);
+                alertList.remove(i);
             }
 
         }
@@ -438,7 +447,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(GameController.getDefenderUpgrade() == 3 && doOnceDefender){
             //changedTurn = true;
             doOnceDefender = false;
-            createAlert(10,font,"You reached Tier 3" + '\n' + "  Survive this turn!",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,Screen.DEFENDER_SCREEN);
+            createAlert(2,font,"You reached Tier 3" + '\n' + " Survive this turn!",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,Screen.DEFENDER_SCREEN);
             //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
 
         }
@@ -473,7 +482,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(GameController.getDefenderUpgrade() == 3 && doOnceAttacker && player == 1){
             //changedTurn = true;
             doOnceAttacker = false;
-            createAlert(10,font,"  You reached Tier 3" + '\n' + "Destroy the castle now!",Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() - 100,Screen.ATTACKER_SCREEN);
+            createAlert(2,font,"Defender reached Tier 3" + '\n' + " Destroy the castle now!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 100,Screen.ATTACKER_SCREEN);
             //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
 
         }
@@ -531,7 +540,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(soundEffectsVolume);
                         EventManager.towerPlaced(ghostTowerType, rwc);
-                        buildMode = false;
+                        if(!(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)))
+                            buildMode = false;
                     }
                     
                 } else {
@@ -582,6 +592,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        unitUpgradeSprite = new UnitUpgradeSprite("UI/NewArtMaybe/unitsTier", 1100,500);
         alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
@@ -750,6 +761,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                             matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
                     }
                 }
+                unitUpgradeSprite.update(batch);
             }
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
@@ -758,7 +770,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                     timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
                 }
-
+                unitUpgradeSprite.update(batch);
 
             }
             for (Button button : buttonList) {
@@ -807,6 +819,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 
             }
+            System.out.println(GameController.getUnitUpgradeLevel());
             batch.end();
             disposeTMP();
         }
