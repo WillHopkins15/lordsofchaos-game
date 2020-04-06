@@ -48,7 +48,7 @@ public class GameClient extends UDPSocket
         // Redirect stdout
         PrintStream defaultOut = System.out;
         System.setOut(new PrintStream(outputStream));
-    
+        
         String failureMsg = "No Servers Online";
         socket.setSoTimeout(5000);
         DatagramPacket packet;
@@ -103,13 +103,13 @@ public class GameClient extends UDPSocket
     @SneakyThrows
     public ArrayList<String> getLogMessages() {
         ArrayList<String> list = new ArrayList<>();
-        InputStream bin = new DataInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
-        BufferedReader messages = new BufferedReader(new InputStreamReader(bin));
-        String line;
-        while ((line = messages.readLine()) != null) {
-            list.add(line);
+        try (InputStream bin = new DataInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
+             BufferedReader messages = new BufferedReader(new InputStreamReader(bin))) {
+            String line;
+            while ((line = messages.readLine()) != null)
+                list.add(line);
+            outputStream.reset();
         }
-        outputStream.reset();
         return list;
     }
     
