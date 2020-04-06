@@ -170,6 +170,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         else if(soundName.equals("ErrorSound")){
             tmpSound = errorSound;
+            tmpVolume = 0.7f;
         }
         else return;
         tmpSound.play(soundEffectsVolume * tmpVolume);
@@ -547,6 +548,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         if(!(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)))
                             buildMode = false;
                     }
+                    else playSound("ErrorSound");
                     
                 } else {
                     //System.out.println("NONTEST");
