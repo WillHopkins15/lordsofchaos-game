@@ -25,6 +25,10 @@ public class UpgradeButton extends HoverButton
     public void leftButtonAction() {
         if (maxLevel)
             return;
+        if (!GameController.canDefenderCanUpgrade()){
+            Game.playSound("ErrorSound");
+            return;
+        }
         selectSound.play(Game.getSoundEffectsVolume());
         Game.instance.setGhostTowerType(null); // this alerts Game that a tower isn't being placed, janky yes
         EventManager.defenderUpgrade();

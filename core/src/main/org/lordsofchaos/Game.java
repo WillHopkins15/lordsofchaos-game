@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Json;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
@@ -35,7 +34,6 @@ import org.lordsofchaos.matrixobjects.Tile;
 import org.lordsofchaos.network.GameClient;
 import org.lordsofchaos.player.Player;
 
-import javax.script.ScriptEngine;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -102,11 +100,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
+    private static Sound errorSound;
     private Sprite[] upgradeBarSprite;
     // alert list
     private  static List<Alert> alertList;
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
+    private UnitUpgradeSprite unitUpgradeSprite;
     public static void main(String[] args) {
         setupClient();
     }
@@ -166,6 +166,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             tmpSound = projectileStartSound;
         else if(soundName.equals("unitDies")) {
             tmpSound = unitDiesSound;
+            tmpVolume = 0.7f;
+        }
+        else if(soundName.equals("ErrorSound")){
+            tmpSound = errorSound;
             tmpVolume = 0.7f;
         }
         else return;
@@ -243,7 +247,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         projectileStartSound =  Gdx.audio.newSound(Gdx.files.internal("sound/projectileStart.wav"));
         projectileHitSound = Gdx.audio.newSound(Gdx.files.internal("sound/projectileHit.ogg"));
         unitDiesSound = Gdx.audio.newSound(Gdx.files.internal("sound/unitDies.wav"));
-
+        errorSound = Gdx.audio.newSound(Gdx.files.internal("sound/ErrorSound.wav"));
     }
 
     public static void updatePathHighlighting() {
@@ -277,15 +281,23 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     public static void showAlert() {
         if (!alertList.isEmpty()) {
+            int i = 0;
             /*for(int i = 0; i < alertList.size(); i++ ) {
                 System.out.println("Alert Name: " + alertList.get(0).getText() +"DeleteStatus: " + alertList.get(i).getDeleteStatus() + " AlertList Size: " + alertList.size());
             }
             */
-            alertList.get(0).update(Gdx.graphics.getDeltaTime(), batch,currentScreen);
-            if (alertList.get(0).getDeleteStatus()) {
+            while(i < alertList.size()) {
+                if (!(alertList.get(i).getCurrentScreen() == currentScreen || alertList.get(i).getCurrentScreen() == null))
+                    i++;
+                else break;
+            }
+            if(i == alertList.size())
+                return;
+            alertList.get(i).update(Gdx.graphics.getDeltaTime(), batch,currentScreen);
+            if (alertList.get(i).getDeleteStatus()) {
                 //System.out.println("DeletedAlert!!!!");
                 //alertList.get(0).dispose();
-                alertList.remove(0);
+                alertList.remove(i);
             }
 
         }
@@ -440,7 +452,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(GameController.getDefenderUpgrade() == 3 && doOnceDefender){
             //changedTurn = true;
             doOnceDefender = false;
-            createAlert(10,font,"You reached Tier 3" + '\n' + "  Survive this turn!",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,Screen.DEFENDER_SCREEN);
+            createAlert(2,font,"You reached Tier 3" + '\n' + " Survive this turn!",Gdx.graphics.getWidth() / 2 - 230, Gdx.graphics.getHeight() - 100,Screen.DEFENDER_SCREEN);
             //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
 
         }
@@ -475,7 +487,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(GameController.getDefenderUpgrade() == 3 && doOnceAttacker && player == 1){
             //changedTurn = true;
             doOnceAttacker = false;
-            createAlert(10,font,"  You reached Tier 3" + '\n' + "Destroy the castle now!",Gdx.graphics.getWidth() / 2 - 250, Gdx.graphics.getHeight() - 100,Screen.ATTACKER_SCREEN);
+            createAlert(2,font,"Defender reached Tier 3" + '\n' + " Destroy the castle now!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 100,Screen.ATTACKER_SCREEN);
             //showAlert(2,"Survive One More Turn!",Gdx.graphics.getWidth() / 2 - 300, Gdx.graphics.getHeight() - 200);
 
         }
@@ -533,8 +545,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     if (GameController.verifyTowerPlacement(ghostTowerType, rwc)) {
                         selectSound.play(soundEffectsVolume);
                         EventManager.towerPlaced(ghostTowerType, rwc);
-                        buildMode = false;
+                        if(!(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)))
+                            buildMode = false;
                     }
+                    else playSound("ErrorSound");
                     
                 } else {
                     //System.out.println("NONTEST");
@@ -584,6 +598,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        unitUpgradeSprite = new UnitUpgradeSprite("UI/NewArtMaybe/unitsTier", 1100,500);
         alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
@@ -591,7 +606,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         currentPath = 0;
         player = 2;
         batch = new SpriteBatch();
-        GameController.initialise();
         doOnceDefender = true;
         doOnceAttacker = true;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
@@ -624,11 +638,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText = new BitmapFont();
-        leaderBoardRowText.getData().setScale(2);
-
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText.getData().setScale(2);
+
         
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
@@ -753,6 +764,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                             matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
                     }
                 }
+                unitUpgradeSprite.update(batch);
             }
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
@@ -761,7 +773,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
                     timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
                 }
-
+                unitUpgradeSprite.update(batch);
 
             }
             for (Button button : buttonList) {
@@ -810,6 +822,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 
             }
+            System.out.println(GameController.getUnitUpgradeLevel());
             batch.end();
             disposeTMP();
         }
@@ -1037,7 +1050,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         b.leftButtonAction();
                     return false;
                 }
-            if (button == Buttons.LEFT) levelEditor.setPlaced(true);
+            if (button == Buttons.LEFT) levelEditor.setPlaced();
             else if (button == Buttons.RIGHT) levelEditor.remove();
         }
         return false;
@@ -1052,7 +1065,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (currentScreen == Screen.LEVEL_EDITOR && levelEditor != null && (currentbutton == Buttons.LEFT))
-            levelEditor.setPlaced(true);
+            levelEditor.setPlaced();
         return false;
     }
     

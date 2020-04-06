@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.Game;
+import org.lordsofchaos.GameController;
 import org.lordsofchaos.gameobjects.TowerType;
 import org.lordsofchaos.graphics.Screen;
 
@@ -22,9 +23,15 @@ public class TowerButton extends HoverButton
     }
     
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        Game.instance.buildTrue();
-        Game.instance.setGhostTowerType(towerType);
+        if(GameController.canAffordTower(towerType)) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.instance.buildTrue();
+            Game.instance.setGhostTowerType(towerType);
+        }
+        else {
+            Game.playSound("ErrorSound");
+            Game.instance.setGhostTowerType(null);
+        }
     }
     
     public void rightButtonAction() {
