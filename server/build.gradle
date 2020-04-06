@@ -1,18 +1,21 @@
 apply plugin: "java"
-apply plugin: "application"
 
 sourceCompatibility = 1.8
 
 sourceSets.main.java.srcDirs = ["src/main"]
 sourceSets.test.java.srcDirs = ["src/test"]
 
-mainClassName = "org.lordsofchaos.server.GameServer"
+project.ext.mainClassName = "org.lordsofchaos.server.GameServer"
+project.ext.assetsDir = new File("../core/assets")
+
+test.workingDir = new File("../")
 
 task server(dependsOn: classes, type: JavaExec) {
-    main = mainClassName
     group = "Execution"
-    description = "Runs the server"
+    description = "Runs the game"
+    main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
+    workingDir = project.assetsDir
 }
 
 task serverJar(type: Jar) {
