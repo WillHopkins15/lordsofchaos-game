@@ -6,6 +6,7 @@ import org.lordsofchaos.GameController;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.*;
 
 /**
@@ -68,7 +69,12 @@ public class GameClient extends UDPSocket
             try {
                 socket.receive(packet);
             } catch (SocketTimeoutException e) {
-                System.out.println("Opponent disconnected.");
+                System.out.println("Failure to connect to opponent.");
+                return false;
+            }
+            
+            if (getObjectFromBytes(packet.getData()).equals("mismatched maps")) {
+                System.out.println("Client maps are mismatched.");
                 return false;
             }
             connected = true;
@@ -91,9 +97,11 @@ public class GameClient extends UDPSocket
         ServerSocket serv = new ServerSocket(port);
         serv.setSoTimeout(0);
         Socket tcpsock = serv.accept();
-        DataInputStream in = new DataInputStream(new BufferedInputStream(tcpsock.getInputStream()));
-        
         server = new ConnectionPoint(tcpsock.getInetAddress(), tcpsock.getPort());
+        
+        DataInputStream in = new DataInputStream(new BufferedInputStream(tcpsock.getInputStream()));
+        DataOutputStream out = new DataOutputStream(tcpsock.getOutputStream());
+        out.writeUTF(GameController.levelJson);
         playerType = in.readUTF();
         
         in.close();

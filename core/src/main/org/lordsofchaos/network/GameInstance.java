@@ -3,6 +3,7 @@ package org.lordsofchaos.network;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -32,7 +33,9 @@ public class GameInstance extends UDPSocket
         attacker = player1;
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
-        connectAndSetTypes(attacker, defender);
+        if (connectAndSetTypes(attacker, defender)) return;
+        send("mismatched maps");
+        running = false;
     }
     
     /**
@@ -43,14 +46,15 @@ public class GameInstance extends UDPSocket
      * @param defender Inetaddress/port pair of client to make a defender
      */
     @SneakyThrows
-    private void connectAndSetTypes(ConnectionPoint attacker, ConnectionPoint defender) {
+    private boolean connectAndSetTypes(ConnectionPoint attacker, ConnectionPoint defender) {
         //Switch socket to TCP
         int localPort = socket.getLocalPort();
         InetAddress localAddress = InetAddress.getLocalHost();
         socket.close();
         
         Socket socket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
-        socket.setKeepAlive(false);
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+        String attackerMap = in.readUTF();
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Attacker");
         /*
@@ -63,7 +67,8 @@ public class GameInstance extends UDPSocket
         socket.close();
         
         socket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
-        socket.setKeepAlive(false);
+        in = new DataInputStream(socket.getInputStream());
+        String defenderMap = in.readUTF();
         out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("Defender");
         out.close();
@@ -71,6 +76,7 @@ public class GameInstance extends UDPSocket
         
         //Switch back to UDP
         this.socket = new DatagramSocket(localPort);
+        return attackerMap.equals(defenderMap);
     }
     
     @SneakyThrows
