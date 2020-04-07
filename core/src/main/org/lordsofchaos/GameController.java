@@ -86,6 +86,8 @@ public class GameController {
     
     private static String inputName;
 
+    private static int endsPhaseRequests = 0; // incremented when a player ends play phase, both players only move move when this is set to 1
+
     /**
      * When a player wins the game, they need to enter a name to add to the database,
      * this function is called by a MyTextInputListener object when they interact with the buttons
@@ -333,7 +335,7 @@ public class GameController {
      */
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
-
+            endsPhaseRequests = 0;
             // add money to both players if not on first wave
             if (wave > 0) {
                // System.out.println("here");
@@ -350,11 +352,18 @@ public class GameController {
 
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
+            endsPhaseRequests = 0;
             waveState = WaveState.Play;
             System.out.println("Play begins");
             wave++;
             resetBuildTimer();
         } else {
+
+            if (endsPhaseRequests == 0)
+            {
+                endsPhaseRequests++;
+                return;
+            }
 
             defender.addMoney();
             attacker.addMoney();
@@ -458,7 +467,10 @@ public class GameController {
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
                 if (Game.multiplayer && clientPlayerType.equals(attacker)) {
-                    Game.getClient().changePhase();
+
+                    if (endsPhaseRequests == 0) {
+                        Game.getClient().changePhase();
+                    }
                 } else {
                     endPhase();
                 }
