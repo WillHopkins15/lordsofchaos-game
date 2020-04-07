@@ -360,7 +360,8 @@ public class GameController {
             attacker.addMoney();
 
             removeAllProjectiles();
-            
+            cleanUpTroops();
+
             waveState = WaveState.DefenderBuild;
             
             // check here rather than in update, because defender only wins if they survive a round at max level
@@ -382,6 +383,18 @@ public class GameController {
         }
         Game.newTurn();
         System.out.println("New state " + waveState);
+    }
+
+    /**
+     * After the play phase ends, destroy any remaining troops (attacker always ends play phase,
+     * which means the defender may have some troops remaining on very low health)
+     */
+    private static void cleanUpTroops()
+    {
+        while (troops.size() > 0)
+        {
+            troopDies(troops.get(0));
+        }
     }
 
     /**
