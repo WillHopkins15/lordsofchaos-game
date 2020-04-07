@@ -155,20 +155,6 @@ public class GameClient extends UDPSocket
     }
     
     /**
-     * Sends an object to the server.
-     *
-     * @param contents Object to send
-     * @param numbered Whether the packet should be time stamped or not
-     */
-    public void send(Object contents, boolean numbered) {
-        if (numbered) {
-            send(contents);
-        } else {
-            sendObject(server, contents);
-        }
-    }
-    
-    /**
      * Sends an object to the server as a time stamped packet
      *
      * @param contents Object to send
@@ -252,19 +238,5 @@ public class GameClient extends UDPSocket
      */
     public boolean isConnected() {
         return connected;
-    }
-    
-    /**
-     * @return Current wave state
-     */
-    public String getCurrentWave() {
-        return GameController.getWaveState().toString();
-    }
-    
-    /**
-     * @return Whether it is this players turn.
-     */
-    public boolean isMyTurn() {
-        return getCurrentWave().equals(getPlayerType() + "Build");
     }
 }

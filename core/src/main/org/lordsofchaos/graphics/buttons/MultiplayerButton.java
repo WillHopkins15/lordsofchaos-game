@@ -30,11 +30,10 @@ public class MultiplayerButton extends MainMenuButton
                         targetScreen = Screen.ATTACKER_SCREEN;
                     }
                     Game.currentScreen = targetScreen;
-                    findingGame = false;
                 } else {
                     Game.multiplayer = false;
-                    findingGame = false;
                 }
+                findingGame = false;
             }).start();
         }
     }
