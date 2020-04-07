@@ -82,10 +82,10 @@ public class GameInstance extends UDPSocket
         }
         in = new DataInputStream(defSocket.getInputStream());
         String defenderMap = in.readUTF();
-        out = new DataOutputStream(attSocket.getOutputStream());
+        out = new DataOutputStream(defSocket.getOutputStream());
         out.writeUTF("Defender");
         out.close();
-        attSocket.close();
+        defSocket.close();
         
         //Switch back to UDP
         this.socket = new DatagramSocket(localPort);
