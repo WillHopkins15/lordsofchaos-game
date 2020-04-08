@@ -906,7 +906,13 @@ public class GameController {
     public static boolean canAttackerAffordUpgrade()
     {
         int currentCost = (1 + attackerUpgradeLevel) * attackerUpgradeBaseCost;
-        return attacker.getCurrentMoney() >= currentCost;
+        if (attacker.getCurrentMoney() >= currentCost) {
+            return true;
+        }
+        else {
+            Game.playSound("ErrorSound");
+            return false;
+        }
     }
 
     public static int getAttackerUpgradeLevel()
