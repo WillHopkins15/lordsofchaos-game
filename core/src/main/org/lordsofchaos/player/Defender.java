@@ -14,7 +14,7 @@ public class Defender extends Player
     protected static Sprite healthBarSprite;
     protected static Sprite healthSprite;
     protected static BitmapFont hpCounter;
-    protected int Health;
+    protected int health;
     protected RealWorldCoordinates coordinates;
     
     public Defender(String Name) {
@@ -56,11 +56,11 @@ public class Defender extends Player
     }
     
     public int getHealth() {
-        return Health;
+        return health;
     }
     
-    public void setHealth(int Health) {
-        this.Health = Health;
+    public void setHealth(int health) {
+        this.health = health;
     }
     
     public RealWorldCoordinates getCoordinates() {

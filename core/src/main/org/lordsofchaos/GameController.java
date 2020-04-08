@@ -86,6 +86,8 @@ public class GameController {
     
     private static String inputName;
 
+    private static int endsPhaseRequests = 0; // incremented when a player ends play phase, both players only move move when this is set to 1
+
     /**
      * When a player wins the game, they need to enter a name to add to the database,
      * this function is called by a MyTextInputListener object when they interact with the buttons
@@ -335,7 +337,7 @@ public class GameController {
      */
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
-
+            endsPhaseRequests = 0;
             // add money to both players if not on first wave
             if (wave > 0) {
                // System.out.println("here");
@@ -352,17 +354,25 @@ public class GameController {
 
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
+            endsPhaseRequests = 0;
             waveState = WaveState.Play;
             System.out.println("Play begins");
             wave++;
             resetBuildTimer();
         } else {
 
+            if (endsPhaseRequests == 0)
+            {
+                endsPhaseRequests++;
+                return;
+            }
+
             defender.addMoney();
             attacker.addMoney();
 
             removeAllProjectiles();
-            
+            cleanUpTroops();
+
             waveState = WaveState.DefenderBuild;
             
             // check here rather than in update, because defender only wins if they survive a round at max level
@@ -384,6 +394,18 @@ public class GameController {
         }
         Game.newTurn();
         System.out.println("New state " + waveState);
+    }
+
+    /**
+     * After the play phase ends, destroy any remaining troops (attacker always ends play phase,
+     * which means the defender may have some troops remaining on very low health)
+     */
+    private static void cleanUpTroops()
+    {
+        while (troops.size() > 0)
+        {
+            troopDies(troops.get(0));
+        }
     }
 
     /**
@@ -447,7 +469,10 @@ public class GameController {
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
                 if (Game.multiplayer && clientPlayerType.equals(attacker)) {
-                    Game.getClient().changePhase();
+
+                    if (endsPhaseRequests == 0) {
+                        Game.getClient().changePhase();
+                    }
                 } else {
                     endPhase();
                 }
