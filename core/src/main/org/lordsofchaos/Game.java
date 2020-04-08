@@ -94,7 +94,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private TowerType ghostTowerType;
     // leaderboard
     private int currentbutton;
-    private Sprite backgroundSprite;
+    private Sprite menuBackgroundSprite;
+    private Sprite gameBackgroundSprite;
+    private Sprite gameBackgroundBottomSprite;
     // leaderbaord
     private List<LeaderboardRow> leaderBoardTop;
     // sound related
@@ -603,7 +605,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         doOnceDefender = true;
         doOnceAttacker = true;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
-        backgroundSprite = new Sprite(new Texture("maps/background.png"));
+        menuBackgroundSprite = new Sprite(new Texture("maps/Background.png"));
+        gameBackgroundSprite = new Sprite(new Texture("maps/BackgroundMap.png"));
+        gameBackgroundBottomSprite = new Sprite(new Texture("maps/BackgroundMapBottom.png"));
         renderer = new MapRenderer();
         OrthographicCamera camera = new OrthographicCamera(width * 2, height * 2);
         camera.position.set(width, 0, 10);
@@ -660,7 +664,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (currentScreen == null) Gdx.app.exit();
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
-            backgroundSprite.draw(batch);
+            menuBackgroundSprite.draw(batch);
             for (Button button : buttonList)
                 if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
@@ -710,8 +714,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 e.printStackTrace();
             }
         } else {
-            if (loading)
-            {
+            if (loading) {
                 loading = false;
                 return;
             }
@@ -723,8 +726,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             float elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
             //System.out.println(currentPath );
+            batch.begin();
+            gameBackgroundSprite.setSize(1280, 720);
+            gameBackgroundSprite.draw(batch);
+            batch.end();
             isometricPov();
             batch.begin();
+            gameBackgroundBottomSprite.setSize(1280, 720);
+            gameBackgroundBottomSprite.draw(batch);
             if (player == 0) defenderPOV();
             else if (player == 1) attackerPOV();
             if (changedTurn) {
@@ -820,6 +829,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 
             }
             System.out.println(GameController.getUnitUpgradeLevel());
+
             batch.end();
             disposeTMP();
         }
