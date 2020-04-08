@@ -77,7 +77,7 @@ public class GameInstance extends UDPSocket
             try {
                 defSocket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
             } catch (BindException e) {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             }
         }
         in = new DataInputStream(defSocket.getInputStream());
