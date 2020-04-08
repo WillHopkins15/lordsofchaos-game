@@ -150,6 +150,8 @@ public class GameController {
 
     public static int getUnitUpgradeLevel(){return upgradeNo + 1;}
 
+    public static boolean canUpgradeTroops(){return  (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0));}
+
     public static void setPlayerType(Boolean type) {
         if (type)
             clientPlayerType = defender;

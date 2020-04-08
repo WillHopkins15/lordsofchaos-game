@@ -19,7 +19,7 @@ public class Defender extends Player
     
     public Defender(String Name) {
         super(Name);
-        setCurrentMoney(100);
+        setCurrentMoney(1000);
         setHealth(100);
         //System.out.println("TEST1");
         /*

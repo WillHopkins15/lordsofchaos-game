@@ -46,6 +46,7 @@ public class GameClient extends UDPSocket
             return false;
         }
         // Redirect stdout
+        outputStream.reset();
         PrintStream defaultOut = System.out;
         System.setOut(new PrintStream(outputStream));
         
