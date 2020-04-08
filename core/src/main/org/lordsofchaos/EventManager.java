@@ -19,6 +19,8 @@ public class EventManager
     private static List<SerializableTower> removedTowers;
     private static int defenderUpgradesThisTurn;
     private static List<Integer> pathsUnblockedThisTurn;
+    private static int attackerUpgradeLevel; // only used for defender
+
 
     /**
      * Check if the defender can upgrade, then apply the upgrade and increment the counter, so the
@@ -29,6 +31,18 @@ public class EventManager
             GameController.defenderUpgrade();
             // if upgrade is successful, need to record this so attacker can upgrade their defender too
             defenderUpgradesThisTurn++;
+        }
+    }
+
+    /**
+     * When the attacker clicks thw upgrade level button (and they have spawned
+     * enough troops to earn an upgrade), this function checks they can afford it, then applies it
+     */
+    public static void attackerUpgrade()
+    {
+        if (GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade())
+        {
+            GameController.upgradeTroops();
         }
     }
 
@@ -46,9 +60,11 @@ public class EventManager
 
         // if the client is defender, only update attacker information
         if (clientPlayerType.equals(GameController.defender)){// && GameController.getWaveState()) == GameController.WaveState.AttackerBuild) {
+            int previousUpgradeLevel = attackerUpgradeLevel;
+            attackerUpgradeLevel = bpd.getAttackerUpgradeLevel();
             unitBuildPlan = bpd.getUnitBuildPlan();
             pathsUnblockedThisTurn = bpd.getPathsUnblockedThisTurn();
-            GameController.defenderNetworkUpdates();
+            GameController.defenderNetworkUpdates(attackerUpgradeLevel - previousUpgradeLevel);
         }
         // vice versa
         else if (clientPlayerType.equals(GameController.attacker)){// && GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
