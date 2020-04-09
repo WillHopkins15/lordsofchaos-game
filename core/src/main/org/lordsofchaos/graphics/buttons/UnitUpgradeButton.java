@@ -53,6 +53,11 @@ public class UnitUpgradeButton extends HoverButton {
         super.texture = new Texture(Gdx.files.internal(path + currentUpgrade + ".png"));
         super.sprite = new Sprite(texture);
         super.sprite.setPosition(buttonX1,buttonY1);
+        spriteActive = super.sprite;
+        textureCooldown = new Texture(Gdx.files.internal(path + currentUpgrade + "Cooldown.png"));
+        spriteCooldown = new Sprite(textureCooldown);
+        spriteCooldown.setPosition(buttonX1,buttonY1);
+        super.sprite = spriteCooldown;
     }
     @Override
     public void leftButtonAction() {
