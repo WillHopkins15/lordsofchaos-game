@@ -559,7 +559,7 @@ public class GameController {
                 }
                 troopsMade++;
                 //calls upgrade troop function
-                upgradeTroops();
+                //upgradeTroops();
                 //creates new troop
                 
                 //checks if upgrades have happened

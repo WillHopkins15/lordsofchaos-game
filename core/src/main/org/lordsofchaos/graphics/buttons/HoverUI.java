@@ -20,7 +20,6 @@ public class HoverUI extends HoverButton {
 
     @Override
     public void update(int x, int y, SpriteBatch batch) {
-        System.out.println("x: " +x + " y: " + y);
         if(checkHover(x,y)){
             infoCardSprite.draw(batch);
         }

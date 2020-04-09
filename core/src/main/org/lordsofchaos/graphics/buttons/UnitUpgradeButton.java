@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import org.lordsofchaos.EventManager;
 import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
@@ -14,6 +15,9 @@ public class UnitUpgradeButton extends HoverButton {
     private BitmapFont font;
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
+    private Texture textureCooldown;
+    private Sprite spriteCooldown;
+    private Sprite spriteActive;
     private int currentUpgrade;
     public UnitUpgradeButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
         super(path + "1.png" , buttonX1, buttonY1, screenLocation);
@@ -23,9 +27,18 @@ public class UnitUpgradeButton extends HoverButton {
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30,150);
         font = Game.getBloxyFont();
+        spriteActive = super.sprite;
+        textureCooldown = new Texture(Gdx.files.internal(path + currentUpgrade + "Cooldown.png"));
+        spriteCooldown = new Sprite(textureCooldown);
+        spriteCooldown.setPosition(buttonX1,buttonY1);
+        super.sprite = spriteCooldown;
     }
     @Override
     public void update(int x, int y,SpriteBatch batch){
+        if(GameController.attackerEarnedUpgrade()) {
+            super.sprite = spriteActive;
+            System.out.println("Can buy upgrade");
+        }
         if(GameController.getUnitUpgradeLevel() != currentUpgrade) {
             currentUpgrade = GameController.getUnitUpgradeLevel();
             createSprite(path);
@@ -43,8 +56,8 @@ public class UnitUpgradeButton extends HoverButton {
     }
     @Override
     public void leftButtonAction() {
-        if(GameController.canUpgradeTroops()) {
-            GameController.upgradeTroops();
+        if(GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade()) {
+            EventManager.attackerUpgrade();
             selectSound.play(Game.getSoundEffectsVolume());
             Game.createAlert(2,font,"Troops have been upgraded!",500,600,null);
         }

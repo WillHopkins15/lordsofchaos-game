@@ -108,15 +108,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
     private static ArrayList<String> multiplayerLogs;
-    public static void main(String[] args) {
-        setupClient();
-    }
 
     private Texture clockTexture;
     private Sprite clockSprite;
 
     private Texture messageLogTexture;
     private Sprite messageLogSprite;
+
+    private Texture HPUpgradeBackgroundTexture;
+    private Sprite HPUpgradeBackgroundSprite;
+    public static void main(String[] args) {
+        setupClient();
+    }
+
+
 
     private static boolean searchingForGame;
     public static boolean setupClient() {
@@ -400,6 +405,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     public void showHealth() {
         healthPercentage();
+        HPUpgradeBackgroundSprite.draw(batch);
         healthBarSprite.draw(batch);
         healthSprite.draw(batch);
         String nr = GameController.defender.getHealth() + "";
@@ -474,10 +480,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(client != null)
         if(searchingForGame ) {
             if( !client.getLogMessages().isEmpty()) {
-                System.out.println(client.getLogMessages().size());
+                System.out.println("asfqwe");
                 messageLogSprite.draw(batch);
                 for (int i = 0; i < multiplayerLogs.size(); i++)
-                    arialFont20.draw(batch, multiplayerLogs.get(i), 600, 600 - i * 50);
+                    arialFont20.draw(batch, multiplayerLogs.get(i), 400, 550 - i * 50);
             }
         }
     }
@@ -704,6 +710,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         messageLogTexture = new Texture(Gdx.files.internal("UI/messageLogS.png"));
         messageLogSprite = new Sprite(messageLogTexture);
         messageLogSprite.setPosition(385,300);
+
+        HPUpgradeBackgroundTexture = new Texture(Gdx.files.internal("UI/HP+UpgradeBackground.png"));
+        HPUpgradeBackgroundSprite = new Sprite(HPUpgradeBackgroundTexture);
+        HPUpgradeBackgroundSprite.setPosition(0,Gdx.graphics.getHeight() - 200);
         Gdx.input.setInputProcessor(this);
     }
     
@@ -871,7 +881,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 
             }
-            System.out.println(GameController.getUnitUpgradeLevel());
+            //System.out.println(GameController.getUnitUpgradeLevel());
             batch.end();
             disposeTMP();
         }
