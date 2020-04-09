@@ -72,12 +72,11 @@ public class GameController {
     private static int width;
     private static int defenderUpgradeLevel = 0;
     private static int defenderMaxUpgradeLevel = 3;
-    private static int attackerUpgradeLevel = 0;
     @SuppressWarnings("unused")
     
     private static int troopUpgradeThreshold = 25;
     private static int troopsMade = 0;
-    private static int upgradeNo = 0;
+    private static int attackerUpgradeLevel = 0;
     private static int healthUpgrade = 0;
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
@@ -152,9 +151,7 @@ public class GameController {
 
     public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
 
-    public static int getUnitUpgradeLevel(){return upgradeNo + 1;}
-
-    public static boolean canUpgradeTroops(){return  (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0));}
+    public static int getUnitUpgradeLevel(){return attackerUpgradeLevel + 1;}
 
     public static void setPlayerType(Boolean type) {
         if (type)
@@ -174,11 +171,10 @@ public class GameController {
         attacker = new Attacker(ATTACKERNAME);
         defender = new Defender(DEFENDERNAME);
         defenderUpgradeLevel = 0;
-        attackerUpgradeLevel = 0;
         defenderMaxUpgradeLevel = 3;
         troopUpgradeThreshold = 25;
         troopsMade = 0;
-        upgradeNo = 0;
+        attackerUpgradeLevel = 0;
         healthUpgrade = 0;
         speedUpgrade = 0;
         damageUpgrade = 0;
@@ -564,7 +560,7 @@ public class GameController {
                 
                 //checks if upgrades have happened
                 //if so newTroop is upgraded
-                if (upgradeNo != 0) {
+                if (attackerUpgradeLevel != 0) {
                     newTroop.setCurrentHealth(newTroop.getCurrentHealth() + healthUpgrade);
                     newTroop.setMovementSpeed(newTroop.getMovementSpeed() + speedUpgrade);
                     newTroop.setDamage(newTroop.getDamage() + damageUpgrade);
@@ -927,8 +923,9 @@ public class GameController {
      */
     public static boolean attackerEarnedUpgrade()
     {
-        if (attackerUpgradeLevel <= 4) {
+        if (attackerUpgradeLevel <= 3) {
             int blocksMade = (int) Math.floor(troopsMade / 25);
+
             // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
             return attackerUpgradeLevel < blocksMade;
         }
@@ -939,9 +936,9 @@ public class GameController {
      * If enough troops have been spawned by the attacker, upgrade all troops
      */
     public static void upgradeTroops() {
-        attacker.addMoney((1 + attackerUpgradeLevel) * attackerUpgradeBaseCost);
-        upgradeNo = upgradeNo + 1;
-        int type = upgradeNo % 3;
+        attacker.addMoney((1 + attackerUpgradeLevel) * -attackerUpgradeBaseCost);
+        attackerUpgradeLevel++;
+        int type = attackerUpgradeLevel % 3;
         switch (type) {
             //upgrades health
             case 0:
