@@ -61,7 +61,7 @@ public class UnitUpgradeButton extends HoverButton {
     }
     @Override
     public void leftButtonAction() {
-        if(GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade()) {
+        if(GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade() && currentUpgrade != 4) {
             EventManager.attackerUpgrade();
             selectSound.play(Game.getSoundEffectsVolume());
             Game.createAlert(2,font,"Troops have been upgraded!",500,600,null);
