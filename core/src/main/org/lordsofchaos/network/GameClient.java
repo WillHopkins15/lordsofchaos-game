@@ -73,7 +73,7 @@ public class GameClient extends UDPSocket
             connectToServerAndGetPlayerType();
             
             System.out.println("Opponent Found.");
-            System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
+            System.out.printf("Assigned to %s.\n", playerType);
             
             // Get confirmation that the other client is ready
             // Need to allow server socket time to get back up

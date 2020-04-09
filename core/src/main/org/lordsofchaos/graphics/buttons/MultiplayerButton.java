@@ -34,8 +34,11 @@ public class MultiplayerButton extends MainMenuButton
                 } else {
                     Game.multiplayer = false;
                 }
-                findingGame = false;
                 //close the messageBox
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ignored) {}
+                findingGame = false;
                 Game.setSearchingForGame(false);
             }).start();
         }
