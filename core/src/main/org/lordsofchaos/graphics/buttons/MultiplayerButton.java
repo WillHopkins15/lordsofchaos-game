@@ -16,6 +16,7 @@ public class MultiplayerButton extends MainMenuButton
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
         Game.multiplayer = true;
+        Game.setSearchingForGame(true);
         if (!findingGame) {
             new Thread(() -> {
                 findingGame = true;
@@ -34,6 +35,8 @@ public class MultiplayerButton extends MainMenuButton
                     Game.multiplayer = false;
                 }
                 findingGame = false;
+                //close the messageBox
+                Game.setSearchingForGame(false);
             }).start();
         }
     }

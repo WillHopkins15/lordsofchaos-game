@@ -82,6 +82,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private float hpSpriteW;
     private BitmapFont unitNumber;
     private BitmapFont matchConclusionFont;
+    private BitmapFont arialFont20;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -106,6 +107,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private  static List<Alert> alertList;
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
+    private static ArrayList<String> multiplayerLogs;
     public static void main(String[] args) {
         setupClient();
     }
@@ -113,7 +115,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Texture clockTexture;
     private Sprite clockSprite;
 
+    private Texture messageLogTexture;
+    private Sprite messageLogSprite;
+
+    private static boolean searchingForGame;
     public static boolean setupClient() {
+        System.out.println("Setting up client");
         client = new GameClient();
         if (!client.makeConnection()) return false;
         client.start();
@@ -158,6 +165,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static BitmapFont getFontArial(int size){
         fontParameterBoxy.size = size;
         return fontGenerator.generateFont(fontParameterBoxy);
+    }
+    public static void setSearchingForGame(boolean x){
+        searchingForGame = x;
+    }
+    public static BitmapFont getBloxyFont(){
+        return font;
     }
     public static void playSound(String soundName){
         Sound tmpSound;
@@ -228,7 +241,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new HoverUI("UI/healthBar1Hitbox.png",3, Gdx.graphics.getHeight() - 112,null,"UI/InfoCards/infoPanelHealthbar.png",10, Gdx.graphics.getHeight() - 275));
         buttonList.add(new HoverUI("UI/upgradeBarHitbox.png",10, Gdx.graphics.getHeight() - 161,null,"UI/InfoCards/infoPanelUpgradebar.png",10, Gdx.graphics.getHeight() - 275));
         buttonList.add(new HoverUI("UI/coinHitbox.png",Gdx.graphics.getWidth() - 215, Gdx.graphics.getHeight() - 85,null,"UI/InfoCards/infoPanelCoins.png",Gdx.graphics.getWidth() - 225, Gdx.graphics.getHeight() - 175));
-        buttonList.add(new HoverUI("UI/timerHitbox.png",Gdx.graphics.getWidth() / 2 + 150, Gdx.graphics.getHeight() - 67,null,"UI/InfoCards/infoPanelTimer.png",Gdx.graphics.getWidth() / 2 + 110, Gdx.graphics.getHeight() - 150));
+        buttonList.add(new HoverUI("UI/timerHitbox.png",Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 77,null,"UI/InfoCards/infoPanelTimer.png",Gdx.graphics.getWidth() / 2 + 225, Gdx.graphics.getHeight() - 150));
         // menu buttons
         menuButtonList = new ArrayList<Button>();
         // slider buttons
@@ -371,7 +384,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         FreeTypeFontParameter fontParameterArial = new FreeTypeFontParameter();
         fontParameterArial.size = 20;
         leaderBoardRowText = fontGenerator.generateFont(fontParameterBoxy);
-
+        arialFont20 = fontGenerator.generateFont(fontParameterArial);
         //fontGenerator.dispose();
     }
     public void createFonts(){
@@ -383,6 +396,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinCounter.setColor(Color.WHITE);
         leaderBoardRowText = new BitmapFont();
         matchConclusionFont = new BitmapFont();
+        arialFont20 = new BitmapFont();
     }
     public void showHealth() {
         healthPercentage();
@@ -456,7 +470,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
         coinSprite.draw(batch);
     }
-    
+    public void showMultiplayerLogs(SpriteBatch batch){
+        if(client != null)
+        if(searchingForGame ) {
+            if( !client.getLogMessages().isEmpty()) {
+                System.out.println(client.getLogMessages().size());
+                messageLogSprite.draw(batch);
+                for (int i = 0; i < multiplayerLogs.size(); i++)
+                    arialFont20.draw(batch, multiplayerLogs.get(i), 600, 600 - i * 50);
+            }
+        }
+    }
     public void defenderPOV() {
         for (Button button : buttonList) {
             if (button instanceof HoverButton && button.getScreenLocation() == currentScreen || button.getScreenLocation() == null) {
@@ -619,6 +643,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        searchingForGame = false;
+        multiplayerLogs = new ArrayList<String>();
+        multiplayerLogs.add("Searching for Game!");
         alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
@@ -662,7 +689,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         clockTexture = new Texture(Gdx.files.internal("UI/clockS.png"));
         clockSprite = new Sprite(clockTexture);
-        clockSprite.setPosition(Gdx.graphics.getWidth() / 2 + 150, Gdx.graphics.getHeight() - 63);
+        clockSprite.setPosition(Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 73);
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
         upgradeBarSprite =  new Sprite[4];
@@ -674,6 +701,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             upgradeBarSprite[i].scale(1.5f);
             upgradeBarSprite[i].setPosition(100,570);
         }
+        messageLogTexture = new Texture(Gdx.files.internal("UI/messageLogS.png"));
+        messageLogSprite = new Sprite(messageLogTexture);
+        messageLogSprite.setPosition(385,300);
         Gdx.input.setInputProcessor(this);
     }
     
@@ -685,10 +715,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if (currentScreen == null) Gdx.app.exit();
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
+
             backgroundSprite.draw(batch);
             for (Button button : buttonList)
                 if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
+            showMultiplayerLogs(batch);
             batch.end();
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer, batch);
@@ -792,7 +824,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                     GameController.getWaveState() == GameController.WaveState.Play) {
                 if(GameController.getWaveState() != GameController.WaveState.Play) {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
-                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 325, Gdx.graphics.getHeight() - 35);
                     clockSprite.draw(batch);
                 }
 

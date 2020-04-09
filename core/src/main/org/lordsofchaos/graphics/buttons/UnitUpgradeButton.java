@@ -2,6 +2,7 @@ package org.lordsofchaos.graphics.buttons;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import org.lordsofchaos.Game;
@@ -10,8 +11,7 @@ import org.lordsofchaos.graphics.Screen;
 
 public class UnitUpgradeButton extends HoverButton {
     private String path;
-    private int x;
-    private int y;
+    private BitmapFont font;
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
     private int currentUpgrade;
@@ -21,8 +21,8 @@ public class UnitUpgradeButton extends HoverButton {
         currentUpgrade = 1;
         infoCardTexture = new Texture("UI/InfoCards/infoPanelTier1.png");
         infoCardSprite = new Sprite(infoCardTexture);
-        infoCardSprite.setPosition(x,y);
         infoCardSprite.setPosition(30,150);
+        font = Game.getBloxyFont();
     }
     @Override
     public void update(int x, int y,SpriteBatch batch){
@@ -46,6 +46,7 @@ public class UnitUpgradeButton extends HoverButton {
         if(GameController.canUpgradeTroops()) {
             GameController.upgradeTroops();
             selectSound.play(Game.getSoundEffectsVolume());
+            Game.createAlert(2,font,"Troops have been upgraded!",500,600,null);
         }
         else Game.playSound("ErrorSound");
     }

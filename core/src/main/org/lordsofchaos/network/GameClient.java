@@ -109,7 +109,7 @@ public class GameClient extends UDPSocket
             String line;
             while ((line = messages.readLine()) != null)
                 list.add(line);
-            outputStream.reset();
+            //outputStream.reset();
         }
         return list;
     }
