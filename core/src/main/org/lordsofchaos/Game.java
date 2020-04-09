@@ -82,7 +82,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private float hpSpriteW;
     private BitmapFont unitNumber;
     private BitmapFont matchConclusionFont;
-    private BitmapFont arialFont20;
+    private BitmapFont arialFont18;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -387,9 +387,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         fontGenerator.dispose();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/arial.ttf"));
         FreeTypeFontParameter fontParameterArial = new FreeTypeFontParameter();
-        fontParameterArial.size = 20;
+        fontParameterArial.size = 18;
         leaderBoardRowText = fontGenerator.generateFont(fontParameterBoxy);
-        arialFont20 = fontGenerator.generateFont(fontParameterArial);
+        arialFont18 = fontGenerator.generateFont(fontParameterArial);
         //fontGenerator.dispose();
     }
     public void createFonts(){
@@ -401,7 +401,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinCounter.setColor(Color.WHITE);
         leaderBoardRowText = new BitmapFont();
         matchConclusionFont = new BitmapFont();
-        arialFont20 = new BitmapFont();
+        arialFont18 = new BitmapFont();
     }
     public void showHealth() {
         healthPercentage();
@@ -483,8 +483,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 multiplayerLogs = client.getLogMessages();
                 messageLogSprite.draw(batch);
                 for (int i = 0; i < multiplayerLogs.size(); i++)
-                    arialFont20.draw(batch, multiplayerLogs.get(i), 400, 550 - i * 25);
+                    arialFont18.draw(batch, multiplayerLogs.get(i), 400, 575 - i * 25);
             }
+            multiplayerLogs.clear();
         }
     }
     public void defenderPOV() {
