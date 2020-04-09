@@ -244,6 +244,7 @@ public class GameController {
      * this client needs to reflect that
      */
     public static void defenderNetworkUpdates(int attackerUpgrades) {
+
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(EventManager.getPathsUnblockedThisTurn().get(i), true);
         }
@@ -251,6 +252,7 @@ public class GameController {
         while (attackerUpgrades > 0)
         {
             upgradeTroops();
+            attackerUpgrades--;
         }
     }
 
@@ -924,7 +926,7 @@ public class GameController {
     public static boolean attackerEarnedUpgrade()
     {
         if (attackerUpgradeLevel <= 3) {
-            int blocksMade = (int) Math.floor(troopsMade / 25);
+            int blocksMade = (int) Math.floor(troopsMade / 1);//25);
 
             // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
             return attackerUpgradeLevel < blocksMade;
