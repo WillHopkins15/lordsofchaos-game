@@ -37,6 +37,7 @@ public class GameController {
     protected final static String DEFENDERNAME = "blank";
     private static final int scaleFactor = 64;
     private static final int defenderUpgradeBaseCost = 50;
+    private static final int attackerUpgradeBaseCost = 50;
     private static final int unblockPathCost = 100;
     public static Attacker attacker;// = new Attacker(ATTACKERNAME);
     public static Defender defender;// = new Defender(DEFENDERNAME);
@@ -71,6 +72,7 @@ public class GameController {
     private static int width;
     private static int defenderUpgradeLevel = 0;
     private static int defenderMaxUpgradeLevel = 3;
+    private static int attackerUpgradeLevel = 0;
     @SuppressWarnings("unused")
     
     private static int troopUpgradeThreshold = 25;
@@ -172,6 +174,7 @@ public class GameController {
         attacker = new Attacker(ATTACKERNAME);
         defender = new Defender(DEFENDERNAME);
         defenderUpgradeLevel = 0;
+        attackerUpgradeLevel = 0;
         defenderMaxUpgradeLevel = 3;
         troopUpgradeThreshold = 25;
         troopsMade = 0;
@@ -222,7 +225,7 @@ public class GameController {
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
-                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth());
+                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth(), attackerUpgradeLevel);
         return bpd;
     }
 
@@ -244,9 +247,14 @@ public class GameController {
      * When the defender receives a new packet from the attacker, if the attacker unblocked any paths,
      * this client needs to reflect that
      */
-    public static void defenderNetworkUpdates() {
+    public static void defenderNetworkUpdates(int attackerUpgrades) {
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(EventManager.getPathsUnblockedThisTurn().get(i), true);
+        }
+
+        while (attackerUpgrades > 0)
+        {
+            upgradeTroops();
         }
     }
 
@@ -897,44 +905,73 @@ public class GameController {
         return true;
     }
 
+    public static boolean canAttackerAffordUpgrade()
+    {
+        int currentCost = (1 + attackerUpgradeLevel) * attackerUpgradeBaseCost;
+        if (attacker.getCurrentMoney() >= currentCost) {
+            return true;
+        }
+        else {
+            Game.playSound("ErrorSound");
+            return false;
+        }
+    }
+
+    public static int getAttackerUpgradeLevel()
+    {
+        return attackerUpgradeLevel;
+    }
+
+    /**
+     * Returns true if the attacker has spawned enough troops to warrant getting an upgrade
+     */
+    public static boolean attackerEarnedUpgrade()
+    {
+        if (attackerUpgradeLevel <= 4) {
+            int blocksMade = upgradeNo % 3;
+            // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
+            return attackerUpgradeLevel < blocksMade;
+        }
+        return false;
+    }
+
     /**
      * If enough troops have been spawned by the attacker, upgrade all troops
      */
     public static void upgradeTroops() {
-        if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
-            upgradeNo = upgradeNo + 1;
-            int type = upgradeNo % 3;
-            switch (type) {
-                //upgrades health
-                case 0:
-                    healthUpgrade = healthUpgrade + 5;
-                    break;
-                //upgrades speed
-                case 1:
-                    speedUpgrade = speedUpgrade + 0.5f;
-                    break;
-                //upgrades damage
-                case 2:
-                    damageUpgrade = damageUpgrade + 3;
-                    break;
-            }
-            
-            if (!troops.isEmpty()) {
-                for (int i = 0; i < troops.size(); i++) {
-                    switch (type) {
-                        //upgrades health
-                        case 0:
-                            troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
-                            break;
-                        //upgrades speed
-                        case 1:
-                            troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
-                            break;
-                        //upgrades damage
-                        case 2:
-                            troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
-                            break;
-                    }
+        attacker.addMoney((1 + attackerUpgradeLevel) * attackerUpgradeBaseCost);
+        upgradeNo = upgradeNo + 1;
+        int type = upgradeNo % 3;
+        switch (type) {
+            //upgrades health
+            case 0:
+                healthUpgrade = healthUpgrade + 5;
+                break;
+            //upgrades speed
+            case 1:
+                speedUpgrade = speedUpgrade + 0.5f;
+                break;
+            //upgrades damage
+            case 2:
+                damageUpgrade = damageUpgrade + 3;
+                break;
+        }
+
+        if (!troops.isEmpty()) {
+            for (int i = 0; i < troops.size(); i++) {
+                switch (type) {
+                    //upgrades health
+                    case 0:
+                        troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
+                        break;
+                    //upgrades speed
+                    case 1:
+                        troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
+                        break;
+                    //upgrades damage
+                    case 2:
+                        troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
+                        break;
                 }
             }
         }

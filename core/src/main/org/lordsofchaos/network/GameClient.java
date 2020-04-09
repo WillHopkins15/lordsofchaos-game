@@ -75,11 +75,14 @@ public class GameClient extends UDPSocket
             System.out.printf("[%d] Assigned to %s.\n", socket.getLocalPort(), playerType);
             
             // Get confirmation that the other client is ready
-            try {
-                socket.receive(packet);
-            } catch (SocketTimeoutException e) {
-                failureMsg = "Failure to connect to opponent.";
-                break;
+            // Need to allow server socket time to get back up
+            while (true) {
+                try {
+                    socket.receive(packet);
+                    break;
+                } catch (SocketException ignored) {
+                    Thread.sleep(500);
+                }
             }
             
             if (getObjectFromBytes(packet.getData()).equals("mismatched maps")) {
