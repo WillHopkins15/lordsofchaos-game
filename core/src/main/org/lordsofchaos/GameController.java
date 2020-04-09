@@ -827,10 +827,10 @@ public class GameController {
         if (troopType == 0) {
             return 10;
         } else if (troopType == 1) {
-            return 10;
+            return 15;
         }
         if (troopType == 2) {
-            return 10;
+            return 20;
         } else return 0;
         // add elses for other troops here
     }
