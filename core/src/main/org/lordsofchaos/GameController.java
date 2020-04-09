@@ -928,7 +928,7 @@ public class GameController {
     public static boolean attackerEarnedUpgrade()
     {
         if (attackerUpgradeLevel <= 4) {
-            int blocksMade = upgradeNo % 3;
+            int blocksMade = (int) Math.floor(troopsMade / 25);
             // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
             return attackerUpgradeLevel < blocksMade;
         }
