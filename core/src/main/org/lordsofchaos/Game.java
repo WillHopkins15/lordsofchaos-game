@@ -480,10 +480,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         if(client != null)
         if(searchingForGame ) {
             if( !client.getLogMessages().isEmpty()) {
-                System.out.println("asfqwe");
+                multiplayerLogs = client.getLogMessages();
                 messageLogSprite.draw(batch);
                 for (int i = 0; i < multiplayerLogs.size(); i++)
-                    arialFont20.draw(batch, multiplayerLogs.get(i), 400, 550 - i * 50);
+                    arialFont20.draw(batch, multiplayerLogs.get(i), 400, 550 - i * 25);
             }
         }
     }

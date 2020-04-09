@@ -53,6 +53,7 @@ public class GameClient extends UDPSocket
         String failureMsg = "No Servers Online";
         socket.setSoTimeout(5000);
         DatagramPacket packet;
+        System.out.println("Searching for server...");
         for (String item : HostManager.getHosts()) {
             InetAddress address;
             try {
