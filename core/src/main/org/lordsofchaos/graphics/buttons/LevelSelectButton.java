@@ -10,8 +10,10 @@ public class LevelSelectButton extends MainMenuButton {
 
     @Override
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        Game.currentScreen = targetScreen;
-        Game.previousSelectPage = -1; // reset this so that the first page an be loaded
+        if(!Game.getSearchingForGame()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.currentScreen = targetScreen;
+            Game.previousSelectPage = -1; // reset this so that the first page an be loaded
+        }
     }
 }

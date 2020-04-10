@@ -14,6 +14,7 @@ public class MultiplayerButton extends MainMenuButton
     
     @Override
     public void leftButtonAction() {
+        if(!Game.getSearchingForGame()) {
         selectSound.play(Game.getSoundEffectsVolume());
         Game.multiplayer = true;
         Game.setSearchingForGame(true);
@@ -37,10 +38,12 @@ public class MultiplayerButton extends MainMenuButton
                 //close the messageBox
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
                 findingGame = false;
                 Game.setSearchingForGame(false);
             }).start();
+        }
         }
     }
     

@@ -149,6 +149,10 @@ public class GameController {
         return level.getPaths();
     }
 
+    public static int getAttackerUpgradeCooldown(){
+        return troopUpgradeThreshold - troopsMade;
+    }
+
     public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
 
     public static int getUnitUpgradeLevel(){return attackerUpgradeLevel + 1;}
@@ -926,7 +930,7 @@ public class GameController {
     public static boolean attackerEarnedUpgrade()
     {
         if (attackerUpgradeLevel <= 3) {
-            int blocksMade = (int) Math.floor(troopsMade / 1);//25);
+            int blocksMade = (int) Math.floor(troopsMade / troopUpgradeThreshold);//25);
 
             // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
             return attackerUpgradeLevel < blocksMade;

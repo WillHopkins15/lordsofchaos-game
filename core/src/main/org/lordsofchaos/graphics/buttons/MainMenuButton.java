@@ -13,8 +13,11 @@ public class MainMenuButton extends Button
     }
     
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        Game.currentScreen = targetScreen;
+        if(!Game.getSearchingForGame()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.currentScreen = targetScreen;
+        }
+
     }
     
     public void rightButtonAction() {

@@ -174,8 +174,20 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static void setSearchingForGame(boolean x){
         searchingForGame = x;
     }
+    public static boolean getSearchingForGame(){return searchingForGame;}
     public static BitmapFont getBloxyFont(){
         return font;
+    }
+    public static void switchPlayer(){
+        if(player == 0){
+            GameController.setPlayerType(false);
+            player = 1;
+            currentScreen = Screen.ATTACKER_SCREEN;
+            return;
+        }
+        GameController.setPlayerType(true);
+        player = 0;
+        currentScreen = Screen.DEFENDER_SCREEN;
     }
     public static void playSound(String soundName){
         Sound tmpSound;
@@ -545,8 +557,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         showAlert();
         for (Button button : buttonList)
-            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton))
+            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton)) {
                 button.getSprite().draw(batch);
+                if (button instanceof UnitUpgradeButton)
+                    ((UnitUpgradeButton) button).showCooldown(batch);
+            }
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
         String nr = "" + x;

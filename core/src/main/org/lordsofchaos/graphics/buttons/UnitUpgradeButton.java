@@ -12,13 +12,15 @@ import org.lordsofchaos.graphics.Screen;
 
 public class UnitUpgradeButton extends HoverButton {
     private String path;
-    private BitmapFont font;
+    private BitmapFont alertFont;
+    private BitmapFont cooldownFont;
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
     private Texture textureCooldown;
     private Sprite spriteCooldown;
     private Sprite spriteActive;
     private int currentUpgrade;
+    boolean onCooldown = false;
     public UnitUpgradeButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
         super(path + "1.png" , buttonX1, buttonY1, screenLocation);
         this.path = path;
@@ -26,7 +28,8 @@ public class UnitUpgradeButton extends HoverButton {
         infoCardTexture = new Texture("UI/InfoCards/infoPanelTier1.png");
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30,150);
-        font = Game.getBloxyFont();
+        alertFont = Game.getBloxyFont();
+        cooldownFont = Game.getFontArial(50);
         spriteActive = super.sprite;
         textureCooldown = new Texture(Gdx.files.internal(path + currentUpgrade + "Cooldown.png"));
         spriteCooldown = new Sprite(textureCooldown);
@@ -35,9 +38,13 @@ public class UnitUpgradeButton extends HoverButton {
     }
     @Override
     public void update(int x, int y,SpriteBatch batch){
+
         if(GameController.attackerEarnedUpgrade()) {
             super.sprite = spriteActive;
             System.out.println("Can buy upgrade");
+        }
+        else{
+            onCooldown = true;
         }
         if(GameController.getUnitUpgradeLevel() != currentUpgrade) {
             currentUpgrade = GameController.getUnitUpgradeLevel();
@@ -46,7 +53,7 @@ public class UnitUpgradeButton extends HoverButton {
         if(checkHover(x,y))
             infoCardSprite.draw(batch);
         //System.out.println(currentUpgrade);
-        sprite.draw(batch);
+        //sprite.draw(batch);
     }
     private void createSprite(String path){
         super.texture.dispose();
@@ -64,9 +71,11 @@ public class UnitUpgradeButton extends HoverButton {
         if(GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade() && currentUpgrade != 4) {
             EventManager.attackerUpgrade();
             selectSound.play(Game.getSoundEffectsVolume());
-            Game.createAlert(2,font,"Troops have been upgraded!",500,600,null);
+            Game.createAlert(2,alertFont,"Troops have been upgraded!",500,600,null);
         }
         else Game.playSound("ErrorSound");
     }
-
+    public void showCooldown(SpriteBatch batch){
+        cooldownFont.draw(batch,"" + GameController.getAttackerUpgradeCooldown(),buttonX1 + sprite.getWidth() / 4,buttonY1 + sprite.getHeight() - sprite.getHeight() / 4 );
+    }
 }

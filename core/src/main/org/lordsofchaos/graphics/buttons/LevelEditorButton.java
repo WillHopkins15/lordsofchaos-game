@@ -12,8 +12,10 @@ public class LevelEditorButton extends MainMenuButton
     
     @Override
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        Game.currentScreen = targetScreen;
+        if(!Game.getSearchingForGame()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.currentScreen = targetScreen;
+        }
     }
     
     @Override
