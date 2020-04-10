@@ -179,15 +179,15 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         return font;
     }
     public static void switchPlayer(){
-        if(player == 0){
-            GameController.setPlayerType(false);
-            player = 1;
-            currentScreen = Screen.ATTACKER_SCREEN;
-            return;
+        if(!multiplayer) {
+            if (player == 0) {
+                player = 1;
+                currentScreen = Screen.ATTACKER_SCREEN;
+                return;
+            }
+            player = 0;
+            currentScreen = Screen.DEFENDER_SCREEN;
         }
-        GameController.setPlayerType(true);
-        player = 0;
-        currentScreen = Screen.DEFENDER_SCREEN;
     }
     public static void playSound(String soundName){
         Sound tmpSound;
@@ -217,7 +217,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         // main menu
         buttonList.add(new MainMenuButton("UI/NewArtMaybe/playLocalButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
-                Gdx.graphics.getHeight() / 2 + 105, Screen.MAIN_MENU, Screen.CHOOSE_FACTION));
+                Gdx.graphics.getHeight() / 2 + 105, Screen.MAIN_MENU, Screen.DEFENDER_SCREEN));
 
         buttonList.add(new MultiplayerButton("UI/NewArtMaybe/playOnlineButton.png",
                 Gdx.graphics.getWidth() / 2 - 150,
@@ -266,7 +266,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuButtonList.add(new SliderButton("UI/slider.png", 557, 360, Screen.MENU, 1));
         
         menuButtonList.add(new MenuButton("UI/returnToGameTmp.png", 510, 470, Screen.MENU));
-        menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.CHOOSE_FACTION));
+        menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.MAIN_MENU));
 
 
     }
@@ -665,6 +665,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
+        player = 0;
         searchingForGame = false;
         multiplayerLogs = new ArrayList<String>();
         multiplayerLogs.add("Searching for Game!");
@@ -673,7 +674,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         selectedSlider = -1;
         sliderClicked = false;
         currentPath = 0;
-        player = 2;
         batch = new SpriteBatch();
         doOnceDefender = true;
         doOnceAttacker = true;
@@ -1053,7 +1053,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 buildMode = false;
             }
 
-        } else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.CHOOSE_FACTION) {
+        } else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.MENU) {
              currentScreen = Screen.MAIN_MENU;
              GameController.initialise();
              doOnceDefender = true;
