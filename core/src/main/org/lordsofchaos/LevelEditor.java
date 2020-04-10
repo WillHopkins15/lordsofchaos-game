@@ -58,12 +58,12 @@ public class LevelEditor {
         this.batch = batch;
         level = new EditorLevel(20, 20);
         renderer.setLevel(level);
-        continueButton = new EditorButton("UI/NewArtMaybe/panel.png", Gdx.graphics.getWidth() - 320, 20, this);
+        continueButton = new EditorButton("UI/NewArtMaybe/continueButton.png", Gdx.graphics.getWidth() - 320, 20, this);
         buttons.put(EditorPhase.OBSTACLES, new ArrayList<>(Arrays.asList(
                 new ObstacleButton("UI/LevelEditor/river.png", 20, 20, this, ObstacleType.RIVER),
                 new ObstacleButton("UI/LevelEditor/trees.png", 140, 20, this, ObstacleType.TREE),
                 new ObstacleButton("UI/LevelEditor/rocks.png", 260, 20, this, ObstacleType.ROCK),
-                continueButton
+                new EditorButton("UI/NewArtMaybe/finishButton.png", Gdx.graphics.getWidth() - 320, 20, this)
         )));
         instructions.put(EditorPhase.SPAWNS, "Place 1 to 4 spawns along the bottom edges.");
         instructions.put(EditorPhase.PATHS, "Draw each path to one of the end points.");
@@ -289,6 +289,7 @@ public class LevelEditor {
         org.lordsofchaos.database.Map map = new org.lordsofchaos.database.Map(name, level.toJSON(), true);
         try {
             DatabaseCommunication.addMap(map);
+            Game.setHasExited();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }

@@ -3,8 +3,7 @@ package org.lordsofchaos.graphics.buttons;
 import org.lordsofchaos.LevelEditor;
 import org.lordsofchaos.graphics.Screen;
 
-public class EditorButton extends Button
-{
+public class EditorButton extends Button {
     
     private LevelEditor levelEditor;
     
