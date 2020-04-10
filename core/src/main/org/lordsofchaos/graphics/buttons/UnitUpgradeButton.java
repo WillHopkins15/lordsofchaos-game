@@ -42,6 +42,7 @@ public class UnitUpgradeButton extends HoverButton {
         if(GameController.attackerEarnedUpgrade()) {
             super.sprite = spriteActive;
             System.out.println("Can buy upgrade");
+            onCooldown = false;
         }
         else{
             onCooldown = true;
@@ -76,6 +77,10 @@ public class UnitUpgradeButton extends HoverButton {
         else Game.playSound("ErrorSound");
     }
     public void showCooldown(SpriteBatch batch){
-        cooldownFont.draw(batch,"" + GameController.getAttackerUpgradeCooldown(),buttonX1 + sprite.getWidth() / 4,buttonY1 + sprite.getHeight() - sprite.getHeight() / 4 );
+        if(onCooldown) {
+            String tmpStr = String.format("%02d", GameController.getAttackerUpgradeCooldown());
+            cooldownFont.draw(batch, tmpStr, buttonX1 + sprite.getWidth() / 4, buttonY1 + sprite.getHeight() - sprite.getHeight() / 4);
+
+        }
     }
 }

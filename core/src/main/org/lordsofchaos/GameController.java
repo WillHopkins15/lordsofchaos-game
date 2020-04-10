@@ -346,6 +346,7 @@ public class GameController {
      * game is moved on to the next phase
      */
     public static void endPhase() {
+        Game.switchPlayer();
         if (waveState == WaveState.DefenderBuild) {
             endsPhaseRequests = 0;
             // add money to both players if not on first wave
@@ -402,6 +403,7 @@ public class GameController {
             resetAddMoneyTimer();
             resetUnitSpawnTimer();
         }
+
         Game.newTurn();
         System.out.println("New state " + waveState);
     }
