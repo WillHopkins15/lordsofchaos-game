@@ -5,10 +5,7 @@ import org.lordsofchaos.BuildPhaseData;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.*;
 import java.time.LocalDateTime;
 
 /**
@@ -40,10 +37,12 @@ public class GameInstance extends UDPSocket
     
     /**
      * Guarantees a connection to the client on the same port by using TCP. This ensures that
-     * the client will always receive its assigned type.
+     * the client will always receive its assigned type. This method gets the clients selected
+     * map, and returns whether both clients maps are the same.
      *
      * @param attacker Inetaddress/port pair of client to make an attacker
      * @param defender Inetaddress/port pair of client to make a defender
+     * @return Whether or not the clients maps are the same
      */
     @SneakyThrows
     private boolean connectAndSetTypes(ConnectionPoint attacker, ConnectionPoint defender) {
@@ -51,28 +50,42 @@ public class GameInstance extends UDPSocket
         int localPort = socket.getLocalPort();
         InetAddress localAddress = InetAddress.getLocalHost();
         socket.close();
-        
-        Socket socket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
-        DataInputStream in = new DataInputStream(socket.getInputStream());
+    
+        Socket attSocket = null;
+        while (attSocket == null) {
+            try {
+                attSocket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
+            } catch (BindException e) {
+                Thread.sleep(1000);
+            }
+        }
+        DataInputStream in = new DataInputStream(attSocket.getInputStream());
         String attackerMap = in.readUTF();
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataOutputStream out = new DataOutputStream(attSocket.getOutputStream());
         out.writeUTF("Attacker");
         /*
         Wait for receiver to close their end of the socket to avoid a TIME_WAIT which relys
         on the kernel to release the port. A TIME_WAIT can last anywhere from 1 to 4 minutes.
         Info at https://hea-www.harvard.edu/~fine/Tech/addrinuse.html
          */
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         out.close();
-        socket.close();
-        
-        socket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
-        in = new DataInputStream(socket.getInputStream());
+        attSocket.close();
+    
+        Socket defSocket = null;
+        while (defSocket == null) {
+            try {
+                defSocket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
+            } catch (BindException e) {
+                Thread.sleep(100);
+            }
+        }
+        in = new DataInputStream(defSocket.getInputStream());
         String defenderMap = in.readUTF();
-        out = new DataOutputStream(socket.getOutputStream());
+        out = new DataOutputStream(defSocket.getOutputStream());
         out.writeUTF("Defender");
         out.close();
-        socket.close();
+        defSocket.close();
         
         //Switch back to UDP
         this.socket = new DatagramSocket(localPort);

@@ -15,6 +15,7 @@ public class ChangePageButton extends Button {
 
     @Override
     public void leftButtonAction() {
+        selectSound.play(Game.getSoundEffectsVolume());
         Game.changeScreen(change);
     }
 

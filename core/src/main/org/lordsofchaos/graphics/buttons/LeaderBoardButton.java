@@ -14,14 +14,16 @@ public class LeaderBoardButton extends MainMenuButton
     
     @Override
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        Game.currentScreen = targetScreen;
-        try {
-            Game.instance.setLeaderBoardTop(5);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        if(!Game.getSearchingForGame()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            Game.currentScreen = targetScreen;
+            try {
+                Game.instance.setLeaderBoardTop(5);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
     

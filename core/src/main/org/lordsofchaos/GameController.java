@@ -37,6 +37,7 @@ public class GameController {
     protected final static String DEFENDERNAME = "blank";
     private static final int scaleFactor = 64;
     private static final int defenderUpgradeBaseCost = 50;
+    private static final int attackerUpgradeBaseCost = 50;
     private static final int unblockPathCost = 100;
     public static Attacker attacker;// = new Attacker(ATTACKERNAME);
     public static Defender defender;// = new Defender(DEFENDERNAME);
@@ -75,7 +76,7 @@ public class GameController {
     
     private static int troopUpgradeThreshold = 25;
     private static int troopsMade = 0;
-    private static int upgradeNo = 0;
+    private static int attackerUpgradeLevel = 0;
     private static int healthUpgrade = 0;
     private static float speedUpgrade = 0;
     private static int damageUpgrade = 0;
@@ -85,6 +86,8 @@ public class GameController {
     private static List<Projectile> projectiles;
     
     private static String inputName;
+
+    private static int endsPhaseRequests = 0; // incremented when a player ends play phase, both players only move move when this is set to 1
 
     /**
      * When a player wins the game, they need to enter a name to add to the database,
@@ -146,9 +149,13 @@ public class GameController {
         return level.getPaths();
     }
 
+    public static int getAttackerUpgradeCooldown(){
+        return troopUpgradeThreshold - troopsMade;
+    }
+
     public static int getDefenderUpgrade(){return defenderUpgradeLevel;}
 
-    public static int getUnitUpgradeLevel(){return upgradeNo;}
+    public static int getUnitUpgradeLevel(){return attackerUpgradeLevel + 1;}
 
     public static void setPlayerType(Boolean type) {
         if (type)
@@ -171,7 +178,7 @@ public class GameController {
         defenderMaxUpgradeLevel = 3;
         troopUpgradeThreshold = 25;
         troopsMade = 0;
-        upgradeNo = 0;
+        attackerUpgradeLevel = 0;
         healthUpgrade = 0;
         speedUpgrade = 0;
         damageUpgrade = 0;
@@ -218,7 +225,7 @@ public class GameController {
     public static BuildPhaseData getGameState() {
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(), EventManager.getTowerBuilds(), EventManager.getRemovedTowers(), EventManager.getDefenderUpgradesThisTurn(),
-                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth());
+                EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(), GameController.defender.getHealth(), attackerUpgradeLevel);
         return bpd;
     }
 
@@ -240,9 +247,16 @@ public class GameController {
      * When the defender receives a new packet from the attacker, if the attacker unblocked any paths,
      * this client needs to reflect that
      */
-    public static void defenderNetworkUpdates() {
+    public static void defenderNetworkUpdates(int attackerUpgrades) {
+
         for (int i = 0; i < EventManager.getPathsUnblockedThisTurn().size(); i++) {
             unblockPath(EventManager.getPathsUnblockedThisTurn().get(i), true);
+        }
+
+        while (attackerUpgrades > 0)
+        {
+            upgradeTroops();
+            attackerUpgrades--;
         }
     }
 
@@ -260,8 +274,14 @@ public class GameController {
     /**
      * Does the attacker have enough money to unblock a path
      */
-    public static boolean canAttackerUnblockPath() {
-        return attacker.getCurrentMoney() >= unblockPathCost;
+    public static boolean canAttackerUnblockPath()
+    {
+        boolean canAfford = attacker.getCurrentMoney() >= unblockPathCost;
+        if (!canAfford)
+        {
+            Game.playSound("ErrorSound");
+        }
+        return canAfford;
     }
 
     /**
@@ -327,7 +347,7 @@ public class GameController {
      */
     public static void endPhase() {
         if (waveState == WaveState.DefenderBuild) {
-
+            endsPhaseRequests = 0;
             // add money to both players if not on first wave
             if (wave > 0) {
                // System.out.println("here");
@@ -344,17 +364,25 @@ public class GameController {
 
             resetBuildTimer();
         } else if (waveState == WaveState.AttackerBuild) {
+            endsPhaseRequests = 0;
             waveState = WaveState.Play;
             System.out.println("Play begins");
             wave++;
             resetBuildTimer();
         } else {
 
+            if (endsPhaseRequests == 0)
+            {
+                endsPhaseRequests++;
+                return;
+            }
+
             defender.addMoney();
             attacker.addMoney();
 
             removeAllProjectiles();
-            
+            cleanUpTroops();
+
             waveState = WaveState.DefenderBuild;
             
             // check here rather than in update, because defender only wins if they survive a round at max level
@@ -376,6 +404,18 @@ public class GameController {
         }
         Game.newTurn();
         System.out.println("New state " + waveState);
+    }
+
+    /**
+     * After the play phase ends, destroy any remaining troops (attacker always ends play phase,
+     * which means the defender may have some troops remaining on very low health)
+     */
+    private static void cleanUpTroops()
+    {
+        while (troops.size() > 0)
+        {
+            troopDies(troops.get(0));
+        }
     }
 
     /**
@@ -439,7 +479,10 @@ public class GameController {
             // if time elapsed, plus wave and change state to play
             if (buildTimer > buildTimeLimit) {
                 if (Game.multiplayer && clientPlayerType.equals(attacker)) {
-                    Game.getClient().changePhase();
+
+                    if (endsPhaseRequests == 0) {
+                        Game.getClient().changePhase();
+                    }
                 } else {
                     endPhase();
                 }
@@ -516,13 +559,14 @@ public class GameController {
                 } else {
                     continue;
                 }
+                troopsMade++;
                 //calls upgrade troop function
-                upgradeTroops();
+                //upgradeTroops();
                 //creates new troop
                 
                 //checks if upgrades have happened
                 //if so newTroop is upgraded
-                if (upgradeNo != 0) {
+                if (attackerUpgradeLevel != 0) {
                     newTroop.setCurrentHealth(newTroop.getCurrentHealth() + healthUpgrade);
                     newTroop.setMovementSpeed(newTroop.getMovementSpeed() + speedUpgrade);
                     newTroop.setDamage(newTroop.getDamage() + damageUpgrade);
@@ -530,7 +574,7 @@ public class GameController {
                 // add troop to on screen troops
                 GameController.troops.add(newTroop);
                 //updates number of troops made
-                troopsMade++;
+
                 // remove from build plan
                 EventManager.buildPlanChange(troop, path, -1, true);
                 
@@ -787,10 +831,10 @@ public class GameController {
         if (troopType == 0) {
             return 10;
         } else if (troopType == 1) {
-            return 10;
+            return 15;
         }
         if (troopType == 2) {
-            return 10;
+            return 20;
         } else return 0;
         // add elses for other troops here
     }
@@ -799,14 +843,20 @@ public class GameController {
      * Called by EventManager when a the attacker attempts to add a troop to the build plan
      */
     public static boolean canAffordTroop(int troopType) {
-        return attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+        boolean canAfford = attacker.getCurrentMoney() >= getTroopTypeCost(troopType);
+        if (!canAfford)
+        {
+            //Game.playSound("ErrorSound");
+        }
+        return canAfford;
     }
 
     /**
      * Called by EventManager when a tower is attempted to be placed
      */
     public static boolean canAffordTower(TowerType towerType) {
-        return defender.getCurrentMoney() >= getTowerTypeCost(towerType);
+        boolean canAfford = defender.getCurrentMoney() >= getTowerTypeCost(towerType);
+        return canAfford;
     }
     
     /**
@@ -843,7 +893,6 @@ public class GameController {
         }
         
         if (!canAffordTower(towerType)) {
-            System.out.println("Can't afford tower type " + towerType + "!");
             return false;
         }
         
@@ -858,45 +907,74 @@ public class GameController {
         return true;
     }
 
+    public static boolean canAttackerAffordUpgrade()
+    {
+        int currentCost = (1 + attackerUpgradeLevel) * attackerUpgradeBaseCost;
+        if (attacker.getCurrentMoney() >= currentCost) {
+            return true;
+        }
+        else {
+            Game.playSound("ErrorSound");
+            return false;
+        }
+    }
+
+    public static int getAttackerUpgradeLevel()
+    {
+        return attackerUpgradeLevel;
+    }
+
+    /**
+     * Returns true if the attacker has spawned enough troops to warrant getting an upgrade
+     */
+    public static boolean attackerEarnedUpgrade()
+    {
+        if (attackerUpgradeLevel <= 3) {
+            int blocksMade = (int) Math.floor(troopsMade / troopUpgradeThreshold);//25);
+
+            // if the attacker has spawned enough troops for an upgrade, but hasn't upgraded yet
+            return attackerUpgradeLevel < blocksMade;
+        }
+        return false;
+    }
+
     /**
      * If enough troops have been spawned by the attacker, upgrade all troops
      */
     public static void upgradeTroops() {
-        if (((troopsMade % troopUpgradeThreshold) == 0) && (upgradeNo <= 4) && (troopsMade > 0)) {
-            upgradeNo = upgradeNo + 1;
-            int type = upgradeNo % 3;
-            
-            switch (type) {
-                //upgrades health
-                case 0:
-                    healthUpgrade = healthUpgrade + 5;
-                    break;
-                //upgrades speed
-                case 1:
-                    speedUpgrade = speedUpgrade + 0.5f;
-                    break;
-                //upgrades damage
-                case 2:
-                    damageUpgrade = damageUpgrade + 3;
-                    break;
-            }
-            
-            if (!troops.isEmpty()) {
-                for (int i = 0; i < troops.size(); i++) {
-                    switch (type) {
-                        //upgrades health
-                        case 0:
-                            troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
-                            break;
-                        //upgrades speed
-                        case 1:
-                            troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
-                            break;
-                        //upgrades damage
-                        case 2:
-                            troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
-                            break;
-                    }
+        attacker.addMoney((1 + attackerUpgradeLevel) * -attackerUpgradeBaseCost);
+        attackerUpgradeLevel++;
+        int type = attackerUpgradeLevel % 3;
+        switch (type) {
+            //upgrades health
+            case 0:
+                healthUpgrade = healthUpgrade + 5;
+                break;
+            //upgrades speed
+            case 1:
+                speedUpgrade = speedUpgrade + 0.5f;
+                break;
+            //upgrades damage
+            case 2:
+                damageUpgrade = damageUpgrade + 3;
+                break;
+        }
+
+        if (!troops.isEmpty()) {
+            for (int i = 0; i < troops.size(); i++) {
+                switch (type) {
+                    //upgrades health
+                    case 0:
+                        troops.get(i).setCurrentHealth(troops.get(i).getCurrentHealth() + healthUpgrade);
+                        break;
+                    //upgrades speed
+                    case 1:
+                        troops.get(i).setMovementSpeed(troops.get(i).getMovementSpeed() + speedUpgrade);
+                        break;
+                    //upgrades damage
+                    case 2:
+                        troops.get(i).setDamage(troops.get(i).getDamage() + damageUpgrade);
+                        break;
                 }
             }
         }
@@ -908,6 +986,7 @@ public class GameController {
      */
     public static boolean canDefenderCanUpgrade() {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+            Game.playSound("ErrorSound");
             System.out.print("Max level");
             return false;
         }
@@ -917,6 +996,7 @@ public class GameController {
             defender.addMoney(-cost);
             return true;
         } else {
+            Game.playSound("ErrorSound");
             System.out.println("Can't afford upgrade");
             return false;
         }

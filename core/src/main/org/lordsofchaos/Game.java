@@ -82,6 +82,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private float hpSpriteW;
     private BitmapFont unitNumber;
     private BitmapFont matchConclusionFont;
+    private BitmapFont arialFont18;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -102,17 +103,31 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     // sound related
     private boolean sliderClicked;
     private int selectedSlider;
+    private static Sound errorSound;
     private Sprite[] upgradeBarSprite;
     // alert list
     private  static List<Alert> alertList;
     private static boolean doOnceDefender;
     private static boolean doOnceAttacker;
-    private UnitUpgradeSprite unitUpgradeSprite;
+    private static ArrayList<String> multiplayerLogs;
+
+    private Texture clockTexture;
+    private Sprite clockSprite;
+
+    private Texture messageLogTexture;
+    private Sprite messageLogSprite;
+
+    private Texture HPUpgradeBackgroundTexture;
+    private Sprite HPUpgradeBackgroundSprite;
     public static void main(String[] args) {
         setupClient();
     }
-    
+
+
+
+    private static boolean searchingForGame;
     public static boolean setupClient() {
+        System.out.println("Setting up client");
         client = new GameClient();
         if (!client.makeConnection()) return false;
         client.start();
@@ -158,6 +173,24 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         fontParameterBoxy.size = size;
         return fontGenerator.generateFont(fontParameterBoxy);
     }
+    public static void setSearchingForGame(boolean x){
+        searchingForGame = x;
+    }
+    public static boolean getSearchingForGame(){return searchingForGame;}
+    public static BitmapFont getBloxyFont(){
+        return font;
+    }
+    public static void switchPlayer(){
+        if(player == 0){
+            GameController.setPlayerType(false);
+            player = 1;
+            currentScreen = Screen.ATTACKER_SCREEN;
+            return;
+        }
+        GameController.setPlayerType(true);
+        player = 0;
+        currentScreen = Screen.DEFENDER_SCREEN;
+    }
     public static void playSound(String soundName){
         Sound tmpSound;
         float tmpVolume = 1;
@@ -167,6 +200,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             tmpSound = projectileStartSound;
         else if(soundName.equals("unitDies")) {
             tmpSound = unitDiesSound;
+            tmpVolume = 0.7f;
+        }
+        else if(soundName.equals("ErrorSound")){
+            tmpSound = errorSound;
             tmpVolume = 0.7f;
         }
         else return;
@@ -213,12 +250,17 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
         // defender upgrade button
         buttonList.add(new UpgradeButton("UI/NewArtMaybe/defenderUpgradeButton.png", 262 + 86, 50, Screen.DEFENDER_SCREEN));
-        
+        buttonList.add (new UnitUpgradeButton("UI/NewArtMaybe/unitsTier", 262 + 86, 50,Screen.ATTACKER_SCREEN));
+
         // attacker path buttons
-        // TO DO: Get starting locations for paths
 
         updatePathHighlighting();
-        
+
+        //Hover UI
+        buttonList.add(new HoverUI("UI/healthBar1Hitbox.png",3, Gdx.graphics.getHeight() - 112,null,"UI/InfoCards/infoPanelHealthbar.png",10, Gdx.graphics.getHeight() - 275));
+        buttonList.add(new HoverUI("UI/upgradeBarHitbox.png",10, Gdx.graphics.getHeight() - 161,null,"UI/InfoCards/infoPanelUpgradebar.png",10, Gdx.graphics.getHeight() - 275));
+        buttonList.add(new HoverUI("UI/coinHitbox.png",Gdx.graphics.getWidth() - 215, Gdx.graphics.getHeight() - 85,null,"UI/InfoCards/infoPanelCoins.png",Gdx.graphics.getWidth() - 225, Gdx.graphics.getHeight() - 175));
+        buttonList.add(new HoverUI("UI/timerHitbox.png",Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 77,null,"UI/InfoCards/infoPanelTimer.png",Gdx.graphics.getWidth() / 2 + 225, Gdx.graphics.getHeight() - 150));
         // menu buttons
         menuButtonList = new ArrayList<Button>();
         // slider buttons
@@ -227,6 +269,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
         menuButtonList.add(new MenuButton("UI/returnToGameTmp.png", 510, 470, Screen.MENU));
         menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.CHOOSE_FACTION));
+
+
     }
     public static void createSound(){
         //Setting up soundtrack
@@ -244,7 +288,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         projectileStartSound =  Gdx.audio.newSound(Gdx.files.internal("sound/projectileStart.wav"));
         projectileHitSound = Gdx.audio.newSound(Gdx.files.internal("sound/projectileHit.ogg"));
         unitDiesSound = Gdx.audio.newSound(Gdx.files.internal("sound/unitDies.wav"));
-
+        errorSound = Gdx.audio.newSound(Gdx.files.internal("sound/ErrorSound.wav"));
     }
 
     public static void updatePathHighlighting() {
@@ -357,9 +401,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         fontGenerator.dispose();
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/arial.ttf"));
         FreeTypeFontParameter fontParameterArial = new FreeTypeFontParameter();
-        fontParameterArial.size = 20;
+        fontParameterArial.size = 18;
         leaderBoardRowText = fontGenerator.generateFont(fontParameterBoxy);
-
+        arialFont18 = fontGenerator.generateFont(fontParameterArial);
         //fontGenerator.dispose();
     }
     public void createFonts(){
@@ -371,9 +415,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinCounter.setColor(Color.WHITE);
         leaderBoardRowText = new BitmapFont();
         matchConclusionFont = new BitmapFont();
+        arialFont18 = new BitmapFont();
     }
     public void showHealth() {
         healthPercentage();
+        HPUpgradeBackgroundSprite.draw(batch);
         healthBarSprite.draw(batch);
         healthSprite.draw(batch);
         String nr = GameController.defender.getHealth() + "";
@@ -444,8 +490,25 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
         coinSprite.draw(batch);
     }
-    
+    public void showMultiplayerLogs(SpriteBatch batch){
+        if(client != null)
+        if(searchingForGame ) {
+            if( !client.getLogMessages().isEmpty()) {
+                multiplayerLogs = client.getLogMessages();
+                messageLogSprite.draw(batch);
+                for (int i = 0; i < multiplayerLogs.size(); i++)
+                    arialFont18.draw(batch, multiplayerLogs.get(i), 400, 575 - i * 25);
+            }
+            multiplayerLogs.clear();
+        }
+    }
     public void defenderPOV() {
+        for (Button button : buttonList) {
+            if (button instanceof HoverButton && button.getScreenLocation() == currentScreen || button.getScreenLocation() == null) {
+                ((HoverButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
+                button.getSprite().draw(batch);
+            }
+        }
         if(GameController.getDefenderUpgrade() == 3 && doOnceDefender){
             //changedTurn = true;
             doOnceDefender = false;
@@ -481,6 +544,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
     
     public void attackerPOV() {
+        for (Button button : buttonList) {
+            if (button instanceof HoverButton && button.getScreenLocation() == currentScreen || button.getScreenLocation() == null) {
+                ((HoverButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
+                button.getSprite().draw(batch);
+            }
+        }
         if(GameController.getDefenderUpgrade() == 3 && doOnceAttacker && player == 1){
             //changedTurn = true;
             doOnceAttacker = false;
@@ -490,8 +559,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         showAlert();
         for (Button button : buttonList)
-            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton))
+            if (button.getScreenLocation() == Screen.ATTACKER_SCREEN && !(button instanceof SliderButton)) {
                 button.getSprite().draw(batch);
+                if (button instanceof UnitUpgradeButton)
+                    ((UnitUpgradeButton) button).showCooldown(batch);
+            }
         unitNumber.getData().setScale(1.5f);
         int x = EventManager.getUnitBuildPlan()[0][0];
         String nr = "" + x;
@@ -545,6 +617,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         if(!(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)))
                             buildMode = false;
                     }
+                    else playSound("ErrorSound");
                     
                 } else {
                     //System.out.println("NONTEST");
@@ -594,7 +667,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         generateFont();
         createSound();
         createButtons();
-        unitUpgradeSprite = new UnitUpgradeSprite("UI/NewArtMaybe/unitsTier", 1100,500);
+        searchingForGame = false;
+        multiplayerLogs = new ArrayList<String>();
+        multiplayerLogs.add("Searching for Game!");
         alertList = new ArrayList<Alert>();
         menuOpen = false;
         selectedSlider = -1;
@@ -614,14 +689,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         camera.update();
         renderer.setView(camera);
 
-        Texture healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar.png"));
+        Texture healthBarTexture = new Texture(Gdx.files.internal("UI/healthBar1.png"));
         healthBarSprite = new Sprite(healthBarTexture);
         Texture healthTexture = new Texture(Gdx.files.internal("UI/health.png"));
         healthSprite = new Sprite(healthTexture);
         
         healthSprite.setScale(5);
         healthSprite.setPosition(210, Gdx.graphics.getHeight() - 64);
-        healthBarSprite.setScale(5);
+        //healthBarSprite.setScale(5);
         healthBarSprite.setPosition(170, Gdx.graphics.getHeight() - 70);
         Texture coinTexture = new Texture(Gdx.files.internal("UI/coins.png"));
         coinSprite = new Sprite(coinTexture);
@@ -633,15 +708,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         renderer.setLevel(GameController.getLevel());
         hpSpriteW = healthSprite.getWidth();
-        healthBarSprite.setPosition(155, Gdx.graphics.getHeight() - 70);
+        healthBarSprite.setPosition(3, Gdx.graphics.getHeight() - 112);
         
         leaderboardRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText = new BitmapFont();
-        leaderBoardRowText.getData().setScale(2);
-
         levelSelectRowTexture = new Texture(Gdx.files.internal("UI/NewArtMaybe/leaderboardRow.png"));
-        leaderBoardRowText.getData().setScale(2);
-        
+
+        clockTexture = new Texture(Gdx.files.internal("UI/clockS.png"));
+        clockSprite = new Sprite(clockTexture);
+        clockSprite.setPosition(Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 73);
         currentScreen = Screen.MAIN_MENU;
         //Upgrade bar
         upgradeBarSprite =  new Sprite[4];
@@ -653,6 +727,13 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             upgradeBarSprite[i].scale(1.5f);
             upgradeBarSprite[i].setPosition(100,570);
         }
+        messageLogTexture = new Texture(Gdx.files.internal("UI/messageLogS.png"));
+        messageLogSprite = new Sprite(messageLogTexture);
+        messageLogSprite.setPosition(385,300);
+
+        HPUpgradeBackgroundTexture = new Texture(Gdx.files.internal("UI/HP+UpgradeBackground.png"));
+        HPUpgradeBackgroundSprite = new Sprite(HPUpgradeBackgroundTexture);
+        HPUpgradeBackgroundSprite.setPosition(0,Gdx.graphics.getHeight() - 200);
         Gdx.input.setInputProcessor(this);
     }
     
@@ -665,9 +746,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
             menuBackgroundSprite.draw(batch);
+
+            backgroundSprite.draw(batch);
             for (Button button : buttonList)
                 if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
+            showMultiplayerLogs(batch);
             batch.end();
         } else if (currentScreen == Screen.LEVEL_EDITOR) {
             if (levelEditor == null) levelEditor = new LevelEditor(renderer, batch);
@@ -770,23 +854,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                             matchConclusionFont.draw(batch, "You Lost!", Gdx.graphics.getWidth() / 2 - 150, Gdx.graphics.getHeight() - 100);
                     }
                 }
-                unitUpgradeSprite.update(batch);
             }
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
                     GameController.getWaveState() == GameController.WaveState.Play) {
                 if(GameController.getWaveState() != GameController.WaveState.Play) {
                     String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
-                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 200, Gdx.graphics.getHeight() - 25);
+                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 325, Gdx.graphics.getHeight() - 35);
+                    clockSprite.draw(batch);
                 }
-                unitUpgradeSprite.update(batch);
 
             }
-            for (Button button : buttonList) {
-                if (button instanceof HoverButton && button.getScreenLocation() == currentScreen) {
-                    ((HoverButton) button).update(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), batch);
-                }
-            }
+
             if(!alertList.isEmpty())
                 showAlert();
             if (menuOpen) {
@@ -828,8 +907,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 }
                 
             }
-            System.out.println(GameController.getUnitUpgradeLevel());
-
+            //System.out.println(GameController.getUnitUpgradeLevel());
             batch.end();
             disposeTMP();
         }

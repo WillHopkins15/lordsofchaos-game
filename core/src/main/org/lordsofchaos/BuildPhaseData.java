@@ -11,17 +11,18 @@ import java.util.List;
 
 public class BuildPhaseData implements Serializable
 {
-    private static final long serialVersionUID = 1846519348571L;
+    private static final long serialVersionUID = 1846519348573L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
     private List<SerializableTower> removedTowers;
     private int defenderUpgradesThisTurn;
     private int defenderHealth;
+    private int attackerUpgradeLevel;
     private List<Integer> pathsUnblockedThisTurn;
     private String currentWave;
     
     public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, List<SerializableTower> removedTowers, int defenderUpgradesThisTurn,
-                          List<Integer> pathsUnblockedThisTurn, String currentWave, int defenderHealth) {
+                          List<Integer> pathsUnblockedThisTurn, String currentWave, int defenderHealth, int attackerUpgradeLevel) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
         this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
@@ -29,8 +30,11 @@ public class BuildPhaseData implements Serializable
         this.pathsUnblockedThisTurn = pathsUnblockedThisTurn;
         this.removedTowers = removedTowers;
         this.currentWave = currentWave;
+        this.attackerUpgradeLevel = attackerUpgradeLevel;
     }
-    
+
+    public int getAttackerUpgradeLevel() {return attackerUpgradeLevel;}
+
     public int[][] getUnitBuildPlan() {
         return unitBuildPlan;
     }
