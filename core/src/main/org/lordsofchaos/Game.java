@@ -178,6 +178,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static BitmapFont getBloxyFont(){
         return font;
     }
+
+    public  void resetGame(){
+        currentScreen = Screen.MAIN_MENU;
+        GameController.initialise();
+        doOnceDefender = true;
+        doOnceAttacker = true;
+        currentPath = 0;
+        for(Button button : buttonList)
+            if (button instanceof PathButton){
+                PathButton.resetSelected();
+                break;
+            }
+        player = 0;
+        renderer.setLevel(GameController.getLevel());
+    }
     public static void switchPlayer(){
         if(!multiplayer) {
             if (player == 0) {
@@ -266,7 +281,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         menuButtonList.add(new SliderButton("UI/slider.png", 557, 360, Screen.MENU, 1));
         
         menuButtonList.add(new MenuButton("UI/returnToGameTmp.png", 510, 470, Screen.MENU));
-        menuButtonList.add(new MainMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.MAIN_MENU));
+        menuButtonList.add(new QuitMenuButton("UI/NewArtMaybe/exitButton.png", 510, 250, Screen.MENU, Screen.MAIN_MENU));
 
 
     }
