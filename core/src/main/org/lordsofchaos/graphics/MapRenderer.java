@@ -269,6 +269,10 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                     //if (s.length() > 7) s = "riverNS";
                     if (s.equals("river") || s.equals("riverN") || s.equals("riverS")) s = "riverNS";
                     else if (s.equals("riverE") || s.equals("riverW")) s = "riverEW";
+                    if (s.equals("riverNS") && y == level.getHeight() - 1) s = "riverbedS";
+                    else if (s.equals("riverNS") && y == 0) s = "riverbedN";
+                    else if (s.equals("riverEW") && x == level.getWidth() - 1) s = "riverbedE";
+                    else if (s.equals("riverEW") && x == 0) s = "riverbedW";
             }
         }
         return s;

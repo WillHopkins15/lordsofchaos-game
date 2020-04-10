@@ -95,7 +95,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private TowerType ghostTowerType;
     // leaderboard
     private int currentbutton;
-    private Sprite backgroundSprite;
+    private Sprite menuBackgroundSprite;
+    private Sprite gameBackgroundSprite;
+    private Sprite gameBackgroundBottomSprite;
     // leaderbaord
     private List<LeaderboardRow> leaderBoardTop;
     // sound related
@@ -693,7 +695,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         doOnceDefender = true;
         doOnceAttacker = true;
         selectSound = Gdx.audio.newSound(Gdx.files.internal("sound/click3.wav"));
-        backgroundSprite = new Sprite(new Texture("maps/background.png"));
+        menuBackgroundSprite = new Sprite(new Texture("maps/Background.png"));
+        gameBackgroundSprite = new Sprite(new Texture("maps/BackgroundMap.png"));
+        gameBackgroundBottomSprite = new Sprite(new Texture("maps/BackgroundMapBottom.png"));
         renderer = new MapRenderer();
         OrthographicCamera camera = new OrthographicCamera(width * 2, height * 2);
         camera.position.set(width, 0, 10);
@@ -752,12 +756,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
+        if (hasExited) exitLevelEditor();
+
         if (currentScreen == null) Gdx.app.exit();
         else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.CHOOSE_FACTION) {
             batch.begin();
+            menuBackgroundSprite.draw(batch);
 
-            backgroundSprite.draw(batch);
             for (Button button : buttonList)
                 if (button.getScreenLocation() == currentScreen)
                     button.getSprite().draw(batch);
@@ -808,8 +814,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 e.printStackTrace();
             }
         } else {
-            if (loading)
-            {
+            if (loading) {
                 loading = false;
                 return;
             }
@@ -821,8 +826,14 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             float elapsedTime = Gdx.graphics.getDeltaTime();
             GameController.update(elapsedTime);
             //System.out.println(currentPath );
+            batch.begin();
+            gameBackgroundSprite.setSize(1280, 720);
+            gameBackgroundSprite.draw(batch);
+            batch.end();
             isometricPov();
             batch.begin();
+            gameBackgroundBottomSprite.setSize(1280, 720);
+            gameBackgroundBottomSprite.draw(batch);
             if (player == 0) defenderPOV();
             else if (player == 1) attackerPOV();
             if (changedTurn) {
@@ -919,8 +930,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         
     }
 
-    public static void changeScreen(int change)
-    {
+    public static void changeScreen(int change) {
         levelSelectPage+= change;
         if (levelSelectPage < 0)
             levelSelectPage = 0;
@@ -930,9 +940,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 {
                     levelSelectPage = (DatabaseCommunication.numberOfMaps() / levelsToShow);
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -1088,14 +1096,26 @@ public class Game extends ApplicationAdapter implements InputProcessor {
              //renderer.setLevel(GameController.getLevel());
          }
         else if (keycode == Input.Keys.ESCAPE && currentScreen == Screen.LEVEL_EDITOR) {
-            currentScreen = Screen.MAIN_MENU;
-            renderer.setLevel(GameController.getLevel());
-            renderer.setColourExceptions(new HashMap<>());
-            renderer.setLevelEditing(false);
-            levelEditor = null;
+            exitLevelEditor();
         }
 
         return false;
+    }
+
+    static boolean hasExited;
+
+    public static void setHasExited() {
+        hasExited = true;
+    }
+
+
+    public void exitLevelEditor() {
+        hasExited = false;
+        currentScreen = Screen.MAIN_MENU;
+        renderer.setLevel(GameController.getLevel());
+        renderer.setColourExceptions(new HashMap<>());
+        renderer.setLevelEditing(false);
+        levelEditor = null;
     }
 
     // called by the load level buttons on the level select
