@@ -154,7 +154,7 @@ public class Tower extends InteractiveObject
             // to defender base
             for (Pair pair : temp) {
                 MatrixCoordinates tco = (MatrixCoordinates) pair.getKey();
-        
+                
                 // had slight issue with the casting should be fine but could be an issue in
                 // debugging
                 inRange.add((Path) GameController.getMatrixObject(tco.getY(), tco.getX()));

@@ -7,7 +7,6 @@ import java.util.List;
 
 public class Leaderboard
 {
-
     /**
      * When a player wins the game, add their name to the leaderboard
      *
@@ -18,25 +17,23 @@ public class Leaderboard
         LeaderboardRow Winner = new LeaderboardRow(name, wave);
         DatabaseCommunication.addRow(Winner);
     }
-
+    
     /**
      * Gets the highest scoring players from the database, returns their information as a 2d array of strings
      *
      * @param count rows to fetch
      */
     public static String[][] getTop(int count) throws SQLException, ClassNotFoundException {
-        List<LeaderboardRow> Top = new ArrayList<>();
-        Top = DatabaseCommunication.getHighScores(count);
+        List<LeaderboardRow> top = DatabaseCommunication.getHighScores(count);
         
         String[][] displayTop = new String[count][3];
         
-        for (int i = 0; i < Top.size(); i++) {
-            displayTop[i][0] = Top.get(i).getName();
-            displayTop[i][1] = Integer.toString(Top.get(i).getWaves());
-            displayTop[i][2] = (Top.get(i).getDateTime()).toString();
+        for (int i = 0; i < top.size(); i++) {
+            displayTop[i][0] = top.get(i).getName();
+            displayTop[i][1] = Integer.toString(top.get(i).getWaves());
+            displayTop[i][2] = (top.get(i).getDateTime()).toString();
         }
         
         return displayTop;
-        
     }
 }

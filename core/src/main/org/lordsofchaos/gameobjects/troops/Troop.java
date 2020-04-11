@@ -145,9 +145,9 @@ public class Troop extends InteractiveObject
             if ((!previousdir.equals(direction)) && (!previousdir.equals("nothing"))) {
                 moveTroop(move, previousdir);
             }
-    
+            
             moveTroop(move, direction);
-    
+            
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
             if (!(currentco.equals(updatedco))) {

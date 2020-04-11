@@ -13,7 +13,7 @@ public class Obstacle extends Tile
     public ObstacleType getType() {
         return type;
     }
-
+    
     @Override
     public String toString() {
         switch (type) {

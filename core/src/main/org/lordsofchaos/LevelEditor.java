@@ -40,6 +40,7 @@ public class LevelEditor
     private EditorButton continueButton;
     private BitmapFont font;
     private SpriteBatch batch;
+    
     /**
      * Create and initialise new LevelEditor instance
      *
