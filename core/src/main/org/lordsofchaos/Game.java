@@ -83,6 +83,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private BitmapFont unitNumber;
     private BitmapFont matchConclusionFont;
     private BitmapFont arialFont18;
+    private BitmapFont boxyFont18;
     private Pixmap towerAttackPixmap;
     private Texture towerAttackTexture;
     private List<TroopSprite> unitsSprite = new ArrayList<>();
@@ -119,6 +120,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     private Texture HPUpgradeBackgroundTexture;
     private Sprite HPUpgradeBackgroundSprite;
+
+    private Texture backgrounPanelTexture;
+    private Sprite backgroundPanelSprite;
+
     public static void main(String[] args) {
         setupClient();
     }
@@ -165,7 +170,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static boolean getMenuOpen() {
         return menuOpen;
     }
-    
+    public  BitmapFont getPixelatedFont(){
+        return unitNumber;
+    }
     public static void setMenuOpen(boolean bool) {
         menuOpen = bool;
     }
@@ -253,9 +260,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 Gdx.graphics.getHeight() / 2 -215, Screen.MAIN_MENU, Screen.LEADERBOARD));
         
         // troop buttons
-        buttonList.add(new UnitButton("UI/ufoButton.png", 30, 50, Screen.ATTACKER_SCREEN, 0));
-        buttonList.add(new UnitButton("UI/ufo3Button.png", 136, 50, Screen.ATTACKER_SCREEN, 1));
-        buttonList.add(new UnitButton("UI/ufo2Button.png", 242, 50, Screen.ATTACKER_SCREEN, 2));
+        buttonList.add(new UnitButton("UI/ufoButtonB.png", 30, 50, Screen.ATTACKER_SCREEN, 0));
+        buttonList.add(new UnitButton("UI/ufo3ButtonB.png", 136, 50, Screen.ATTACKER_SCREEN, 1));
+        buttonList.add(new UnitButton("UI/ufo2ButtonB.png", 242, 50, Screen.ATTACKER_SCREEN, 2));
         // select attacker/defender buttons
         buttonList.add(new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.DEFENDER_SCREEN, 0));
         buttonList.add(new PlayerButton("UI/NewArtMaybe/attackerButton.png", Gdx.graphics.getWidth() - 400, Gdx.graphics.getHeight() / 2, Screen.CHOOSE_FACTION, Screen.ATTACKER_SCREEN, 1));
@@ -275,7 +282,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new HoverUI("UI/healthBar1Hitbox.png",3, Gdx.graphics.getHeight() - 112,null,"UI/InfoCards/infoPanelHealthbar.png",10, Gdx.graphics.getHeight() - 275));
         buttonList.add(new HoverUI("UI/upgradeBarHitbox.png",10, Gdx.graphics.getHeight() - 161,null,"UI/InfoCards/infoPanelUpgradebar.png",10, Gdx.graphics.getHeight() - 275));
         buttonList.add(new HoverUI("UI/coinHitbox.png",Gdx.graphics.getWidth() - 215, Gdx.graphics.getHeight() - 85,null,"UI/InfoCards/infoPanelCoins.png",Gdx.graphics.getWidth() - 225, Gdx.graphics.getHeight() - 175));
-        buttonList.add(new HoverUI("UI/timerHitbox.png",Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 77,null,"UI/InfoCards/infoPanelTimer.png",Gdx.graphics.getWidth() / 2 + 225, Gdx.graphics.getHeight() - 150));
+        buttonList.add(new HoverUI("UI/timerHitbox.png",Gdx.graphics.getWidth() / 2 + 275, Gdx.graphics.getHeight() - 77,null,"UI/InfoCards/infoPanelTimer.png",Gdx.graphics.getWidth() / 2 + 235, Gdx.graphics.getHeight() - 175));
         // menu buttons
         menuButtonList = new ArrayList<Button>();
         // slider buttons
@@ -408,6 +415,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameterBoxy = new FreeTypeFontParameter();
+        fontParameterBoxy.size = 18;
+        boxyFont18 = fontGenerator.generateFont(fontParameterBoxy);
         fontParameterBoxy.size = 30;
         timerFont = fontGenerator.generateFont(fontParameterBoxy);
         fontParameterBoxy.size = 40;
@@ -431,15 +440,16 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         leaderBoardRowText = new BitmapFont();
         matchConclusionFont = new BitmapFont();
         arialFont18 = new BitmapFont();
+        boxyFont18 = new BitmapFont();
     }
     public void showHealth() {
         healthPercentage();
-        HPUpgradeBackgroundSprite.draw(batch);
+        //HPUpgradeBackgroundSprite.draw(batch);
         healthBarSprite.draw(batch);
         healthSprite.draw(batch);
         String nr = GameController.defender.getHealth() + "";
         hpCounter.getData().setScale(1.5f);
-        hpCounter.draw(batch, nr + " / 100", 205 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 54);
+        boxyFont18.draw(batch, nr + " / 100" , 205 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 51);
     }
     
     public void showUnitHealthBar() {
@@ -501,7 +511,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         coinSprite.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 72);
         String tmpCoinCounter = player.getCurrentMoney() + "";
         coinCounter.getData().setScale(2.0f);
-        coinCounter.draw(batch, tmpCoinCounter, Gdx.graphics.getWidth() - 120, Gdx.graphics.getHeight() - 50);
+        timerFont.draw(batch, tmpCoinCounter, Gdx.graphics.getWidth() - 135, Gdx.graphics.getHeight() - 35);
         
         coinSprite.draw(batch);
     }
@@ -588,7 +598,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 int tmpTroopType = ((UnitButton) button).getTroopType();
                 String unitNr = "" + EventManager.getUnitBuildPlan()[tmpTroopType][tmpPath];
                 unitNumber.draw(batch, unitNr, button.getX() + button.getSprite().getWidth() - 20 - (unitNr.length() - 1) * 10, button.getY() + 25);
-                //unitNumber.draw(batch, nr, unitButton.getX() + unitButton.getSprite().getWidth() - 20 - (nr.length() - 1) * 10, unitButton.getY() + 25);
             }
         }
         showHealth();
@@ -749,6 +758,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         HPUpgradeBackgroundTexture = new Texture(Gdx.files.internal("UI/HP+UpgradeBackground.png"));
         HPUpgradeBackgroundSprite = new Sprite(HPUpgradeBackgroundTexture);
         HPUpgradeBackgroundSprite.setPosition(0,Gdx.graphics.getHeight() - 200);
+
+        backgrounPanelTexture = new Texture("UI/NewArtMaybe/panelB.png");
+        backgroundPanelSprite = new Sprite(backgrounPanelTexture);
+        backgroundPanelSprite.setPosition(Gdx.graphics.getWidth() - backgroundPanelSprite.getWidth() - 10, Gdx.graphics.getHeight() - backgroundPanelSprite.getHeight() - 10);
         Gdx.input.setInputProcessor(this);
     }
     
@@ -756,7 +769,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public void render() {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         if (hasExited) exitLevelEditor();
 
         if (currentScreen == null) Gdx.app.exit();
@@ -832,6 +844,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             batch.end();
             isometricPov();
             batch.begin();
+            backgroundPanelSprite.draw(batch);
             gameBackgroundBottomSprite.setSize(1280, 720);
             gameBackgroundBottomSprite.draw(batch);
             if (player == 0) defenderPOV();
@@ -874,12 +887,12 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                     GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
                     GameController.getWaveState() == GameController.WaveState.Play) {
-                if(GameController.getWaveState() != GameController.WaveState.Play) {
-                    String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
-                    timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 325, Gdx.graphics.getHeight() - 35);
-                    clockSprite.draw(batch);
+                String timerTmp = String.format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
+                if(GameController.getWaveState() == GameController.WaveState.Play) {
+                    timerTmp = "Play";
                 }
-
+                timerFont.draw(batch, timerTmp, Gdx.graphics.getWidth() / 2 + 325, Gdx.graphics.getHeight() - 35);
+                clockSprite.draw(batch);
             }
 
             if(!alertList.isEmpty())

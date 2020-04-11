@@ -150,7 +150,7 @@ public class GameController {
     }
 
     public static int getAttackerUpgradeCooldown(){
-        return troopUpgradeThreshold - troopsMade;
+        return troopUpgradeThreshold - troopsMade % troopUpgradeThreshold;
     }
 
     public static int getDefenderUpgrade(){return defenderUpgradeLevel;}

@@ -12,6 +12,7 @@ public class UpgradeButton extends HoverButton
 {
     
     public static boolean maxLevel;
+    private static boolean doOnce = true;
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
     public UpgradeButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
@@ -47,8 +48,15 @@ public class UpgradeButton extends HoverButton
     }
     @Override
     public void update(int x, int y, SpriteBatch batch) {
-        if(checkHover(x,y)){
+        if(checkHover(x,y) && !maxLevel){
             infoCardSprite.draw(batch);
+        }
+        if(maxLevel && doOnce){
+            doOnce = false;
+            super.texture.dispose();
+            super.texture = new Texture("UI/NewArtMaybe/defenderUpgradeButtonMAX.png");
+            super.sprite = new Sprite(super.texture);
+            super.sprite.setPosition(buttonX1,buttonY1);
         }
     }
 }

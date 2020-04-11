@@ -25,11 +25,11 @@ public class UnitUpgradeButton extends HoverButton {
         super(path + "1.png" , buttonX1, buttonY1, screenLocation);
         this.path = path;
         currentUpgrade = 1;
-        infoCardTexture = new Texture("UI/InfoCards/infoPanelTier1.png");
+        infoCardTexture = new Texture("UI/InfoCards/infoPanelUnitUpgrade1.png");
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30,150);
         alertFont = Game.getBloxyFont();
-        cooldownFont = Game.getFontArial(50);
+        cooldownFont = Game.instance.getPixelatedFont();
         spriteActive = super.sprite;
         textureCooldown = new Texture(Gdx.files.internal(path + currentUpgrade + "Cooldown.png"));
         spriteCooldown = new Sprite(textureCooldown);
@@ -45,13 +45,14 @@ public class UnitUpgradeButton extends HoverButton {
             onCooldown = false;
         }
         else{
+            if(!sprite.equals(spriteCooldown)) sprite = spriteCooldown;
             onCooldown = true;
         }
         if(GameController.getUnitUpgradeLevel() != currentUpgrade) {
             currentUpgrade = GameController.getUnitUpgradeLevel();
             createSprite(path);
         }
-        if(checkHover(x,y))
+        if(checkHover(x,y) && currentUpgrade < 4)
             infoCardSprite.draw(batch);
         //System.out.println(currentUpgrade);
         //sprite.draw(batch);
@@ -66,20 +67,26 @@ public class UnitUpgradeButton extends HoverButton {
         spriteCooldown = new Sprite(textureCooldown);
         spriteCooldown.setPosition(buttonX1,buttonY1);
         super.sprite = spriteCooldown;
+        infoCardTexture.dispose();
+        if(currentUpgrade < 4) {
+            infoCardTexture = new Texture("UI/InfoCards/infoPanelUnitUpgrade" + currentUpgrade + ".png");
+            infoCardSprite = new Sprite(infoCardTexture);
+            infoCardSprite.setPosition(30, 150);
+        }
     }
     @Override
     public void leftButtonAction() {
         if(GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade() && currentUpgrade != 4) {
             EventManager.attackerUpgrade();
             selectSound.play(Game.getSoundEffectsVolume());
-            Game.createAlert(2,alertFont,"Troops have been upgraded!",500,600,null);
+            Game.createAlert(2,alertFont,"Troops have been upgraded!",300,600,null);
         }
         else Game.playSound("ErrorSound");
     }
     public void showCooldown(SpriteBatch batch){
-        if(onCooldown) {
+        if(onCooldown && currentUpgrade < 4) {
             String tmpStr = String.format("%02d", GameController.getAttackerUpgradeCooldown());
-            cooldownFont.draw(batch, tmpStr, buttonX1 + sprite.getWidth() / 4, buttonY1 + sprite.getHeight() - sprite.getHeight() / 4);
+            cooldownFont.draw(batch, tmpStr, buttonX1 + sprite.getWidth() - 20 - (tmpStr.length() - 1) * 10, buttonY1 + 25);
 
         }
     }
