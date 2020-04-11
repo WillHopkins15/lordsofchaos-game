@@ -36,7 +36,16 @@ public class LeaderboardRow
         verifyWaves(waves);
         this.date = Date.valueOf(java.time.LocalDate.now());
     }
-
+    
+    /**
+     * Check the input name is not empty
+     *
+     * @param name name to check
+     */
+    public static boolean verifyName(String name) {
+        return name.length() > 0;
+    }
+    
     /**
      * Check the number of waves given to this object is possible
      *
@@ -48,31 +57,6 @@ public class LeaderboardRow
         else
             this.waves = 100;
     }
-
-    /**
-     * Check the input name is not empty
-     *
-     * @param name name to check
-     */
-    public static boolean verifyName(String name) {
-        return name.length() > 0;
-    }
-
-    /**
-     * Sets the name of this LeaderBoardRow, first checks if name is legal, if not, gives name the value "Invalid name"
-     *
-     * @param name name to set
-     */
-    private void setName(String name) {
-        if (verifyName(name))
-        {
-            this.name = name;
-        }
-        else
-        {
-            this.name = "Invalid name";
-        }
-    }
     
     public int getID() {
         return id;
@@ -80,6 +64,19 @@ public class LeaderboardRow
     
     public String getName() {
         return name;
+    }
+    
+    /**
+     * Sets the name of this LeaderBoardRow, first checks if name is legal, if not, gives name the value "Invalid name"
+     *
+     * @param name name to set
+     */
+    private void setName(String name) {
+        if (verifyName(name)) {
+            this.name = name;
+        } else {
+            this.name = "Invalid name";
+        }
     }
     
     public int getWaves() {

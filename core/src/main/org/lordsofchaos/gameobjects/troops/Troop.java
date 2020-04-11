@@ -14,8 +14,9 @@ import org.lordsofchaos.matrixobjects.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Troop extends InteractiveObject {
-
+public class Troop extends InteractiveObject
+{
+    
     protected float movementSpeed;
     protected int currentHealth;
     protected int maxHealth;
@@ -48,7 +49,7 @@ public class Troop extends InteractiveObject {
     public float getMovementSpeed() {
         return movementSpeed;
     }
-
+    
     public void setMovementSpeed(float movementSpeed) {
         this.movementSpeed = movementSpeed;
     }
@@ -71,7 +72,7 @@ public class Troop extends InteractiveObject {
     
     public List<Path> getPath() {
         if (path == null) {
-            path = new ArrayList<Path>();
+            path = new ArrayList<>();
         }
         return path;
     }
@@ -95,22 +96,22 @@ public class Troop extends InteractiveObject {
     public DamageType getArmourType() {
         return armourType;
     }
-
+    
     /**
      * This troop will move along the path it has stored, scaled with deltaTime to make movement framerate-independent
      *
      * @param deltaTime time taken to execute the last frame
      */
     public void move(float deltaTime) {
-        int move = (int)(movementSpeed * deltaTime);
-
+        int move = (int) (movementSpeed * deltaTime);
+        
         setMoved(false);
         // move along set path
         
         MatrixCoordinates currentco = new MatrixCoordinates(realWorldCoordinates);
-
+        
         System.out.println(currentco.toString());
-
+        
         MatrixObject foundPath = GameController.getMatrixObject(currentco.getY(), currentco.getX());
         
         int index = -1;
@@ -144,42 +145,15 @@ public class Troop extends InteractiveObject {
                 }
             }
             
-            if ((previousdir.equals(direction) == false) && (!previousdir.equals("nothing"))) {
-                switch (previousdir) {
-                    case "north":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
-                        break;
-                    case "east":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
-                        break;
-                    case "south":
-                        realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
-                        break;
-                    case "west":
-                        realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
-                        break;
-                }
+            if ((!previousdir.equals(direction)) && (!previousdir.equals("nothing"))) {
+                moveTroop(move, previousdir);
             }
-            
-            switch (direction) {
-                case "north":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() - (int) move);
-                    break;
-                case "east":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() + (int) move);
-                    break;
-                case "south":
-                    realWorldCoordinates.setY(realWorldCoordinates.getY() + (int) move);
-                    break;
-                case "west":
-                    realWorldCoordinates.setX(realWorldCoordinates.getX() - (int) move);
-                    break;
-            }
-            
+    
+            moveTroop(move, direction);
+    
             MatrixCoordinates updatedco = new MatrixCoordinates(realWorldCoordinates);
             //if the path tile that the troop is on changes then it wil; be added to the new troop list;
-            if ((currentco.equals(updatedco)) == false) {
-                // System.out.println("Troop co is : " + currentco);
+            if (!(currentco.equals(updatedco))) {
                 previousdir = direction;
                 (getPath().get(index)).removeTroop(this);
                 (getPath().get(index + 1)).addTroop(this);
@@ -189,9 +163,22 @@ public class Troop extends InteractiveObject {
             (getPath().get(index)).removeTroop(this);
             setAtEnd(true);
         }
-        
     }
-
-
     
+    private void moveTroop(int move, String direction) {
+        switch (direction) {
+            case "north":
+                realWorldCoordinates.setY(realWorldCoordinates.getY() - move);
+                break;
+            case "east":
+                realWorldCoordinates.setX(realWorldCoordinates.getX() + move);
+                break;
+            case "south":
+                realWorldCoordinates.setY(realWorldCoordinates.getY() + move);
+                break;
+            case "west":
+                realWorldCoordinates.setX(realWorldCoordinates.getX() - move);
+                break;
+        }
+    }
 }

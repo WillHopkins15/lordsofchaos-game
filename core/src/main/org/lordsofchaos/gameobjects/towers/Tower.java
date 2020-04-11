@@ -36,14 +36,14 @@ public class Tower extends InteractiveObject
         isCompleted = false;
         this.type = type;
     }
-
+    
     /**
      * Increase damage for all towers
      */
     public static void upgradeTowerDamage() {
         globalDamageMultiplier += damageUpgrade;
     }
-
+    
     /**
      * Decrease the shot cooldown for all towers
      */
@@ -66,7 +66,7 @@ public class Tower extends InteractiveObject
     public int getRange() {
         return range;
     }
-
+    
     public void setRange(int range) {
         this.range = range;
         findPathInRange();
@@ -84,7 +84,7 @@ public class Tower extends InteractiveObject
     public Troop getTarget() {
         return target;
     }
-
+    
     /**
      * When the range of this tower is changed/set, get a list of all the path tiles that are in range (can be shot at)
      */
@@ -95,19 +95,14 @@ public class Tower extends InteractiveObject
         // List<Coordinates> temp = new ArrayList<Coordinates>();
         MatrixCoordinates matrixco = new MatrixCoordinates(getRealWorldCoordinates());
         
-        //System.out.println("matrixco is: " + matrixco.getY() + "," + matrixco.getX());
         MatrixCoordinates tempco;
         MatrixCoordinates defenderbase = new MatrixCoordinates(GameController.defender.getCoordinates());
-        //  System.out.println("defenderbase is at: " + defenderbase.getY() + "," + defenderbase.getX());
         
         // creating the numerical bounds for the tiles that would be in range
-        
         int y = (matrixco.getY() - getRange());
         int ylimit = (y + 1 + (range * 2));
-        // System.out.println("lower bound is:" + y + "upper bound is:" + ylimit);
         int x = (matrixco.getX() - getRange());
         int xlimit = (x + 1 + (range * 2));
-        // System.out.println("lower bound is:" + x + "upper bound is:" + xlimit);
         
         int count = 0;
         
@@ -115,19 +110,14 @@ public class Tower extends InteractiveObject
             for (int b = x; b < xlimit; b++) {
                 
                 if (GameController.inBounds(a, b)) {
-                    //System.out.println("the inRange coords: " + a + "," + b);
                     if (GameController.getMatrixObject(a, b) instanceof Path) {
-                        // System.out.println("the path coords: " + a + "," + b);
                         count++;
                     }
                 }
             }
         }
         
-        //  System.out.println("count is: " + count);
-        
         if (count != 0) {
-            
             Pair[] temp = new Pair[count];
             
             count = 0;
@@ -143,9 +133,7 @@ public class Tower extends InteractiveObject
             
             for (int a = y; a < ylimit; a++) {
                 for (int b = x; b < xlimit; b++) {
-                    
                     if (GameController.inBounds(a, b)) {
-                        
                         if (GameController.getMatrixObject(a, b) instanceof Path) {
                             tempco = new MatrixCoordinates(b, a);
                             
@@ -157,38 +145,27 @@ public class Tower extends InteractiveObject
                             temp[count] = new Pair(tempco, distancetemp);
                             count++;
                         }
-                        
                     }
-                    
                 }
             }
             
             sort(temp, 0, count - 1);
-            for (int i = 0; i < count; i++) {
-                //   System.out.println(temp[i].getKey() + "," + temp[i].getValue());
-                
-            }
             
             // loop to add path tiles to arraylist inRange in descending order of distance
             // to defender base
-            for (int i = 0; i < temp.length; i++) {
-                MatrixCoordinates tco = (MatrixCoordinates) temp[i].getKey();
-                
+            for (Pair pair : temp) {
+                MatrixCoordinates tco = (MatrixCoordinates) pair.getKey();
+        
                 // had slight issue with the casting should be fine but could be an issue in
                 // debugging
                 inRange.add((Path) GameController.getMatrixObject(tco.getY(), tco.getX()));
             }
-            
-            for (int i = 0; i < count; i++) {
-                System.out.println("this is the inRange: " + inRange.get(i).getMatrixPosition());
-            }
-            
         }
-        
     }
-
+    
     /**
      * this functions is part of the quicksort algorithm
+     *
      * @param tiles
      * @param l
      * @param h
@@ -216,9 +193,10 @@ public class Tower extends InteractiveObject
         
         return i + 1;
     }
-
+    
     /**
      * this function is about of the quicksort algorithm used to sort the tiles by their distance to the defender's base
+     *
      * @param tiles
      * @param l
      * @param h
@@ -231,45 +209,32 @@ public class Tower extends InteractiveObject
             sort(tiles, part + 1, h);
         }
     }
-
+    
     /**
      * Loop through each tile in the list of in range tiles and return the closest
      */
     private Troop findNearestTroop() {
-        Troop temp;
         if (inRange != null && !inRange.isEmpty()) {
             // loop through inRange path objects to find closest troop
             int count = 0;
             
             while (count < inRange.size()) {
-                //System.out.println("this is the current tile path" + inRange.get(count).getMatrixPosition());
                 if ((inRange.get(count).getTroops()).isEmpty()) {
-                    MatrixCoordinates hi = new MatrixCoordinates(5, 8);
-                    if (inRange.get(count).getMatrixPosition().equals(hi)) {
-                        // System.out.println("fucking knew it was this bitch ass tile");
-                    }
                     count++;
-                    
                 } else {
                     MatrixCoordinates hi = new MatrixCoordinates(5, 8);
-                    if (inRange.get(count).getMatrixPosition().equals(hi)) {
-                        // System.out.println("fucking knew it was this bitch ass tile pt 2");
-                    }
-                    // System.out.println("coord of tile: " + inRange.get(count).getMatrixPosition());
                     return inRange.get(count).getTroops().get(0);
                 }
             }
-            
             return null;
         }
-        
         return null;
     }
     
     public void resetTimer() {
         shootTimer = 0;
     }
-
+    
     /**
      * when the shootTimerLimit has elapsed, find the nearest troop and notify GameController that this tower
      * is shooting at it, then reset the timer
@@ -280,8 +245,6 @@ public class Tower extends InteractiveObject
             target = findNearestTroop();
             // if target is null, no troops are in range
             if (target != null) {
-                MatrixCoordinates temp = new MatrixCoordinates(target.getRealWorldCoordinates());
-                //   System.out.println("Current of target is : " + temp);
                 GameController.shootTroop(this, target);
             }
             resetTimer();

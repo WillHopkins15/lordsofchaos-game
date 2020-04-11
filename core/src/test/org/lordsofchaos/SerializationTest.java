@@ -97,6 +97,6 @@ public class SerializationTest
     
     @After
     public void cleanup() {
-    
+
     }
 }

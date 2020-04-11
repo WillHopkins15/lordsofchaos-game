@@ -7,8 +7,9 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class PathButton extends HoverButton {
-
+public class PathButton extends HoverButton
+{
+    
     private static boolean[] selected;
     private int pathNr;
     private boolean justSelected;
@@ -22,6 +23,13 @@ public class PathButton extends HoverButton {
         selected = new boolean[3];
         selected[0] = true;
         this.justSelected = false;
+    }
+    
+    public static void resetSelected() {
+        for (int i = 0; i < selected.length; i++)
+            selected[i] = false;
+        selected[0] = true;
+        
     }
     
     @Override
@@ -45,9 +53,9 @@ public class PathButton extends HoverButton {
             return y > buttonY1 && y < buttonY2;
         return false;
     }
-
+    
     public void update(int x, int y, SpriteBatch batch) {
-        if ((checkHover(x , y) || selected[pathNr]) && GameController.getWaveState() != GameController.WaveState.Play) {
+        if ((checkHover(x, y) || selected[pathNr]) && GameController.getWaveState() != GameController.WaveState.Play) {
             super.sprite.setColor(1, 1, 1, 1);
         } else {
             super.sprite.setColor(1, 1, 1, 0);
@@ -67,11 +75,5 @@ public class PathButton extends HoverButton {
                 buyPathButton.dispose();
         }
     }
-    public static void resetSelected(){
-        for(int i = 0; i < selected.length;i++)
-            selected[i] = false;
-        selected[0] = true;
-
-    }
-
+    
 }

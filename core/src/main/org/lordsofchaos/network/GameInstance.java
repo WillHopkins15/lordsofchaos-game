@@ -50,7 +50,7 @@ public class GameInstance extends UDPSocket
         int localPort = socket.getLocalPort();
         InetAddress localAddress = InetAddress.getLocalHost();
         socket.close();
-    
+        
         Socket attSocket = null;
         while (attSocket == null) {
             try {
@@ -71,7 +71,7 @@ public class GameInstance extends UDPSocket
         Thread.sleep(3000);
         out.close();
         attSocket.close();
-    
+        
         Socket defSocket = null;
         while (defSocket == null) {
             try {
@@ -146,8 +146,9 @@ public class GameInstance extends UDPSocket
     
     /**
      * Checks whether the packet received is the most recent packet sent.
+     *
      * @param packetData timestamped packet
-     * @param sender port number of the sender
+     * @param sender     port number of the sender
      * @return true if the packet is valid
      */
     private boolean validatePacket(TimestampedPacket packetData, int sender) {

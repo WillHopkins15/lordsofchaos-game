@@ -15,7 +15,7 @@ public abstract class GameObject implements Comparable<GameObject>
     public String getSpriteName() {
         return spriteName;
     }
-
+    
     public void setSpriteName(String spriteName) {
         this.spriteName = spriteName;
     }
@@ -32,7 +32,7 @@ public abstract class GameObject implements Comparable<GameObject>
     public int compareTo(GameObject o) {
         int thisSum = realWorldCoordinates.getX() + realWorldCoordinates.getY();
         int otherSum = o.realWorldCoordinates.getX() + o.realWorldCoordinates.getY();
-        return thisSum < otherSum ? 1 : thisSum > otherSum ? -1 : 0;
+        return Integer.compare(otherSum, thisSum);
     }
     
 }

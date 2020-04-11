@@ -20,8 +20,8 @@ public class EventManager
     private static int defenderUpgradesThisTurn;
     private static List<Integer> pathsUnblockedThisTurn;
     private static int attackerUpgradeLevel; // only used for defender
-
-
+    
+    
     /**
      * Check if the defender can upgrade, then apply the upgrade and increment the counter, so the
      * attacker knows how many upgrades to apply when they receive the next packet
@@ -33,33 +33,31 @@ public class EventManager
             defenderUpgradesThisTurn++;
         }
     }
-
+    
     /**
      * When the attacker clicks thw upgrade level button (and they have spawned
      * enough troops to earn an upgrade), this function checks they can afford it, then applies it
      */
-    public static void attackerUpgrade()
-    {
-        if (GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade())
-        {
+    public static void attackerUpgrade() {
+        if (GameController.canAttackerAffordUpgrade() && GameController.attackerEarnedUpgrade()) {
             GameController.upgradeTroops();
         }
     }
-
+    
     /**
      * When this client receives a packet from the other client, unpack the information
      *
      * @param bpd the packet sent by the other client
      */
     public static void recieveBuildPhaseData(BuildPhaseData bpd, Player clientPlayerType) {
-
+        
         // don't apply updates during play phase
         if (GameController.getWaveState() == GameController.WaveState.Play) return;
-
+        
         if (clientPlayerType == null) return;
-
+        
         // if the client is defender, only update attacker information
-        if (clientPlayerType.equals(GameController.defender)){// && GameController.getWaveState()) == GameController.WaveState.AttackerBuild) {
+        if (clientPlayerType.equals(GameController.defender)) {
             int previousUpgradeLevel = attackerUpgradeLevel;
             attackerUpgradeLevel = bpd.getAttackerUpgradeLevel();
             unitBuildPlan = bpd.getUnitBuildPlan();
@@ -67,26 +65,26 @@ public class EventManager
             GameController.defenderNetworkUpdates(attackerUpgradeLevel - previousUpgradeLevel);
         }
         // vice versa
-        else if (clientPlayerType.equals(GameController.attacker)){// && GameController.getWaveState() == GameController.WaveState.DefenderBuild) {
+        else if (clientPlayerType.equals(GameController.attacker)) {
             towerBuilds = bpd.getTowerBuildPlan();
             defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
             removedTowers = bpd.getRemovedTowers();
             GameController.attackerNetworkUpdates();
         }
     }
-
+    
     /**
      * Called when GameController is initialised, resets all values and makes EventManager ready to start a new game
      *
      * @param givenTroopsTypes how many troop types are in this level
-     * @param givenPathCount how many paths are in this level
+     * @param givenPathCount   how many paths are in this level
      */
     public static void initialise(int givenTroopsTypes, int givenPathCount) {
         troopTypes = givenTroopsTypes;
         pathCount = givenPathCount;
         resetEventManager();
     }
-
+    
     /**
      * When a newly-placed tower is right clicked, remove it from the game
      *
@@ -101,19 +99,19 @@ public class EventManager
             System.out.println("Couldn't find tower to remove in gc");
         }
     }
-
+    
     /**
      * Given a Tower object, search a list of SerializableTower objects and find the one with the same coordinates (if there
      * is one)
      *
-     * @param tower the tower to convert
+     * @param tower              the tower to convert
      * @param serializableTowers the SerializableTowers to search
      */
     public static SerializableTower findSerializeableTower(Tower tower, List<SerializableTower> serializableTowers) {
         SerializableTower serTower = null;
-        for (int i = 0; i < serializableTowers.size(); i++) {
-            if (serializableTowers.get(i).getRealWorldCoordinates().equals(tower.getRealWorldCoordinates())) {
-                serTower = serializableTowers.get(i);
+        for (SerializableTower serializableTower : serializableTowers) {
+            if (serializableTower.getRealWorldCoordinates().equals(tower.getRealWorldCoordinates())) {
+                serTower = serializableTower;
                 break;
             }
         }
@@ -132,14 +130,14 @@ public class EventManager
         return removedTowers;
     }
     
-        public static int getDefenderUpgradesThisTurn() {
+    public static int getDefenderUpgradesThisTurn() {
         return defenderUpgradesThisTurn;
     }
     
     public static List<Integer> getPathsUnblockedThisTurn() {
         return pathsUnblockedThisTurn;
     }
-
+    
     /**
      * When the attacker buys a path, it needs to unblocked in the GameController
      */
@@ -147,11 +145,11 @@ public class EventManager
         GameController.unblockPath(index, false);
         pathsUnblockedThisTurn.add(index);
     }
-
+    
     /**
      * When a tower is placed, create a new SerializableTower and pass it to the GameController
      *
-     * @param rwc the position to place the tower
+     * @param rwc       the position to place the tower
      * @param towerType the type of tower that's been placed
      */
     public static void towerPlaced(TowerType towerType, RealWorldCoordinates rwc) {
@@ -161,7 +159,7 @@ public class EventManager
             GameController.createTower(tbp);
         }
     }
-
+    
     /**
      * Resets all values, called after play phase finishes
      */
@@ -172,14 +170,14 @@ public class EventManager
         defenderUpgradesThisTurn = 0;
         pathsUnblockedThisTurn = new ArrayList<>();
     }
-
+    
     /**
      * Whenever a troop is bought, spawned, or cancelled, the buildPlan (which is a frequency matrix) needs to
      * be updated to reflect these changes
      *
-     * @param unitType which kind of unit is in question
-     * @param path which path is the unit assigned to
-     * @param change positive value adds troops to the buildPlan, negative removes
+     * @param unitType     which kind of unit is in question
+     * @param path         which path is the unit assigned to
+     * @param change       positive value adds troops to the buildPlan, negative removes
      * @param troopSpawned distinguishes between troops that have been cancelled (and so the player should be refunded)
      *                     and troops that have been spawned. In both cases, the troop should be removed from the build plan
      */
@@ -190,7 +188,7 @@ public class EventManager
         }
         
         // if path is blocked can't add troop (although this check should be performed before this point)
-        if (GameController.getBlockedPaths().contains(new Integer(path))) {
+        if (GameController.getBlockedPaths().contains(path)) {
             System.out.println("Path is blocked");
             return;
         }

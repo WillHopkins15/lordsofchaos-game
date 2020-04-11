@@ -6,7 +6,8 @@ import org.lordsofchaos.GameController;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.coordinatesystems.RealWorldCoordinates;
 
-abstract public class Conversions {
+abstract public class Conversions
+{
     
     public static Vector2 realWorldCoordinatesToScreenPosition(RealWorldCoordinates rwc) {
         Vector2 isometric = realWorldCooridinateToIsometric(rwc);

@@ -32,9 +32,11 @@ public class BuildPhaseData implements Serializable
         this.currentWave = currentWave;
         this.attackerUpgradeLevel = attackerUpgradeLevel;
     }
-
-    public int getAttackerUpgradeLevel() {return attackerUpgradeLevel;}
-
+    
+    public int getAttackerUpgradeLevel() {
+        return attackerUpgradeLevel;
+    }
+    
     public int[][] getUnitBuildPlan() {
         return unitBuildPlan;
     }

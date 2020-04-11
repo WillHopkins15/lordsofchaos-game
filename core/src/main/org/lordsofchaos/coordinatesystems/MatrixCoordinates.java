@@ -2,8 +2,9 @@ package org.lordsofchaos.coordinatesystems;
 
 import org.lordsofchaos.GameController;
 
-public class MatrixCoordinates extends Coordinates {
-
+public class MatrixCoordinates extends Coordinates
+{
+    
     public MatrixCoordinates(int x, int y) {
         setY(y);
         setX(x);
@@ -20,10 +21,10 @@ public class MatrixCoordinates extends Coordinates {
     private static int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(value, max));
     }
-
+    
     @Override
     public boolean equals(Coordinates other) {
         return super.equals(other);
     }
-
+    
 }

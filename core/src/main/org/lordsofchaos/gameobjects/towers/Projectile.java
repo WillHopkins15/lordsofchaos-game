@@ -24,7 +24,7 @@ public class Projectile extends GameObject
     public Tower getTower() {
         return tower;
     }
-
+    
     /**
      * Given a troop to shoot at, aim at the next tile it's going to move to
      *
@@ -36,7 +36,7 @@ public class Projectile extends GameObject
         
         return new RealWorldCoordinates(targetTroop.getNextTile());
     }
-
+    
     /**
      * This update function controls the movement of this projectile, scaled with deltaTime so that framerate does not affect gameplay
      *
@@ -56,7 +56,7 @@ public class Projectile extends GameObject
             GameController.damageTroop(tower, targetTroop, this);
         }
     }
-
+    
     /**
      * Return the distance between two coordinates
      */

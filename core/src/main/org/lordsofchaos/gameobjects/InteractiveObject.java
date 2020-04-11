@@ -11,13 +11,12 @@ public abstract class InteractiveObject extends GameObject
         super(spriteName, rwc);
         setCost(cost);
         setDamage(damage);
-        
     }
     
     public int getCost() {
         return cost;
     }
-
+    
     public void setCost(int cost) {
         this.cost = cost;
     }

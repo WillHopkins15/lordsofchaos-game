@@ -13,18 +13,22 @@ import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.gameobjects.GameObject;
 import org.lordsofchaos.gameobjects.towers.DefenderTower;
 import org.lordsofchaos.gameobjects.towers.Tower;
-import org.lordsofchaos.matrixobjects.*;
+import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Obstacle;
+import org.lordsofchaos.matrixobjects.ObstacleType;
+import org.lordsofchaos.matrixobjects.Path;
 
 import java.io.File;
 import java.util.*;
 
-public class MapRenderer extends IsometricTiledMapRenderer {
-
+public class MapRenderer extends IsometricTiledMapRenderer
+{
+    
     private static final int tileOffsetX = -256;
     private static final int tileOffsetY = -170;
     private static final int tileWidth = 512;
     private static final int tileHeight = 512;
-
+    
     private Level level;
     private MatrixObject[] sortedObjects = new MatrixObject[400];
     private HashMap<String, Texture> textures = new HashMap<>();
@@ -32,7 +36,7 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     private HashMap<GameObject, Sprite> cachedSprites = new HashMap<>();
     private HashMap<Integer, Color> colourExceptions = new HashMap<>();
     private boolean levelEditing = false;
-
+    
     public MapRenderer() {
         super(new TmxMapLoader().load("maps/BlankMap.tmx"));
         File tileDirectory = new File("core/assets/maps/tiles");
@@ -54,21 +58,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
             if (!file.isHidden())
                 textures.put(file.getName(), new Texture(Gdx.files.internal("troops/" + file.getName())));
     }
-
+    
     /**
-     *
-     * Sets the level that the renderer should render
-     *
-     * @param level The level to be rendered
-     */
-    public void setLevel(Level level) {
-        this.level = level;
-        cachedTiles.clear();
-        sortedObjects = null;
-    }
-
-    /**
-     *
      * Updates the cached sprite and surrounding sprites for a given coordinate
      *
      * @param mc The coordinate to refresh
@@ -80,25 +71,23 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                 if (i >= 0 && i < level.getWidth() && j >= 0 && j < level.getHeight())
                     cachedTiles.remove(level.index(i, j));
     }
-
+    
     /**
-     *
      * The method called frequently to render the level
-     *
      */
     @Override
     public void render() {
         super.render();
-
+        
         List<MatrixCoordinates> updatedCoordinates = level.getUpdatedCoordinates();
         if (!updatedCoordinates.isEmpty()) {
             sortedObjects = level.getObjects().clone();
             Arrays.sort(sortedObjects);
-            for (MatrixCoordinates coordinate: updatedCoordinates)
+            for (MatrixCoordinates coordinate : updatedCoordinates)
                 refreshSprite(coordinate);
             level.resetUpdatedCoordinates();
         }
-
+        
         getBatch().begin();
         
         for (MatrixObject object : sortedObjects) {
@@ -135,17 +124,16 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         }
         
         getBatch().end();
-
+        
     }
-
+    
     /**
-     *
      * Determines whether the adjacent tile to a certain coordinate in a certain direction is of a specified type.
      *
-     * @param x The x coordinate of the tile to check adjacent to
-     * @param y The y coordinate of the tile to check adjacent to
+     * @param x         The x coordinate of the tile to check adjacent to
+     * @param y         The y coordinate of the tile to check adjacent to
      * @param direction The direction of the adjacent tile to check
-     * @param type The type against which to test the adjacent tile
+     * @param type      The type against which to test the adjacent tile
      * @return A boolean dictating whether the adjacent tile is the specified type
      */
     public boolean adjacentTileIs(int x, int y, String direction, String type) {
@@ -197,10 +185,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
                 return false;
         }
     }
-
-
+    
     /**
-     *
      * Retrieves a sprite for a given game object (Troop, Tower).
      * Ideally from cache, otherwise a new sprite is generated
      *
@@ -213,9 +199,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         cachedSprites.put(object, sprite);
         return sprite;
     }
-
+    
     /**
-     *
      * Retrieves a sprite for a given game object (Tile).
      * Ideally from cache, otherwise a new sprite is generated
      *
@@ -229,9 +214,8 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         cachedTiles.put(level.index(object.getMatrixPosition()), sprite);
         return sprite;
     }
-
+    
     /**
-     *
      * Calculates the filename of a sprite base on the MatrixObject (Tile) and its surrounding tiles that determine its variation
      *
      * @param object The matrix object for which to retrieve the sprite name
@@ -257,9 +241,12 @@ public class MapRenderer extends IsometricTiledMapRenderer {
         } else if (object instanceof Obstacle) {
             Obstacle obstacle = (Obstacle) object;
             switch (obstacle.getType()) {
-                case BASE: return "dirt";
-                case ROCK: return "rock";
-                case TREE: return "tree4"; // + new Random().nextInt(5);
+                case BASE:
+                    return "dirt";
+                case ROCK:
+                    return "rock";
+                case TREE:
+                    return "tree4"; // + new Random().nextInt(5);
                 case RIVER:
                     s = "river";
                     if (adjacentTileIs(x, y, "N", "River")) s += "N";
@@ -285,8 +272,19 @@ public class MapRenderer extends IsometricTiledMapRenderer {
     public void setColourExceptions(HashMap<Integer, Color> colourExceptions) {
         this.colourExceptions = colourExceptions;
     }
-
+    
     public Level getLevel() {
         return level;
+    }
+    
+    /**
+     * Sets the level that the renderer should render
+     *
+     * @param level The level to be rendered
+     */
+    public void setLevel(Level level) {
+        this.level = level;
+        cachedTiles.clear();
+        sortedObjects = null;
     }
 }

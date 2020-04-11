@@ -16,14 +16,9 @@ import org.lordsofchaos.matrixobjects.*;
 import java.sql.SQLException;
 import java.util.*;
 
-public class LevelEditor {
-
-    public enum EditorPhase {
-        SPAWNS,
-        PATHS,
-        OBSTACLES
-    }
-
+public class LevelEditor
+{
+    
     private static final Color CANT_PLACE = new Color(0.4f, 0.4f, 0.4f, 1f);
     private static final Color CAN_PLACE = new Color(0.6f, 1f, 0.6f, 1f);
     private static final Color CAN_PLACE_ENDPOINT = new Color(0.6f, 1f, 1f, 1f);
@@ -45,13 +40,11 @@ public class LevelEditor {
     private EditorButton continueButton;
     private BitmapFont font;
     private SpriteBatch batch;
-
     /**
-     *
      * Create and initialise new LevelEditor instance
      *
      * @param renderer The renderer to use for the level's rendering
-     * @param batch The batch to use to display the buttons and UI
+     * @param batch    The batch to use to display the buttons and UI
      */
     public LevelEditor(MapRenderer renderer, SpriteBatch batch) {
         this.renderer = renderer;
@@ -72,13 +65,12 @@ public class LevelEditor {
         font = new BitmapFont();
         font = Game.getFontArial(20);
     }
-
+    
     /**
-     *
      * The loop called repeatedly by the Game instance, used to adjust what is to be rendered based on the mouse position
      *
      * @param mousePosition The coordinate of the tile the user's mouse is over
-     * @param force Whether the rendering should be updated despite no change in mouse position. Used by other internal methods
+     * @param force         Whether the rendering should be updated despite no change in mouse position. Used by other internal methods
      */
     public void run(MatrixCoordinates mousePosition, boolean force) {
         if (this.mousePosition == null || !this.mousePosition.equals(mousePosition) || placed || force) {
@@ -154,12 +146,11 @@ public class LevelEditor {
         }
         renderer.render();
         batch.begin();
-        font.draw(batch, instructions.get(currentPhase), 20, Gdx. graphics.getHeight() - 20);
+        font.draw(batch, instructions.get(currentPhase), 20, Gdx.graphics.getHeight() - 20);
         batch.end();
     }
-
+    
     /**
-     *
      * Darkens the entire map to indicate where tiles cannot be placed
      *
      * @param exceptions The exceptions HashMap to write to
@@ -168,9 +159,8 @@ public class LevelEditor {
         for (int i = 0; i < level.getWidth() * level.getHeight(); i++)
             exceptions.put(i, CANT_PLACE);
     }
-
+    
     /**
-     *
      * Calculates the tiles around the last placed Path tile where the user can place the next one.
      * Used during phase 2, the placing of the paths
      *
@@ -207,15 +197,14 @@ public class LevelEditor {
                     !adjacentPaths.containsAll(cornerSE) && !adjacentPaths.containsAll(cornerSW) &&
                     isPlaceable(x + xOffset, y + yOffset) && x + xOffset > 0 &&
                     y + yOffset > 0 && !(x + xOffset == this.lastPath.getMatrixPosition().getX() &&
-                            y + yOffset == this.lastPath.getMatrixPosition().getY())) {
+                    y + yOffset == this.lastPath.getMatrixPosition().getY())) {
                 placeableCoordinates.add(level.index(x + xOffset, y + yOffset));
             }
         }
         return placeableCoordinates;
     }
-
+    
     /**
-     *
      * Determines whether the tile at a given coordinate is part of the placeable map
      *
      * @param x The x coordinate
@@ -229,9 +218,8 @@ public class LevelEditor {
             return ((Obstacle) level.objectAt(x, y)).getType() != ObstacleType.BASE;
         return true;
     }
-
+    
     /**
-     *
      * Determines whether an spawn, path or obstacle cna be placed at the given coordinate
      *
      * @param x The x coordinate
@@ -257,15 +245,13 @@ public class LevelEditor {
         }
         return true;
     }
-
+    
     /**
-     *
      * Continues the editor to the next stage
-     *
      */
     public void nextStep() {
         if (currentPhase == EditorPhase.SPAWNS) {
-            for (Path spawn: spawns)
+            for (Path spawn : spawns)
                 level.newPath(spawn);
             lastPath = spawns.get(currentPathIndex);
             currentPhase = EditorPhase.PATHS;
@@ -278,9 +264,8 @@ public class LevelEditor {
             Gdx.input.getTextInput(listener, "Name your level", "", "Type name");
         }
     }
-
+    
     /**
-     *
      * The name of the level when received from the text input listener
      *
      * @param name The name of the level
@@ -294,9 +279,8 @@ public class LevelEditor {
             e.printStackTrace();
         }
     }
-
+    
     /**
-     *
      * Determines whether the object at the given coordinate can be removed
      *
      * @param mc The coordinate
@@ -314,11 +298,9 @@ public class LevelEditor {
         }
         return false;
     }
-
+    
     /**
-     *
      * Removes a spawn, path or obstacle at the current mouse porition
-     *
      */
     public void remove() {
         if (!canRemoveAt(mousePosition)) return;
@@ -345,10 +327,8 @@ public class LevelEditor {
         level.addObject(tile);
         run(mousePosition, true);
     }
-
+    
     /**
-     *
-     *
      *
      */
     public void setPlaced() {
@@ -362,10 +342,17 @@ public class LevelEditor {
     public void setCurrentObstacleType(ObstacleType currentObstacleType) {
         this.currentObstacleType = currentObstacleType;
     }
-
+    
     public List<Button> getButtons() {
         if (buttons.containsKey(currentPhase)) return buttons.get(currentPhase);
         return new ArrayList<>();
     }
-
+    
+    public enum EditorPhase
+    {
+        SPAWNS,
+        PATHS,
+        OBSTACLES
+    }
+    
 }
