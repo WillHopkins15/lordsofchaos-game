@@ -1,7 +1,6 @@
 package org.lordsofchaos.graphics;
 
-public enum Screen
-{
+public enum Screen {
     MAIN_MENU,
     CHOOSE_FACTION,
     DEFENDER_SCREEN,

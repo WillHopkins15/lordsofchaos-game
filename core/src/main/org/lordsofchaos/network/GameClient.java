@@ -1,21 +1,34 @@
 package org.lordsofchaos.network;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import lombok.SneakyThrows;
 import org.lordsofchaos.BuildPhaseData;
 import org.lordsofchaos.GameController;
 
-import java.io.*;
-import java.net.*;
-import java.util.ArrayList;
-
 /**
- * Client which periodically sends game data over UDP to a server running a game
- * instance.
+ * Client which periodically sends game data over UDP to a server running a game instance.
  *
  * @author Will Hopkins
  */
-public class GameClient extends UDPSocket
-{
+public class GameClient extends UDPSocket {
+
     private ConnectionPoint server;
     private byte[] buffer = new byte[256];
     private String playerType = "";
@@ -30,11 +43,10 @@ public class GameClient extends UDPSocket
     }
 
     /**
-     * Filters through the knownhosts file to find an online server. Fails if
-     * no servers are online. When a connection is made to a server, the method
-     * blocks until the server pairs this client with another. Intended to be used
-     * when the user chooses to look for a match. All System.out calls in this
-     * method are redirected to a local Stream. The logged messages can be retrieved
+     * Filters through the knownhosts file to find an online server. Fails if no servers are online.
+     * When a connection is made to a server, the method blocks until the server pairs this client
+     * with another. Intended to be used when the user chooses to look for a match. All System.out
+     * calls in this method are redirected to a local Stream. The logged messages can be retrieved
      * as an ArrayList via the <code>getLogMessages</code> method.
      *
      * @return true if connection made successfully, false otherwise
@@ -45,9 +57,8 @@ public class GameClient extends UDPSocket
         if (connected) {
             return false;
         }
-        // Redirect stdout
-
         outputStream.reset();
+        // Redirect stdout
         PrintStream defaultOut = System.out;
         System.setOut(new PrintStream(outputStream));
 
@@ -94,7 +105,9 @@ public class GameClient extends UDPSocket
             connected = true;
             break;
         }
-        if (!connected) System.out.printf("Failed to connect. Reason: %s\n", failureMsg);
+        if (!connected) {
+            System.out.printf("Failed to connect. Reason: %s\n", failureMsg);
+        }
         // Set stdout back to default
         System.setOut(defaultOut);
         return connected;
@@ -109,19 +122,20 @@ public class GameClient extends UDPSocket
     @SneakyThrows
     public ArrayList<String> getLogMessages() {
         ArrayList<String> list = new ArrayList<>();
-        try (InputStream bin = new DataInputStream(new ByteArrayInputStream(outputStream.toByteArray()));
-             BufferedReader messages = new BufferedReader(new InputStreamReader(bin))) {
+        try (InputStream bin = new DataInputStream(
+            new ByteArrayInputStream(outputStream.toByteArray()));
+            BufferedReader messages = new BufferedReader(new InputStreamReader(bin))) {
             String line;
-            while ((line = messages.readLine()) != null)
+            while ((line = messages.readLine()) != null) {
                 list.add(line);
-            //outputStream.reset();
+            }
         }
         return list;
     }
 
     /**
-     * Temporarily switch to TCP in order to guarantee a connection with the server, and that
-     * this players type will get set correctly.
+     * Temporarily switch to TCP in order to guarantee a connection with the server, and that this
+     * players type will get set correctly.
      */
     @SneakyThrows
     private void connectToServerAndGetPlayerType() {
@@ -174,9 +188,11 @@ public class GameClient extends UDPSocket
     protected void parsePacket(DatagramPacket packet) {
         Object received = getObjectFromBytes(packet.getData());
         if (received == null) {
-            System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
+            System.out
+                .printf("[%d] Received null from %d\n", socket.getLocalPort(), packet.getPort());
         } else if (received.getClass() == String.class) {
-            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(), received);
+            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), packet.getPort(),
+                received);
             if (received.equals("Change Phase")) {
                 GameController.endPhase();
             }
@@ -188,14 +204,14 @@ public class GameClient extends UDPSocket
     }
 
     /**
-     * @return InetAdress/Port number pair of connected server. Null if not connected
+     * Returns InetAdress/Port number pair of connected server. Null if not connected
      */
     public ConnectionPoint getServer() {
         return server;
     }
 
     /**
-     * @return Current game state
+     * Returns current game state
      */
     public BuildPhaseData getGameState() {
         return gameState;
@@ -219,28 +235,28 @@ public class GameClient extends UDPSocket
     }
 
     /**
-     * @return Assigned player type - either Attacker or Defender
+     * Returns the assigned player type - either Attacker or Defender
      */
     public String getPlayerType() {
         return this.playerType;
     }
 
     /**
-     * @return Whether this player type is an attacker.
+     * Returns whether this player type is an attacker.
      */
     public boolean isAttacker() {
         return this.getPlayerType().equals("Attacker");
     }
 
     /**
-     * @return Whether this player type is a defender.
+     * Returns whether this player type is a defender.
      */
     public boolean isDefender() {
         return this.getPlayerType().equals("Defender");
     }
 
     /**
-     * @return if the client has been connected to a server
+     * Returns if the client has been connected to a server
      */
     public boolean isConnected() {
         return connected;

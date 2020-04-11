@@ -3,6 +3,7 @@ package org.lordsofchaos.matrixobjects;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 
 public abstract class MatrixObject implements Comparable<MatrixObject> {
+
     // this is not a real-world position, so when constructing a matrixObject, only pass in
     // matrixPositions
     protected MatrixCoordinates matrixPosition;
@@ -14,7 +15,7 @@ public abstract class MatrixObject implements Comparable<MatrixObject> {
     public void setMatrixPosition(int x, int y) {
         matrixPosition = new MatrixCoordinates(x, y);
     }
-    
+
     public MatrixCoordinates getMatrixPosition() {
         return matrixPosition;
     }
@@ -25,5 +26,5 @@ public abstract class MatrixObject implements Comparable<MatrixObject> {
         int otherSum = o.matrixPosition.getX() + o.matrixPosition.getY();
         return Integer.compare(otherSum, thisSum);
     }
-    
+
 }

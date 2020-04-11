@@ -1,32 +1,33 @@
 package org.lordsofchaos;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
-import org.lordsofchaos.matrixobjects.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
+import org.lordsofchaos.matrixobjects.MatrixObject;
+import org.lordsofchaos.matrixobjects.Obstacle;
+import org.lordsofchaos.matrixobjects.ObstacleType;
+import org.lordsofchaos.matrixobjects.Path;
+import org.lordsofchaos.matrixobjects.Tile;
 
 public class Level {
 
     private final int width;
     private final int height;
+    protected List<List<Path>> paths;
+    protected List<Obstacle> obstacles;
     private MatrixObject[] objects;
     private List<MatrixCoordinates> updatedCoordinates = new ArrayList<>();
     private List<Integer> blockedPaths;
 
-    protected List<List<Path>> paths;
-    protected List<Obstacle> obstacles;
-
 
     /**
-     *
      * Create a new blank map, containing only the defender's base
      *
-     * @param width The width of the map to create
+     * @param width  The width of the map to create
      * @param height The height of the map to create
      */
     public Level(int width, int height) {
@@ -39,7 +40,6 @@ public class Level {
 
 
     /**
-     *
      * Create a complete map from a JSON object
      *
      * @param json the JSON object from which to read the map data
@@ -82,55 +82,63 @@ public class Level {
             int x = Integer.parseInt(xyt[0]), y = Integer.parseInt(xyt[1]);
             String typeString = xyt[2];
             ObstacleType type = ObstacleType.RIVER;
-            if (typeString.equals("TREE")) type = ObstacleType.TREE;
-            else if (typeString.equals("ROCK")) type = ObstacleType.ROCK;
+            if (typeString.equals("TREE")) {
+                type = ObstacleType.TREE;
+            } else if (typeString.equals("ROCK")) {
+                type = ObstacleType.ROCK;
+            }
             Obstacle o = new Obstacle(x, y, type);
             addObject(o);
             obstacles.add(o);
         }
 
         blockedPaths = new ArrayList<>();
-        if (paths.size() > 1)
-            for (int i = 1; i < paths.size(); i++)
+        if (paths.size() > 1) {
+            for (int i = 1; i < paths.size(); i++) {
                 blockPath(i);
+            }
+        }
 
     }
 
     /**
+     * Creates an array of the blank tiles, the same size as the map
      *
-     *  Creates an array of the blank tiles, the same size as the map
-     *
-     * @param width The width of the map
+     * @param width  The width of the map
      * @param height The height of the map
      * @return The array of MatrixObjects
      */
     public MatrixObject[] blankObjects(int width, int height) {
         MatrixObject[] matrix = new MatrixObject[width * height];
-        for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) {
-            Tile t = new Tile(x, y, null);
-            matrix[index(x, y)] = t;
-            updatedCoordinates.add(t.getMatrixPosition());
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Tile t = new Tile(x, y, null);
+                matrix[index(x, y)] = t;
+                updatedCoordinates.add(t.getMatrixPosition());
+            }
         }
-        for (int i = width - 1; i >= width - 3; i--)
-            for (int j = height - 1; j >= height - 3 ; j--)
+        for (int i = width - 1; i >= width - 3; i--) {
+            for (int j = height - 1; j >= height - 3; j--) {
                 matrix[index(i, j)] = new Obstacle(i, j, ObstacleType.BASE);
+            }
+        }
         return matrix;
     }
 
     /**
-     *
-     * @return A string of JSON data, representing the map in its current composition
+     * Returns a string of JSON data, representing the map in its current composition
      */
     public String toJSON() {
         List<List<String>> pathStrings = new ArrayList<>();
-        for (List<Path> path: paths) {
+        for (List<Path> path : paths) {
             List<String> P = new ArrayList<>();
-            for (Path p: path)
+            for (Path p : path) {
                 P.add(p.getMatrixPosition().getX() + ":" + p.getMatrixPosition().getY());
+            }
             pathStrings.add(P);
         }
         List<String> obstacleStrings = new ArrayList<>();
-        for (Obstacle obstacle: obstacles) {
+        for (Obstacle obstacle : obstacles) {
             MatrixCoordinates mc = obstacle.getMatrixPosition();
             obstacleStrings.add(mc.getX() + ":" + mc.getY() + ":" + obstacle.toString());
         }
@@ -144,28 +152,28 @@ public class Level {
     }
 
     /**
-     *
      * Print a visual representation of the level to the console
-     *
      */
     public void visualise() {
         for (int y = height - 1; y > -1; y--) {
-            System.out.println();
             for (int x = 0; x < width; x++) {
-                if (objectAt(x, y) instanceof Obstacle) System.out.print("X ");
-                else if (objectAt(x, y) instanceof Path) System.out.print("@ ");
-                else if (objectAt(x, y) instanceof Tile) {
+                if (objectAt(x, y) instanceof Obstacle) {
+                    System.out.print("X ");
+                } else if (objectAt(x, y) instanceof Path) {
+                    System.out.print("@ ");
+                } else if (objectAt(x, y) instanceof Tile) {
                     Tile t = (Tile) objectAt(x, y);
-                    if (t.getTower() != null) System.out.print("T ");
-                    else System.out.print("- ");
+                    if (t.getTower() != null) {
+                        System.out.print("T ");
+                    } else {
+                        System.out.print("- ");
+                    }
                 }
             }
         }
-        System.out.println();
     }
 
     /**
-     *
      * Calculates the index of a given coordinate in the array of objects
      *
      * @param x The x coordinate
@@ -181,7 +189,6 @@ public class Level {
     }
 
     /**
-     *
      * Returns the object in the objects array at a given coordinate
      *
      * @param x The x coordinate
@@ -197,7 +204,6 @@ public class Level {
     }
 
     /**
-     *
      * Adds the given object to the level
      *
      * @param object The object to add
@@ -208,34 +214,30 @@ public class Level {
     }
 
     /**
-     *
      * Blocks the path at the given index
      *
      * @param i The index of the path to block
-     *
      */
     public void blockPath(int i) {
         MatrixCoordinates mc = getPath(i).get(1).getMatrixPosition();
         MatrixCoordinates mc1 = getPath(i).get(2).getMatrixPosition();
-        addObject(new Obstacle(mc.getX(), mc.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
-        addObject(new Obstacle(mc1.getX(), mc1.getY(), new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
+        addObject(new Obstacle(mc.getX(), mc.getY(),
+            new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
+        addObject(new Obstacle(mc1.getX(), mc1.getY(),
+            new Random().nextFloat() < 0.5 ? ObstacleType.ROCK : ObstacleType.TREE));
         blockedPaths.add(i);
     }
 
     /**
-     *
      * Unblocks the path at the given index
      *
      * @param i The index of the path to unblock
-     *
      */
     public void unblockPath(int i) {
         List<Path> path = getPath(i);
         addObject(path.get(1));
         addObject(path.get(2));
         blockedPaths.remove((Integer) i);
-        System.out.println(path.get(1).getMatrixPosition().toString());
-        System.out.println(objects[index(path.get(1).getMatrixPosition())].toString());
     }
 
     public int getWidth() {
