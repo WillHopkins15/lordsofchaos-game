@@ -1,16 +1,15 @@
 package org.lordsofchaos;
 
-import org.lordsofchaos.gameobjects.towers.SerializableTower;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
-public class BuildPhaseData implements Serializable
-{
+public class BuildPhaseData implements Serializable {
+
     private static final long serialVersionUID = 1846519348573L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
@@ -20,9 +19,11 @@ public class BuildPhaseData implements Serializable
     private int attackerUpgradeLevel;
     private List<Integer> pathsUnblockedThisTurn;
     private String currentWave;
-    
-    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan, List<SerializableTower> removedTowers, int defenderUpgradesThisTurn,
-                          List<Integer> pathsUnblockedThisTurn, String currentWave, int defenderHealth, int attackerUpgradeLevel) {
+
+    public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan,
+        List<SerializableTower> removedTowers, int defenderUpgradesThisTurn,
+        List<Integer> pathsUnblockedThisTurn, String currentWave, int defenderHealth,
+        int attackerUpgradeLevel) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
         this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
@@ -32,49 +33,50 @@ public class BuildPhaseData implements Serializable
         this.currentWave = currentWave;
         this.attackerUpgradeLevel = attackerUpgradeLevel;
     }
-    
+
     public int getAttackerUpgradeLevel() {
         return attackerUpgradeLevel;
     }
-    
+
     public int[][] getUnitBuildPlan() {
         return unitBuildPlan;
     }
-    
+
     public List<SerializableTower> getTowerBuildPlan() {
         return towerBuildPlan;
     }
-    
+
     public List<SerializableTower> getRemovedTowers() {
         return removedTowers;
     }
-    
+
     public List<Integer> getPathsUnblockedThisTurn() {
         return pathsUnblockedThisTurn;
     }
-    
+
     public int getDefenderUpgradesThisTurn() {
         return defenderUpgradesThisTurn;
     }
-    
+
     public int getDefenderHealth() {
         return defenderHealth;
     }
-    
+
     public String getCurrentWave() {
         return currentWave;
     }
-    
+
     public String toString() {
         String units = Arrays.deepToString(unitBuildPlan);
         String towers = towerBuildPlan.toString();
         return "Units: " + units + " Towers: " + towers;
     }
-    
-    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+
+    private void readObject(ObjectInputStream aInputStream)
+        throws ClassNotFoundException, IOException {
         aInputStream.defaultReadObject();
     }
-    
+
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
         aOutputStream.defaultWriteObject();
     }

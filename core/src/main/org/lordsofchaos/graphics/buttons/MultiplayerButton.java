@@ -4,14 +4,15 @@ import org.lordsofchaos.Game;
 import org.lordsofchaos.GameController;
 import org.lordsofchaos.graphics.Screen;
 
-public class MultiplayerButton extends MainMenuButton
-{
+public class MultiplayerButton extends MainMenuButton {
+
     boolean findingGame = false;
-    
-    public MultiplayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
+
+    public MultiplayerButton(String path, float buttonX1, float buttonY1, Screen screenLocation,
+        Screen targetScreen) {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
-    
+
     @Override
     public void leftButtonAction() {
         if (!Game.getSearchingForGame()) {
@@ -46,9 +47,9 @@ public class MultiplayerButton extends MainMenuButton
             }
         }
     }
-    
+
     @Override
     public void rightButtonAction() {
-    
+
     }
 }

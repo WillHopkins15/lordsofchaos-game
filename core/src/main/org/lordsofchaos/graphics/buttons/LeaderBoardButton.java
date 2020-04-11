@@ -1,17 +1,16 @@
 package org.lordsofchaos.graphics.buttons;
 
+import java.sql.SQLException;
 import org.lordsofchaos.Game;
 import org.lordsofchaos.graphics.Screen;
 
-import java.sql.SQLException;
+public class LeaderBoardButton extends MainMenuButton {
 
-public class LeaderBoardButton extends MainMenuButton
-{
-    
-    public LeaderBoardButton(String path, float buttonX1, float buttonY1, Screen screenLocation, Screen targetScreen) {
+    public LeaderBoardButton(String path, float buttonX1, float buttonY1, Screen screenLocation,
+        Screen targetScreen) {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
-    
+
     @Override
     public void leftButtonAction() {
         if (!Game.getSearchingForGame()) {
@@ -26,9 +25,9 @@ public class LeaderBoardButton extends MainMenuButton
             }
         }
     }
-    
+
     @Override
     public void rightButtonAction() {
-    
+
     }
 }

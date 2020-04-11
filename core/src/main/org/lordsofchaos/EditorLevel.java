@@ -1,23 +1,22 @@
 package org.lordsofchaos;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import org.lordsofchaos.coordinatesystems.MatrixCoordinates;
 import org.lordsofchaos.matrixobjects.Obstacle;
 import org.lordsofchaos.matrixobjects.Path;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 
 /**
- * A subclass of the Level class, specifically for levels that are being currently edited in the LevelEditor
+ * A subclass of the Level class, specifically for levels that are being currently edited in the
+ * LevelEditor
  */
-public class EditorLevel extends Level
-{
-    
+public class EditorLevel extends Level {
+
     public EditorLevel(int width, int height) {
         super(width, height);
     }
-    
+
     /**
      * Creates a new path, starting at the given spawn point
      *
@@ -26,7 +25,7 @@ public class EditorLevel extends Level
     public void newPath(Path spawn) {
         paths.add(new ArrayList<>(Collections.singletonList(spawn)));
     }
-    
+
     /**
      * Adds a single Path object to a path array
      *
@@ -36,7 +35,7 @@ public class EditorLevel extends Level
     public void addPath(Path p, int i) {
         getPath(i).add(p);
     }
-    
+
     /**
      * Removes the last Path object from the path array at the given index
      *
@@ -46,7 +45,7 @@ public class EditorLevel extends Level
     public Path removePath(int i) {
         return getPath(i).remove(getPath(i).size() - 1);
     }
-    
+
     /**
      * Adds an obstacle to the map
      *
@@ -56,7 +55,7 @@ public class EditorLevel extends Level
         removeObstacle(o.getMatrixPosition());
         obstacles.add(o);
     }
-    
+
     /**
      * Removes an obstacle at the given coordinate. if the tile at the coordinate is an obstacle
      *
@@ -65,5 +64,5 @@ public class EditorLevel extends Level
     public void removeObstacle(MatrixCoordinates mc) {
         obstacles.removeIf(obstacle -> mc.equals(obstacle.getMatrixPosition()));
     }
-    
+
 }

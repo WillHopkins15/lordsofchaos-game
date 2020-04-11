@@ -1,27 +1,31 @@
 package org.lordsofchaos.network;
 
-import lombok.SneakyThrows;
-import org.lordsofchaos.BuildPhaseData;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import lombok.SneakyThrows;
+import org.lordsofchaos.BuildPhaseData;
 
 /**
  * Class that abstracts sending and receiving objects over a DatagramSocket.
  *
  * @author Will Hopkins
  */
-public abstract class UDPSocket extends Thread
-{
+public abstract class UDPSocket extends Thread {
+
     protected volatile boolean running = true;
     protected volatile BuildPhaseData gameState = null;
     protected DatagramSocket socket;
-    private byte[] buffer = new byte[1024 * 16]; //Needs to be big enough to hold the game state object
+    private byte[] buffer = new byte[1024
+        * 16]; //Needs to be big enough to hold the game state object
     private int timeoutCount = 0;
-    
+
     /**
      * Creates a UDP Datagram socket on an available port.
      */
@@ -29,10 +33,10 @@ public abstract class UDPSocket extends Thread
     protected UDPSocket() {
         socket = new DatagramSocket();
     }
-    
+
     /**
-     * Converts an object into a byte stream and sends it through an open UDP socket to
-     * the given player.
+     * Converts an object into a byte stream and sends it through an open UDP socket to the given
+     * player.
      *
      * @param recipient Local IP/port number pair of recipient
      * @param contents  Object to serialize and send
@@ -41,23 +45,24 @@ public abstract class UDPSocket extends Thread
     protected void sendObject(ConnectionPoint recipient, Object contents) {
         if (!socket.isClosed()) {
             byte[] bytes = objectToByteArray(contents);
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(), recipient.getPort());
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(),
+                recipient.getPort());
             socket.send(packet);
         } else {
             System.out.println("Packet not sent: Socket closed");
         }
     }
-    
+
     /**
-     * Listens on the open socket for a Datagram packet. Closes the socket if it times out
-     * 10 times in a row.
+     * Listens on the open socket for a Datagram packet. Closes the socket if it times out 10 times
+     * in a row.
      *
      * @return received packet
      */
     @SneakyThrows
     protected DatagramPacket receive() {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        
+
         try {
             socket.receive(packet);
         } catch (SocketException e) {
@@ -71,11 +76,11 @@ public abstract class UDPSocket extends Thread
             }
             return null;
         }
-        
+
         timeoutCount = 0;
         return (packet);
     }
-    
+
     /**
      * Serializes an object into a byte array.
      *
@@ -89,10 +94,10 @@ public abstract class UDPSocket extends Thread
         oout.writeObject(object);
         return bout.toByteArray();
     }
-    
+
     /**
-     * De-serializes byte array back into an object. Byte array must have been
-     * serialized by an ObjectOutputStream.
+     * De-serializes byte array back into an object. Byte array must have been serialized by an
+     * ObjectOutputStream.
      *
      * @param bytes Byte array to convert
      * @return Resulting deserialized object
@@ -109,7 +114,7 @@ public abstract class UDPSocket extends Thread
         }
         return obj;
     }
-    
+
     /**
      * Creates a thread for listening for Datagram packets and processing the data within.
      */
@@ -123,7 +128,7 @@ public abstract class UDPSocket extends Thread
             }
         }).start();
     }
-    
+
     /**
      * Creates a thread for sending Datagram packets concurrently.
      */
@@ -139,20 +144,19 @@ public abstract class UDPSocket extends Thread
             }
         }).start();
     }
-    
+
     public abstract void run();
-    
+
     protected abstract void send(Object contents);
-    
+
     /**
-     * If the object received is a String, then it logs the message to the console.
-     * If the object is a game state, then this method updates the clients stored
-     * game state data.
+     * If the object received is a String, then it logs the message to the console. If the object is
+     * a game state, then this method updates the clients stored game state data.
      *
      * @param packet UDP packet containing the object
      */
     protected abstract void parsePacket(DatagramPacket packet);
-    
+
     /**
      * Closes the socket if open and kills any open threads.
      */
