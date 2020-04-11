@@ -20,7 +20,6 @@ public class BuyPathButton extends Button
         if (GameController.canAttackerUnblockPath()) {
             EventManager.unblockPath(pathNr);
             selectSound.play(Game.getSoundEffectsVolume());
-            System.out.println("Unblocked path: " + pathNr);
         } else System.out.println("Can't unblock path");
     }
     

@@ -23,7 +23,6 @@ abstract public class HoverButton extends Button
     }
     
     public boolean checkHover(int x, int y) {
-        //System.out.println("Selected path: " + pathNr + " Selected[i]: " + selected[0] + " " + selected[1] + " " + selected[2]);
         return (x > buttonX1 && x < buttonX2 && y > buttonY1 && y < buttonY2);
     }
     

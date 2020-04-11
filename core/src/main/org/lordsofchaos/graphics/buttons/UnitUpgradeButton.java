@@ -41,10 +41,8 @@ public class UnitUpgradeButton extends HoverButton
     
     @Override
     public void update(int x, int y, SpriteBatch batch) {
-        
         if (GameController.attackerEarnedUpgrade()) {
             super.sprite = spriteActive;
-            System.out.println("Can buy upgrade");
             onCooldown = false;
         } else {
             if (!sprite.equals(spriteCooldown)) sprite = spriteCooldown;
@@ -56,8 +54,6 @@ public class UnitUpgradeButton extends HoverButton
         }
         if (checkHover(x, y) && currentUpgrade < 4)
             infoCardSprite.draw(batch);
-        //System.out.println(currentUpgrade);
-        //sprite.draw(batch);
     }
     
     private void createSprite(String path) {

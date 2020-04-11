@@ -45,9 +45,8 @@ public class GameClient extends UDPSocket
         if (connected) {
             return false;
         }
-        // Redirect stdout
-        
         outputStream.reset();
+        // Redirect stdout
         PrintStream defaultOut = System.out;
         System.setOut(new PrintStream(outputStream));
         
@@ -114,7 +113,6 @@ public class GameClient extends UDPSocket
             String line;
             while ((line = messages.readLine()) != null)
                 list.add(line);
-            //outputStream.reset();
         }
         return list;
     }

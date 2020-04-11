@@ -949,7 +949,7 @@ public class GameController
     public static boolean canDefenderCanUpgrade() {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
             Game.playSound("ErrorSound");
-            System.out.print("Max level");
+            System.out.println("Max level");
             return false;
         }
         int cost = defenderUpgradeBaseCost * (defenderUpgradeLevel + 1);

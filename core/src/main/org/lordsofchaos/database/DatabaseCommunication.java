@@ -73,7 +73,6 @@ public class DatabaseCommunication
             String values = "('" + map.getID() + "', '" + map.getJson() + "', '" + userGenerated + "', '" + map.getMapName() + "')";
             query = "INSERT INTO " + dbName + ".maps (id, json_string, user_generated, map_name) VALUES " + values;
         }
-        System.out.println(query);
         connectToDB();
         Statement myStmt = conn.createStatement();
         myStmt.execute(query);
@@ -193,14 +192,7 @@ public class DatabaseCommunication
      * Debug function, prints rows to the console
      */
     private static void printOutTable() throws SQLException, ClassNotFoundException {
-        //Map map = new Map(10,"test_map", "testJson",false );
-        //addMap(map);
         Map map = getMap(3);
-        //List<LeaderboardRow> rows = getHighScores(3);//getRows(0, true);
-        //for (int i = 0; i < rows.size(); i++) {
-        //    System.out.println(rows.get(i).ToString());
-        //}
-        System.out.println(map.getMapName());
     }
     
     public static void main(String args[]) throws SQLException, ClassNotFoundException {

@@ -377,25 +377,18 @@ public class Game extends ApplicationAdapter implements InputProcessor
                 }
             }
             
-            // don't need any change page buttons
-            if (pagesNeeded < 2) {
-                System.out.println("HERE1");
-            }
             // if need multiple pages, and are currently on first page, only need a forward button
-            else if (levelSelectPage == 0) {
-                System.out.println("HERE2");
+            if (levelSelectPage == 0) {
                 buttonList.add(new ChangePageButton("UI/NewArtMaybe/forwardPage.png",
                         Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, 1));
             }
             // if need multiple pages, and are on the last page, only need a back button
             else if (levelSelectPage == pagesNeeded - 1) {
-                System.out.println("HERE3");
                 buttonList.add(new ChangePageButton("UI/NewArtMaybe/backwardPage.png",
                         Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, -1));
             }
             // otherwise, need both forward and backward buttons
             else {
-                System.out.println("HERE4");
                 buttonList.add(new ChangePageButton("UI/NewArtMaybe/forwardPage.png",
                         Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 250, Screen.LEVEL_SELECT, 1));
                 buttonList.add(new ChangePageButton("UI/NewArtMaybe/backwardPage.png",
@@ -436,7 +429,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
             leaderBoardRowText.draw(batch, str, Gdx.graphics.getWidth() / 2 - 400, Gdx.graphics.getHeight() / 2 + 175 + yOffset);
             
             if (previousSelectPage != levelSelectPage) {
-                System.out.println("Added button " + i);
                 buttonList.add(new LoadLevelButton("UI/NewArtMaybe/loadButton.png",
                         Gdx.graphics.getWidth() / 2 + 400, Gdx.graphics.getHeight() / 2 + 100 + yOffset, Screen.LEVEL_SELECT, maps.get(i).getJson()));
             }
@@ -984,7 +976,6 @@ public class Game extends ApplicationAdapter implements InputProcessor
                                 button.leftButtonAction();
                                 if (((SliderButton) button).getSoundType() == 0) {
                                     soundTrack.setVolume(soundTrackVolume);
-                                    System.out.println(soundTrackVolume);
                                 }
                             }
                         }

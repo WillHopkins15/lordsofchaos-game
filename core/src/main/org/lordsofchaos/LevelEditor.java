@@ -259,7 +259,6 @@ public class LevelEditor
             currentPhase = EditorPhase.OBSTACLES;
         } else if (currentPhase == EditorPhase.OBSTACLES) {
             // Complete - Write to file
-            System.out.println(level.toJSON().length());
             MyTextInputListener listener = new MyTextInputListener(this);
             Gdx.input.getTextInput(listener, "Name your level", "", "Type name");
         }

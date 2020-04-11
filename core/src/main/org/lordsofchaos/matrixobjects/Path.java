@@ -13,7 +13,6 @@ public class Path extends MatrixObject
     
     public Path(int x, int y) {
         super(x, y);
-        //setTroops(troops);
     }
     
     // Getters and Setters

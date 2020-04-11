@@ -139,7 +139,6 @@ public class Tower extends InteractiveObject
                             
                             ydistance = defenderbase.getY() - tempco.getY();
                             xdistance = defenderbase.getX() - tempco.getX();
-                            System.out.println("the path coords: " + a + "," + b);
                             distancetemp = Math.sqrt((ydistance * ydistance) + (xdistance * xdistance));
                             
                             temp[count] = new Pair(tempco, distancetemp);

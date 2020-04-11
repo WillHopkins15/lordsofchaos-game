@@ -198,7 +198,7 @@ public class EventManager
             if (GameController.canAffordTroop(unitType)) {
                 GameController.troopPurchased(unitType);
             } else {
-                System.out.print("Can't afford troop type " + unitType + "!");
+                System.out.println("Can't afford troop type " + unitType + "!");
                 return;
             }
         } else if (change == -1) {

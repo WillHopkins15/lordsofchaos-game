@@ -16,8 +16,6 @@ public class HoverUI extends HoverButton
         infoCardTexture = new Texture(Gdx.files.internal(infoCardPath));
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(infoCardX, infoCardY);
-        
-        System.out.println("X1: " + super.buttonX1 + " X2: " + super.buttonX2 + " Y1: " + super.buttonY1 + " Y2: " + super.buttonY2);
     }
     
     @Override

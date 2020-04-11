@@ -145,7 +145,6 @@ public class Level
      */
     public void visualise() {
         for (int y = height - 1; y > -1; y--) {
-            System.out.println();
             for (int x = 0; x < width; x++) {
                 if (objectAt(x, y) instanceof Obstacle) System.out.print("X ");
                 else if (objectAt(x, y) instanceof Path) System.out.print("@ ");
@@ -156,7 +155,6 @@ public class Level
                 }
             }
         }
-        System.out.println();
     }
     
     /**
@@ -222,8 +220,6 @@ public class Level
         addObject(path.get(1));
         addObject(path.get(2));
         blockedPaths.remove((Integer) i);
-        System.out.println(path.get(1).getMatrixPosition().toString());
-        System.out.println(objects[index(path.get(1).getMatrixPosition())].toString());
     }
     
     public int getWidth() {

@@ -25,7 +25,6 @@ public class SliderButton extends Button
     public void leftButtonAction() {
         if (Game.getMenuOpen()) {
             sprite.setPosition(super.buttonX1, buttonY1);
-            //System.out.println("SliderClicked");
             float x = Gdx.input.getX() - 10;
             if (x > xMin + 215) x = xMin + 215;
             if (x < xMin + 15) x = xMin + 15;
@@ -40,7 +39,6 @@ public class SliderButton extends Button
                 if (soundType == 0)
                     Game.setSoundTrackVolume(newVolume);
                 else Game.setSoundEffectsVolume(newVolume);
-                //System.out.println("X: " + super.buttonX1);
             }
         }
     }
