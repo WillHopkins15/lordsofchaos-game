@@ -48,7 +48,7 @@ public class GameServer extends Thread {
     }
 
     /**
-     * @return Number of current connections
+     * Returns the number of current connections
      */
     protected int getNumConnections() {
         return connections.size();

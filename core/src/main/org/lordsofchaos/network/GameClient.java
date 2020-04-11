@@ -204,14 +204,14 @@ public class GameClient extends UDPSocket {
     }
 
     /**
-     * @return InetAdress/Port number pair of connected server. Null if not connected
+     * Returns InetAdress/Port number pair of connected server. Null if not connected
      */
     public ConnectionPoint getServer() {
         return server;
     }
 
     /**
-     * @return Current game state
+     * Returns current game state
      */
     public BuildPhaseData getGameState() {
         return gameState;
@@ -235,28 +235,28 @@ public class GameClient extends UDPSocket {
     }
 
     /**
-     * @return Assigned player type - either Attacker or Defender
+     * Returns the assigned player type - either Attacker or Defender
      */
     public String getPlayerType() {
         return this.playerType;
     }
 
     /**
-     * @return Whether this player type is an attacker.
+     * Returns whether this player type is an attacker.
      */
     public boolean isAttacker() {
         return this.getPlayerType().equals("Attacker");
     }
 
     /**
-     * @return Whether this player type is a defender.
+     * Returns whether this player type is a defender.
      */
     public boolean isDefender() {
         return this.getPlayerType().equals("Defender");
     }
 
     /**
-     * @return if the client has been connected to a server
+     * Returns if the client has been connected to a server
      */
     public boolean isConnected() {
         return connected;

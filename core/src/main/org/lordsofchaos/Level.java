@@ -126,7 +126,7 @@ public class Level {
     }
 
     /**
-     * @return A string of JSON data, representing the map in its current composition
+     * Returns a string of JSON data, representing the map in its current composition
      */
     public String toJSON() {
         List<List<String>> pathStrings = new ArrayList<>();

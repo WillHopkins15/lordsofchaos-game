@@ -22,7 +22,7 @@ public class HostManager {
     private static final String HOSTFILE = "knownhosts";
 
     /**
-     * @return A list of known hostnames
+     * Returns a list of known hostnames
      * @throws IOException If an I/O error occurs opening the source file
      */
     public static ArrayList<String> getHosts() throws IOException {
