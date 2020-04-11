@@ -28,7 +28,7 @@ public class UnitButton extends HoverButton
     public void leftButtonAction() {
         if(GameController.canAffordTroop(troopType)) {
             unitPath = Game.getCurrentPath();
-            selectSound.play(0.75f);
+            selectSound.play(Game.getSoundEffectsVolume());
             EventManager.buildPlanChange(troopType, unitPath, 1, false);
         }
         else Game.playSound("ErrorSound");

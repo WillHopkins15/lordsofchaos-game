@@ -1003,7 +1003,19 @@ public class GameController {
             return false;
         }
     }
-
+    public static boolean canDefenderUpgrade() {
+        if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
+            return false;
+        }
+        int cost = defenderUpgradeBaseCost * (defenderUpgradeLevel + 1);
+        // check if can afford
+        if (defender.getCurrentMoney() >= cost) {
+            return true;
+        } else {
+            System.out.println("Can't afford upgrade");
+            return false;
+        }
+    }
     /**
      * Upgrade the defender based off which level they are at
      */
