@@ -27,11 +27,10 @@ public class EventManager
      * attacker knows how many upgrades to apply when they receive the next packet
      */
     public static void defenderUpgrade() {
-        if (GameController.canDefenderCanUpgrade()) {
-            GameController.defenderUpgrade();
-            // if upgrade is successful, need to record this so attacker can upgrade their defender too
-            defenderUpgradesThisTurn++;
-        }
+        System.out.println("Defender just upgraded");
+        GameController.defenderUpgrade();
+        // if upgrade is successful, need to record this so attacker can upgrade their defender too
+        defenderUpgradesThisTurn++;
     }
 
     /**

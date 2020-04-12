@@ -987,6 +987,7 @@ public class GameController {
      * they are not already at max level
      */
     public static boolean canDefenderCanUpgrade() {
+        System.out.println("Checking if can upgrade");
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
             Game.playSound("ErrorSound");
             System.out.print("Max level");
@@ -995,6 +996,7 @@ public class GameController {
         int cost = defenderUpgradeBaseCost * (defenderUpgradeLevel + 1);
         // check if can afford
         if (defender.getCurrentMoney() >= cost) {
+            System.out.println("Took money " + cost);
             defender.addMoney(-cost);
             return true;
         } else {
@@ -1009,6 +1011,7 @@ public class GameController {
      */
     public static void defenderUpgrade() {
         defenderUpgradeLevel++;
+        System.out.println("Defender just upgraded to " + defenderUpgradeLevel);
         if (defenderUpgradeLevel == 1 || defenderUpgradeLevel == 3) {
             Tower.upgradeTowerDamage();
         } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
