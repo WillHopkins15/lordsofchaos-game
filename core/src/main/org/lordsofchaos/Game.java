@@ -544,6 +544,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             }
         }
         player = 0;
+        for(Button button : buttonList)
+            if(button instanceof UpgradeButton)
+                ((UpgradeButton)button).reset();
         renderer.setLevel(GameController.getLevel());
     }
 

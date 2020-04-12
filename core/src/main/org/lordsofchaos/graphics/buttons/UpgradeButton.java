@@ -1,5 +1,6 @@
 package org.lordsofchaos.graphics.buttons;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,18 +15,20 @@ public class UpgradeButton extends HoverButton {
     private static boolean doOnce = true;
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
-
+    private String path;
     public UpgradeButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
         super(path, buttonX1, buttonY1, screenLocation);
         infoCardTexture = new Texture(
             "UI/InfoCards/infoPanelTier" + (GameController.getDefenderUpgrade() + 1) + ".png");
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30, 150);
+        this.path = path;
     }
 
     @Override
     public void leftButtonAction() {
         if (maxLevel) {
+            Game.playSound("ErrorSound");
             return;
         }
         if (!GameController.canDefenderUpgrade()){
@@ -60,11 +63,23 @@ public class UpgradeButton extends HoverButton {
             infoCardSprite.draw(batch);
         }
         if (maxLevel && doOnce) {
-            doOnce = false;
             super.texture.dispose();
             super.texture = new Texture("UI/NewArtMaybe/defenderUpgradeButtonMAX.png");
             super.sprite = new Sprite(super.texture);
             super.sprite.setPosition(buttonX1, buttonY1);
         }
+    }
+    public void reset(){
+        doOnce = true;
+        maxLevel = false;
+        super.texture.dispose();
+        super.texture = new Texture(Gdx.files.internal(path));
+        super.sprite = new Sprite(super.texture);
+        super.sprite.setPosition(buttonX1,buttonY1);
+        infoCardTexture.dispose();
+        infoCardTexture = new Texture(
+                "UI/InfoCards/infoPanelTier" + (GameController.getDefenderUpgrade() + 1) + ".png");
+        infoCardSprite = new Sprite(infoCardTexture);
+        infoCardSprite.setPosition(30, 150);
     }
 }
