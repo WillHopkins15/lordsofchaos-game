@@ -1,23 +1,26 @@
 package org.lordsofchaos.network;
 
-import lombok.SneakyThrows;
-import org.lordsofchaos.BuildPhaseData;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.*;
+import java.net.BindException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.time.LocalDateTime;
+import lombok.SneakyThrows;
+import org.lordsofchaos.BuildPhaseData;
 
 /**
  * Thread for running an instance of the game over UDP.
  */
-public class GameInstance extends UDPSocket
-{
+public class GameInstance extends UDPSocket {
+
     private ConnectionPoint attacker;
     private ConnectionPoint defender;
     private LocalDateTime lastAttPacketTime = null;
     private LocalDateTime lastDefPacketTime = null;
-    
+
     /**
      * Opens a new DatagramSocket on an available port for communication with the two players.
      *
@@ -30,15 +33,17 @@ public class GameInstance extends UDPSocket
         attacker = player1;
         defender = player2;
         System.out.printf("Thread spawned on port %d\n", socket.getLocalPort());
-        if (connectAndSetTypes(attacker, defender)) return;
+        if (connectAndSetTypes(attacker, defender)) {
+            return;
+        }
         send("mismatched maps");
         running = false;
     }
-    
+
     /**
-     * Guarantees a connection to the client on the same port by using TCP. This ensures that
-     * the client will always receive its assigned type. This method gets the clients selected
-     * map, and returns whether both clients maps are the same.
+     * Guarantees a connection to the client on the same port by using TCP. This ensures that the
+     * client will always receive its assigned type. This method gets the clients selected map, and
+     * returns whether both clients maps are the same.
      *
      * @param attacker Inetaddress/port pair of client to make an attacker
      * @param defender Inetaddress/port pair of client to make a defender
@@ -50,11 +55,12 @@ public class GameInstance extends UDPSocket
         int localPort = socket.getLocalPort();
         InetAddress localAddress = InetAddress.getLocalHost();
         socket.close();
-    
+
         Socket attSocket = null;
         while (attSocket == null) {
             try {
-                attSocket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress, localPort);
+                attSocket = new Socket(attacker.getAddress(), attacker.getPort(), localAddress,
+                    localPort);
             } catch (BindException e) {
                 Thread.sleep(1000);
             }
@@ -71,11 +77,12 @@ public class GameInstance extends UDPSocket
         Thread.sleep(3000);
         out.close();
         attSocket.close();
-    
+
         Socket defSocket = null;
         while (defSocket == null) {
             try {
-                defSocket = new Socket(defender.getAddress(), defender.getPort(), localAddress, localPort);
+                defSocket = new Socket(defender.getAddress(), defender.getPort(), localAddress,
+                    localPort);
             } catch (BindException e) {
                 Thread.sleep(100);
             }
@@ -86,26 +93,26 @@ public class GameInstance extends UDPSocket
         out.writeUTF("Defender");
         out.close();
         defSocket.close();
-        
+
         //Switch back to UDP
         this.socket = new DatagramSocket(localPort);
         return attackerMap.equals(defenderMap);
     }
-    
+
     @SneakyThrows
     public void run() {
         send("Starting game...");
-        
+
         socket.setSoTimeout(500);
         createInputThread();
         createOutputThread();
-        
+
         while (running) {
-        
+
         }
         System.out.println("Game Instance Closed");
     }
-    
+
     /**
      * Sends an object to both players who are connected to the server.
      *
@@ -116,7 +123,7 @@ public class GameInstance extends UDPSocket
         sendObject(attacker, contents);
         sendObject(defender, contents);
     }
-    
+
     @Override
     protected void parsePacket(DatagramPacket packet) {
         int senderPort = packet.getPort();
@@ -125,29 +132,33 @@ public class GameInstance extends UDPSocket
         if (data == null) {
             System.out.printf("[%d] Received null from %d\n", socket.getLocalPort(), senderPort);
         } else if (data.getClass() == String.class) {
-            System.out.printf("[%d] Message from %d: %s\n", socket.getLocalPort(), senderPort, data);
+            System.out
+                .printf("[%d] Message from %d: %s\n", socket.getLocalPort(), senderPort, data);
             if (data.equals("Change Phase")) {
                 System.out.printf("[%d] Sending Phase Change\n", socket.getLocalPort());
                 send("Change Phase");
             }
         } else if (data.getClass() == BuildPhaseData.class) {
-            if (!validatePacket(received, senderPort)) return;
+            if (!validatePacket(received, senderPort)) {
+                return;
+            }
             System.out.printf("[%d] Received game state\n", socket.getLocalPort());
             if (((BuildPhaseData) data).getCurrentWave().equals("AttackerBuild")
-                    && senderPort == defender.getPort()) {
+                && senderPort == defender.getPort()) {
                 return;
             } else if (((BuildPhaseData) data).getCurrentWave().equals("DefenderBuild")
-                    && senderPort == attacker.getPort()) {
+                && senderPort == attacker.getPort()) {
                 return;
             }
             setGameState((BuildPhaseData) data);
         }
     }
-    
+
     /**
      * Checks whether the packet received is the most recent packet sent.
+     *
      * @param packetData timestamped packet
-     * @param sender port number of the sender
+     * @param sender     port number of the sender
      * @return true if the packet is valid
      */
     private boolean validatePacket(TimestampedPacket packetData, int sender) {
@@ -167,7 +178,7 @@ public class GameInstance extends UDPSocket
         System.out.printf("[%d] Game state expired.", socket.getLocalPort());
         return false;
     }
-    
+
     protected void setGameState(BuildPhaseData gameState) {
         this.gameState = gameState;
     }
