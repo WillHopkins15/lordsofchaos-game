@@ -354,6 +354,11 @@ public class GameController {
      * ends, this function is called and the game is moved on to the next phase
      */
     public static void endPhase() {
+        // If wave state is defender/attacker build, don't allow end turn for first three seconds
+        if (waveState != WaveState.Play && buildTimer < 3)
+        {
+            return;
+        }
         Game.switchPlayer();
         if (waveState == WaveState.DefenderBuild) {
             endsPhaseRequests = 0;
