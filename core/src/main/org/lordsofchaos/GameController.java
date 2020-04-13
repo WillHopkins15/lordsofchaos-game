@@ -242,6 +242,7 @@ public class GameController {
      */
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
+        EventManager.resetEventManager();
     }
 
     public static List<Integer> getBlockedPaths() {
