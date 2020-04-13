@@ -10,7 +10,7 @@ import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
 public class BuildPhaseData implements Serializable {
 
-    private static final long serialVersionUID = 1846519348573L;
+    private static final long serialVersionUID = 1846519348574L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
     private List<SerializableTower> removedTowers;
