@@ -405,6 +405,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
     }
 
+    /**
+     * Changes between pages on the level select screen
+     */
     public static void changeScreen(int change) {
         levelSelectPage += change;
         if (levelSelectPage < 0) {
@@ -420,6 +423,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
     }
 
+    /**
+     * Loads the level select screen and initialises the page
+     */
     private static void selectLevelScreen()
         throws FileNotFoundException, SQLException, ClassNotFoundException {
         int pagesNeeded = (int) Math
@@ -551,6 +557,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         ghostTowerType = newType;
     }
 
+    /**
+     * Gets the top scoring player from the database and sets leaderBoardTop to this values
+     *
+     * @param count the number of rows to get from the database
+     */
     public void setLeaderBoardTop(int count) throws SQLException, ClassNotFoundException {
         leaderBoardTop = DatabaseCommunication.getHighScores(count);
     }
