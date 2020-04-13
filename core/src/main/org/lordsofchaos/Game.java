@@ -214,7 +214,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public static void switchPlayer() {
-        if (!multiplayer) {
+        if (!multiplayer && !client.isConnected()) {
             if (player == 0) {
                 player = 1;
                 currentScreen = Screen.ATTACKER_SCREEN;

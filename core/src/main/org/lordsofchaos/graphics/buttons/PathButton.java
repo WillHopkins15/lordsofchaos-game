@@ -20,7 +20,7 @@ public class PathButton extends HoverButton {
         this.pathNr = pathNr;
         super.sprite.setColor(1, 1, 1, 0);
         super.sprite.setScale(0.5f, 0.5f);
-        selected = new boolean[3];
+        selected = new boolean[GameController.getLevel().getPaths().size()];
         selected[0] = true;
         this.justSelected = false;
     }
@@ -36,7 +36,7 @@ public class PathButton extends HoverButton {
     @Override
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < selected.length; i++) {
             selected[i] = false;
         }
         selected[pathNr] = true;
