@@ -138,8 +138,8 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     private Sprite clockSprite;
     private Sprite messageLogSprite;
     private Sprite backgroundPanelSprite;
-    private static float halfWidth = Gdx.graphics.getWidth() / 2f;
-    private static float halfHeight = Gdx.graphics.getHeight() / 2f;
+    private static float halfWidth;
+    private static float halfHeight;
 
     public static void main(String[] args) {
         setupClient();
@@ -922,6 +922,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
      */
     @Override
     public void create() {
+        halfWidth = Gdx.graphics.getWidth() / 2f;
+        halfHeight = Gdx.graphics.getHeight() / 2f;
+
         instance = this;
         createFonts();
         generateFont();
