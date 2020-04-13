@@ -10,23 +10,23 @@ import org.lordsofchaos.gameobjects.towers.SerializableTower;
 
 public class BuildPhaseData implements Serializable {
 
-    private static final long serialVersionUID = 1846519348573L;
+    private static final long serialVersionUID = 1846519348574L;
     private int[][] unitBuildPlan;
     private List<SerializableTower> towerBuildPlan;
     private List<SerializableTower> removedTowers;
-    private int defenderUpgradesThisTurn;
+    private int defenderUpgradeLevel;
     private int defenderHealth;
     private int attackerUpgradeLevel;
     private List<Integer> pathsUnblockedThisTurn;
     private String currentWave;
 
     public BuildPhaseData(int[][] unitBuildPlan, List<SerializableTower> towerBuildPlan,
-        List<SerializableTower> removedTowers, int defenderUpgradesThisTurn,
+        List<SerializableTower> removedTowers, int defenderUpgradeLevel,
         List<Integer> pathsUnblockedThisTurn, String currentWave, int defenderHealth,
         int attackerUpgradeLevel) {
         this.unitBuildPlan = unitBuildPlan;
         this.towerBuildPlan = towerBuildPlan;
-        this.defenderUpgradesThisTurn = defenderUpgradesThisTurn;
+        this.defenderUpgradeLevel = defenderUpgradeLevel;
         this.defenderHealth = defenderHealth;
         this.pathsUnblockedThisTurn = pathsUnblockedThisTurn;
         this.removedTowers = removedTowers;
@@ -54,8 +54,8 @@ public class BuildPhaseData implements Serializable {
         return pathsUnblockedThisTurn;
     }
 
-    public int getDefenderUpgradesThisTurn() {
-        return defenderUpgradesThisTurn;
+    public int getDefenderUpgradeLevel() {
+        return defenderUpgradeLevel;
     }
 
     public int getDefenderHealth() {
