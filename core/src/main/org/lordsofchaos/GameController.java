@@ -295,10 +295,10 @@ public class GameController {
      * Attacker has various updates it needs to perform whenever it receives a new packet from the
      * defender
      */
-    public static void attackerNetworkUpdates() {
+    public static void attackerNetworkUpdates(int defenderUpgrades) {
         attackerPlaceTowers();
         attackerRemoveTowers();
-        attackerUpdgradeDefender();
+        attackerUpdgradeDefender(defenderUpgrades);
     }
 
     /**
@@ -331,11 +331,10 @@ public class GameController {
     /**
      * If the defender bought an upgrade(s), attacker needs to apply this change also
      */
-    private static void attackerUpdgradeDefender() {
-        // when defender attempts to upgrade, the event manager only increments this value if upgrade
-        // is successful, so no more checks are needed and we can immediately upgrade the defender
-        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++) {
+    private static void attackerUpdgradeDefender(int defenderUpgrades) {
+        while (defenderUpgrades > 0) {
             defenderUpgrade();
+            defenderUpgrades--;
         }
     }
 
