@@ -16,7 +16,7 @@ public class EventManager {
     private static int[][] unitBuildPlan;
     private static List<SerializableTower> towerBuilds;
     private static List<SerializableTower> removedTowers;
-    private static int defenderUpgradesThisTurn;
+    private static int defenderUpgradeLevel;
     private static List<Integer> pathsUnblockedThisTurn;
     private static int attackerUpgradeLevel; // only used for defender
 
@@ -26,11 +26,10 @@ public class EventManager {
      * attacker knows how many upgrades to apply when they receive the next packet
      */
     public static void defenderUpgrade() {
-
         if (GameController.canDefenderCanUpgrade()) {
             GameController.defenderUpgrade();
             // if upgrade is successful, need to record this so attacker can upgrade their defender too
-            defenderUpgradesThisTurn++;
+            defenderUpgradeLevel = GameController.getDefenderUpgrade();
         }
     }
 
@@ -70,10 +69,12 @@ public class EventManager {
         }
         // vice versa
         else if (clientPlayerType.equals(GameController.attacker)) {
+
+            int previousUpgradeLevel = defenderUpgradeLevel;
+            defenderUpgradeLevel = bpd.getDefenderUpgradeLevel();
             towerBuilds = bpd.getTowerBuildPlan();
-            defenderUpgradesThisTurn = bpd.getDefenderUpgradesThisTurn();
             removedTowers = bpd.getRemovedTowers();
-            GameController.attackerNetworkUpdates();
+            GameController.attackerNetworkUpdates(defenderUpgradeLevel - previousUpgradeLevel);
         }
     }
 
@@ -138,7 +139,7 @@ public class EventManager {
     }
 
     public static int getDefenderUpgradesThisTurn() {
-        return defenderUpgradesThisTurn;
+        return defenderUpgradeLevel;
     }
 
     public static List<Integer> getPathsUnblockedThisTurn() {
@@ -174,7 +175,6 @@ public class EventManager {
         unitBuildPlan = new int[troopTypes][pathCount];
         towerBuilds = new ArrayList<>();
         removedTowers = new ArrayList<>();
-        defenderUpgradesThisTurn = 0;
         pathsUnblockedThisTurn = new ArrayList<>();
     }
 

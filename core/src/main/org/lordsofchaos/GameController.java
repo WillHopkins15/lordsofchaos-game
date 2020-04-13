@@ -242,6 +242,7 @@ public class GameController {
      */
     public static void setGameState(BuildPhaseData bpd) {
         EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
+        EventManager.resetEventManager();
     }
 
     public static List<Integer> getBlockedPaths() {
@@ -294,10 +295,10 @@ public class GameController {
      * Attacker has various updates it needs to perform whenever it receives a new packet from the
      * defender
      */
-    public static void attackerNetworkUpdates() {
+    public static void attackerNetworkUpdates(int defenderUpgrades) {
         attackerPlaceTowers();
         attackerRemoveTowers();
-        attackerUpdgradeDefender();
+        attackerUpdgradeDefender(defenderUpgrades);
     }
 
     /**
@@ -330,11 +331,10 @@ public class GameController {
     /**
      * If the defender bought an upgrade(s), attacker needs to apply this change also
      */
-    private static void attackerUpdgradeDefender() {
-        // when defender attempts to upgrade, the event manager only increments this value if upgrade
-        // is successful, so no more checks are needed and we can immediately upgrade the defender
-        for (int i = 0; i < EventManager.getDefenderUpgradesThisTurn(); i++) {
+    private static void attackerUpdgradeDefender(int defenderUpgrades) {
+        while (defenderUpgrades > 0) {
             defenderUpgrade();
+            defenderUpgrades--;
         }
     }
 
@@ -970,6 +970,7 @@ public class GameController {
      * the upgrade and they are not already at max level
      */
     public static boolean canDefenderCanUpgrade() {
+        System.out.println("Checking if can upgrade");
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
             Game.playSound("ErrorSound");
             System.out.println("Max level");
@@ -978,6 +979,7 @@ public class GameController {
         int cost = defenderUpgradeBaseCost * (defenderUpgradeLevel + 1);
         // check if can afford
         if (defender.getCurrentMoney() >= cost) {
+            System.out.println("Took money " + cost);
             defender.addMoney(-cost);
             return true;
         } else {
@@ -1004,6 +1006,7 @@ public class GameController {
      */
     public static void defenderUpgrade() {
         defenderUpgradeLevel++;
+        System.out.println("Defender just upgraded to " + defenderUpgradeLevel);
         if (defenderUpgradeLevel == 1 || defenderUpgradeLevel == 3) {
             Tower.upgradeTowerDamage();
         } else if (defenderUpgradeLevel == 2 || defenderUpgradeLevel == 4) {
