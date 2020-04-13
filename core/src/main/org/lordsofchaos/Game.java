@@ -214,7 +214,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     public static void switchPlayer() {
-        if (!multiplayer && !client.isConnected()) {
+        if (!multiplayer && client == null) {
             if (player == 0) {
                 player = 1;
                 currentScreen = Screen.ATTACKER_SCREEN;
@@ -1110,8 +1110,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             if (GameController.getWaveState() == GameController.WaveState.AttackerBuild ||
                 GameController.getWaveState() == GameController.WaveState.DefenderBuild ||
                 GameController.getWaveState() == GameController.WaveState.Play) {
+                int tmpInt = 30 - (int) GameController.getBuildPhaseTimer();
+                if(tmpInt < 0) tmpInt = 0;
                 String timerTmp = String
-                    .format("%02d", 30 - (int) GameController.getBuildPhaseTimer());
+                    .format("%02d", tmpInt);
                 if (GameController.getWaveState() == GameController.WaveState.Play) {
                     timerTmp = "Play";
                 }
