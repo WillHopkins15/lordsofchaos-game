@@ -100,10 +100,15 @@ public class GameClient extends UDPSocket {
                 }
                 break;
             }
-            failureMsg = "Opponent Disconnected";
 
-            if (getObjectFromBytes(packet.getData()).equals("mismatched maps")) {
-                failureMsg = "Client maps are mismatched.";
+            byte[] data = packet.getData();
+            if (data != null) {
+                if (getObjectFromBytes(data).equals("mismatched maps")) {
+                    failureMsg = "Client maps are mismatched.";
+                    break;
+                }
+            } else {
+                failureMsg = "Opponent Disconnected";
                 break;
             }
             connected = true;
