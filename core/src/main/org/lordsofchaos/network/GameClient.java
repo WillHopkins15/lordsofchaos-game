@@ -97,6 +97,7 @@ public class GameClient extends UDPSocket {
                     Thread.sleep(500);
                 } catch (SocketTimeoutException e) {
                     failureMsg = "Opponent Disconnected";
+                    break;
                 }
             }
 
