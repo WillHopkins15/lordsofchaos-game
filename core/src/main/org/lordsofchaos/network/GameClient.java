@@ -63,7 +63,7 @@ public class GameClient extends UDPSocket {
         System.setOut(new PrintStream(outputStream));
 
         String failureMsg = "No Servers Online";
-        socket.setSoTimeout(5000);
+        socket.setSoTimeout(2000);
         DatagramPacket packet;
         System.out.println("Searching for server...");
         for (String item : HostManager.getHosts()) {
@@ -95,6 +95,8 @@ public class GameClient extends UDPSocket {
                     break;
                 } catch (SocketException ignored) {
                     Thread.sleep(500);
+                } catch (SocketTimeoutException e) {
+                    failureMsg = "Opponent Disconnected";
                 }
             }
 
