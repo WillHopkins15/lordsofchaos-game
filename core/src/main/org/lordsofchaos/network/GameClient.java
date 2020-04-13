@@ -63,7 +63,7 @@ public class GameClient extends UDPSocket {
         System.setOut(new PrintStream(outputStream));
 
         String failureMsg = "No Servers Online";
-        socket.setSoTimeout(5000);
+        socket.setSoTimeout(2000);
         DatagramPacket packet;
         System.out.println("Searching for server...");
         for (String item : HostManager.getHosts()) {
@@ -89,17 +89,26 @@ public class GameClient extends UDPSocket {
 
             // Get confirmation that the other client is ready
             // Need to allow server socket time to get back up
-            while (true) {
+            int timeoutCount = 0;
+            while (timeoutCount++ < 5) {
                 try {
                     socket.receive(packet);
-                    break;
                 } catch (SocketException ignored) {
                     Thread.sleep(500);
+                    continue;
+                } catch (SocketTimeoutException ignored) {
                 }
+                break;
             }
 
-            if (getObjectFromBytes(packet.getData()).equals("mismatched maps")) {
-                failureMsg = "Client maps are mismatched.";
+            byte[] data = packet.getData();
+            if (data != null) {
+                if (getObjectFromBytes(data).equals("mismatched maps")) {
+                    failureMsg = "Client maps are mismatched.";
+                    break;
+                }
+            } else {
+                failureMsg = "Opponent Disconnected";
                 break;
             }
             connected = true;
