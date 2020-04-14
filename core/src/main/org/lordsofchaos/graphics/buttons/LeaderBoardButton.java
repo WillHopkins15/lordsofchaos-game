@@ -11,6 +11,10 @@ public class LeaderBoardButton extends MainMenuButton {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
 
+    /**
+     * On left click this button should play a sound effect and then load the leaderboard page, and display the top five
+     * scores from the database
+     */
     @Override
     public void leftButtonAction() {
         if (!Game.getSearchingForGame()) {

@@ -13,6 +13,10 @@ public class LoadLevelButton extends Button {
         this.mapJson = mapJson;
     }
 
+    /**
+     * On left click this button should play a sound effect and load the selected map into Game.java
+     * When the player starts a game/ searches for an online match, this map will be used to play on
+     */
     @Override
     public void leftButtonAction() {
         Game.instance.levelSelected(mapJson);
