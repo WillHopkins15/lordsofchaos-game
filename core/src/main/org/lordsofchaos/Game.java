@@ -779,6 +779,43 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     }
 
     /**
+     * Opens an in-game menu with buttons and volume sliders.
+     */
+    public void  showMenu(){
+        int x = Gdx.input.getX();
+        int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+        menuSprite.draw(batch);
+        for (Button button : menuButtonList) {
+            button.getSprite().draw(batch);
+            if (button instanceof SliderButton) {
+
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                    if (button.checkClick(x, y) && !sliderClicked) {
+                        button.leftButtonAction();
+                        sliderClicked = true;
+                        selectedSlider = ((SliderButton) button).getSoundType();
+                        if (((SliderButton) button).getSoundType() == 0) {
+                            soundTrack.setVolume(soundTrackVolume);
+                        }
+                    } else if (((SliderButton) button).getSoundType() == selectedSlider
+                            && sliderClicked) {
+                        button.leftButtonAction();
+                        if (((SliderButton) button).getSoundType() == 0) {
+                            soundTrack.setVolume(soundTrackVolume);
+                        }
+                    }
+                }
+            } else {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !sliderClicked) {
+                    if (button.checkClick(x, y)) {
+                        button.leftButtonAction();
+                        setMenuOpen(false);
+                    }
+                }
+            }
+        }
+    }
+    /**
      *
      * Draw buttons and alerts specific to the defender
      *
@@ -1241,38 +1278,7 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                 showAlert();
             }
             if (menuOpen) {
-                int x = Gdx.input.getX();
-                int y = Gdx.graphics.getHeight() - Gdx.input.getY();
-                menuSprite.draw(batch);
-                for (Button button : menuButtonList) {
-                    button.getSprite().draw(batch);
-                    if (button instanceof SliderButton) {
-
-                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                            if (button.checkClick(x, y) && !sliderClicked) {
-                                button.leftButtonAction();
-                                sliderClicked = true;
-                                selectedSlider = ((SliderButton) button).getSoundType();
-                                if (((SliderButton) button).getSoundType() == 0) {
-                                    soundTrack.setVolume(soundTrackVolume);
-                                }
-                            } else if (((SliderButton) button).getSoundType() == selectedSlider
-                                && sliderClicked) {
-                                button.leftButtonAction();
-                                if (((SliderButton) button).getSoundType() == 0) {
-                                    soundTrack.setVolume(soundTrackVolume);
-                                }
-                            }
-                        }
-                    } else {
-                        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !sliderClicked) {
-                            if (button.checkClick(x, y)) {
-                                button.leftButtonAction();
-                                setMenuOpen(false);
-                            }
-                        }
-                    }
-                }
+                showMenu();
             }
             batch.end();
             disposeTMP();
