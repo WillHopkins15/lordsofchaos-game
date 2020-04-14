@@ -225,7 +225,7 @@ public class GameController {
      * Collects all the information about what has changed since the last packet was sent
      */
     public static BuildPhaseData getGameState() {
-        System.out.println("Towers giving " + EventManager.getTowerBuilds() + " is attacker " + clientPlayerType.equals(attacker));
+        //System.out.println("Towers giving " + EventManager.getTowerBuilds() + " is attacker " + clientPlayerType.equals(attacker));
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(),
             EventManager.getTowerBuilds(),
@@ -242,7 +242,7 @@ public class GameController {
      * @param bpd the object that contains all the required information about what has changed
      */
     public static void setGameState(BuildPhaseData bpd) {
-        System.out.println("Towers got " + bpd.getTowerBuildPlan().size() + " is attacker " + clientPlayerType.equals(attacker));
+        //System.out.println("Towers got " + bpd.getTowerBuildPlan().size() + " is attacker " + clientPlayerType.equals(attacker));
         EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
         EventManager.resetEventManager();
     }

@@ -88,6 +88,7 @@ public class EventManager {
         troopTypes = givenTroopsTypes;
         pathCount = givenPathCount;
         towerBuilds = new ArrayList<>();
+        unitBuildPlan = new int[troopTypes][pathCount];
         resetEventManager();
     }
 
@@ -172,7 +173,7 @@ public class EventManager {
      * Resets all values, called after play phase finishes
      */
     public static void resetEventManager() {
-        unitBuildPlan = new int[troopTypes][pathCount];
+        //unitBuildPlan = new int[troopTypes][pathCount];
         //towerBuilds = new ArrayList<>();
         removedTowers = new ArrayList<>();
         pathsUnblockedThisTurn = new ArrayList<>();
@@ -190,6 +191,7 @@ public class EventManager {
      *                     troop should be removed from the build plan
      */
     public static void buildPlanChange(int unitType, int path, int change, boolean troopSpawned) {
+        System.out.println("troop change " + change + ", spawned = " + troopSpawned);
         if (unitType < 0 || unitType > 2 || path < 0 || path > GameController.getPaths().size()) {
             System.out.println("Invalid buildPlanChange");
             return; // unit or path doesn't exist
