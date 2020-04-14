@@ -318,9 +318,6 @@ public class GameController {
      */
     private static void attackerPlaceTowers() {
         List<SerializableTower> currentTowers = new ArrayList<>();
-
-
-
         // loop through the currently placed towers and convert to SerializableTower list
         // any new towers which aren't in this list need to be created and added to the game
         // and any towers which have been removed, need to be taken out of the game
@@ -329,18 +326,14 @@ public class GameController {
             if (t instanceof TowerType1) {
                 SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
                 currentTowers.add(st);
-            } else if (t instanceof TowerType1) {
-                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+            } else if (t instanceof TowerType2) {
+                SerializableTower st = new SerializableTower(TowerType.type2, t.getRealWorldCoordinates());
                 currentTowers.add(st);
-            } else if (t instanceof TowerType1) {
-                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+            } else if (t instanceof TowerType3) {
+                SerializableTower st = new SerializableTower(TowerType.type3, t.getRealWorldCoordinates());
                 currentTowers.add(st);
             }
         }
-
-        System.out.println("Attacker current towers " + currentTowers);
-        System.out.println("Attacker build plan towers " + EventManager.getTowerBuilds());
-
         List<SerializableTower> newTowers = new ArrayList<>();
         List<SerializableTower> toRemove = new ArrayList<>();
 
@@ -357,9 +350,6 @@ public class GameController {
                 newTowers.add(t);
             }
         }
-
-        System.out.println("Attacker adding towers " + newTowers);
-
         for (SerializableTower t : currentTowers) {
             boolean found = false;
             for (SerializableTower t1 : EventManager.getTowerBuilds()) {
@@ -373,12 +363,8 @@ public class GameController {
                 toRemove.add(t);
             }
         }
-
-        System.out.println("Attacker removing towers " + toRemove);
-
         // create new towers
         for (int i = 0; i < newTowers.size(); i++) {
-            System.out.println("Attacker Placing tower " + i);
             MatrixCoordinates mc = new MatrixCoordinates(
                     newTowers.get(i).getRealWorldCoordinates());
 
@@ -386,13 +372,10 @@ public class GameController {
                 createTower(newTowers.get(i));
             }
         }
-
         // remove towers
         for (int i = 0; i < toRemove.size(); i++) {
-            System.out.println("Attacker removing tower " + i);
             removeTower(toRemove.get(i));
         }
-
     }
 
     /**
@@ -549,7 +532,6 @@ public class GameController {
      * @param deltaTime the time taken to process the last frame
      */
     public static void update(float deltaTime) {
-
         // if frame time is too high, don't process the frame as it's likely a lag spike/ loading
         if (deltaTime > 0.2f) {
             return;

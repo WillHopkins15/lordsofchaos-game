@@ -18,6 +18,7 @@ public class MainMenuButton extends Button {
      */
     public void leftButtonAction() {
         if (!Game.getSearchingForGame()) {
+            Game.multiplayer = false;
             selectSound.play(Game.getSoundEffectsVolume());
             Game.currentScreen = targetScreen;
         }
