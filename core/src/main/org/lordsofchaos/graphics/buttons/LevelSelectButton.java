@@ -10,6 +10,10 @@ public class LevelSelectButton extends MainMenuButton {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
     }
 
+    /**
+     * On left click this button should play a sound effect and then load the level select screen,
+     * and also set previousSelectPage to -1 as an initialiser
+     */
     @Override
     public void leftButtonAction() {
         if (!Game.getSearchingForGame()) {

@@ -349,6 +349,10 @@ public class GameController {
     private static void resetAddMoneyTimer() {
     }
 
+    /**
+     * Returns false if the end turn button should be greyed out (i.e. the game is in the play phase
+     * or the build timer is less than three seconds in)
+     */
     public static boolean endTurnButtonEnabled()
     {
         if (waveState == WaveState.Play)

@@ -13,6 +13,9 @@ public class ChangePageButton extends Button {
         this.change = change;
     }
 
+    /**
+     * On left click this button should play a sound effect and then change the page of the level select screen
+     */
     @Override
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
