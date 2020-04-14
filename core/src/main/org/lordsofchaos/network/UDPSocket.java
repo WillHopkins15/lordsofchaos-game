@@ -22,15 +22,15 @@ public abstract class UDPSocket extends Thread {
     protected volatile boolean running = true;
     protected volatile BuildPhaseData gameState = null;
     protected DatagramSocket socket;
-    private byte[] buffer = new byte[1024
-        * 16]; //Needs to be big enough to hold the game state object
+    //Needs to be big enough to hold the game state object
+    private byte[] buffer = new byte[1024 * 16];
     private int timeoutCount = 0;
 
     /**
      * Creates a UDP Datagram socket on an available port.
      */
     @SneakyThrows
-    protected UDPSocket() {
+    public UDPSocket() {
         socket = new DatagramSocket();
     }
 
@@ -42,7 +42,7 @@ public abstract class UDPSocket extends Thread {
      * @param contents  Object to serialize and send
      */
     @SneakyThrows
-    protected void sendObject(ConnectionPoint recipient, Object contents) {
+    public void sendObject(ConnectionPoint recipient, Object contents) {
         if (!socket.isClosed()) {
             byte[] bytes = objectToByteArray(contents);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, recipient.getAddress(),
@@ -57,10 +57,11 @@ public abstract class UDPSocket extends Thread {
      * Listens on the open socket for a Datagram packet. Closes the socket if it times out 10 times
      * in a row.
      *
+     * @param buffer Byte array to place received data into
      * @return received packet
      */
     @SneakyThrows
-    protected DatagramPacket receive() {
+    public DatagramPacket receive(byte[] buffer) {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         try {
@@ -121,7 +122,7 @@ public abstract class UDPSocket extends Thread {
     protected void createInputThread() {
         new Thread(() -> {
             while (running) {
-                DatagramPacket packet = receive();
+                DatagramPacket packet = receive(buffer);
                 if (packet != null) {
                     parsePacket(packet);
                 }

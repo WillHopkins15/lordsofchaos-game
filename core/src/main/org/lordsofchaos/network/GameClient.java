@@ -14,7 +14,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -89,26 +88,15 @@ public class GameClient extends UDPSocket {
 
             // Get confirmation that the other client is ready
             // Need to allow server socket time to get back up
-            int timeoutCount = 0;
-            while (timeoutCount++ < 10) {
-                try {
-                    socket.receive(packet);
-                } catch (SocketException ignored) {
-                    Thread.sleep(500);
-                    continue;
-                } catch (SocketTimeoutException ignored) {
-                }
-                break;
+            packet = null;
+            while (packet == null) {
+                packet = receive(buffer);
             }
 
-            Object data = getObjectFromBytes(packet.getData());
-            if (data != null) {
-                if (data.equals("mismatched maps")) {
-                    failureMsg = "Client maps are mismatched.";
-                    break;
-                }
-            } else {
-                failureMsg = "Opponent Disconnected";
+            Object message = new String(packet.getData());
+            System.out.println(message);
+            if (message.equals("mismatched maps")) {
+                failureMsg = "Client maps are mismatched.";
                 break;
             }
             connected = true;
