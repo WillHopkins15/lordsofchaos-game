@@ -90,7 +90,7 @@ public class GameClient extends UDPSocket {
             // Get confirmation that the other client is ready
             // Need to allow server socket time to get back up
             int timeoutCount = 0;
-            while (timeoutCount++ < 5) {
+            while (timeoutCount++ < 10) {
                 try {
                     socket.receive(packet);
                 } catch (SocketException ignored) {
@@ -101,9 +101,9 @@ public class GameClient extends UDPSocket {
                 break;
             }
 
-            byte[] data = packet.getData();
+            Object data = getObjectFromBytes(packet.getData());
             if (data != null) {
-                if (getObjectFromBytes(data).equals("mismatched maps")) {
+                if (data.equals("mismatched maps")) {
                     failureMsg = "Client maps are mismatched.";
                     break;
                 }
