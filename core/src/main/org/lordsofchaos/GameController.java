@@ -352,11 +352,11 @@ public class GameController {
     public static boolean endTurnButtonEnabled()
     {
         if (waveState == WaveState.Play)
-            return true;
-        else if (buildTimer < 3)
-            return true;
-        else
             return false;
+        else if (buildTimer < 3)
+            return false;
+        else
+            return true;
     }
 
     /**
