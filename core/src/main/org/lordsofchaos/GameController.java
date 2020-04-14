@@ -225,9 +225,10 @@ public class GameController {
      * Collects all the information about what has changed since the last packet was sent
      */
     public static BuildPhaseData getGameState() {
+        System.out.println("Towers giving " + EventManager.getTowerBuilds() + " is attacker " + clientPlayerType.equals(attacker));
         // send towerBuilds and unitBuildPlan over network
         BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(),
-            EventManager.getTowerBuilds(), EventManager.getRemovedTowers(),
+            EventManager.getTowerBuilds(),
             EventManager.getDefenderUpgradesThisTurn(),
             EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(),
             GameController.defender.getHealth(), attackerUpgradeLevel);
@@ -241,6 +242,7 @@ public class GameController {
      * @param bpd the object that contains all the required information about what has changed
      */
     public static void setGameState(BuildPhaseData bpd) {
+        System.out.println("Towers got " + bpd.getTowerBuildPlan().size() + " is attacker " + clientPlayerType.equals(attacker));
         EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
         EventManager.resetEventManager();
     }
@@ -306,26 +308,91 @@ public class GameController {
      * attacker's game
      */
     private static void attackerRemoveTowers() {
-        for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
-            removeTower(EventManager.getRemovedTowers().get(i));
-        }
+        //for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
+         //   removeTower(EventManager.getRemovedTowers().get(i));
+        //}
     }
 
     /**
      * Any towers the defender placed need to be added to the attacker's game
      */
     private static void attackerPlaceTowers() {
-        for (int i = 0; i < EventManager.getTowerBuilds().size(); i++) {
+        List<SerializableTower> currentTowers = new ArrayList<>();
+
+
+
+        // loop through the currently placed towers and convert to SerializableTower list
+        // any new towers which aren't in this list need to be created and added to the game
+        // and any towers which have been removed, need to be taken out of the game
+        for (Tower t : towers)
+        {
+            if (t instanceof TowerType1) {
+                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+                currentTowers.add(st);
+            } else if (t instanceof TowerType1) {
+                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+                currentTowers.add(st);
+            } else if (t instanceof TowerType1) {
+                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+                currentTowers.add(st);
+            }
+        }
+
+        System.out.println("Attacker current towers " + currentTowers);
+        System.out.println("Attacker build plan towers " + EventManager.getTowerBuilds());
+
+        List<SerializableTower> newTowers = new ArrayList<>();
+        List<SerializableTower> toRemove = new ArrayList<>();
+
+        for (SerializableTower t : EventManager.getTowerBuilds()) {
+            boolean found = false;
+            for (SerializableTower t1 : currentTowers) {
+                if (t1.equals(t)) {
+                    found = true;
+                    break;
+                }
+            }
+            // if the tower from the event manager is not currently in the game, add it to the list
+            if (!found) {
+                newTowers.add(t);
+            }
+        }
+
+        System.out.println("Attacker adding towers " + newTowers);
+
+        for (SerializableTower t : currentTowers) {
+            boolean found = false;
+            for (SerializableTower t1 : EventManager.getTowerBuilds()) {
+                if (t1.equals(t)) {
+                    found = true;
+                    break;
+                }
+            }
+            // if the tower is not found, it has been removed
+            if (!found) {
+                toRemove.add(t);
+            }
+        }
+
+        System.out.println("Attacker removing towers " + toRemove);
+
+        // create new towers
+        for (int i = 0; i < newTowers.size(); i++) {
             System.out.println("Attacker Placing tower " + i);
             MatrixCoordinates mc = new MatrixCoordinates(
-                EventManager.getTowerBuilds().get(i).getRealWorldCoordinates());
+                    newTowers.get(i).getRealWorldCoordinates());
 
             if (((Tile) (getMatrixObject(mc.getY(), mc.getX()))).getTower() == null) {
-                createTower(EventManager.getTowerBuilds().get(i));
+                createTower(newTowers.get(i));
             }
-            // check if tower has not already been added
         }
-        EventManager.getTowerBuilds().clear();
+
+        // remove towers
+        for (int i = 0; i < toRemove.size(); i++) {
+            System.out.println("Attacker removing tower " + i);
+            removeTower(toRemove.get(i));
+        }
+
     }
 
     /**

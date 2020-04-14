@@ -73,7 +73,6 @@ public class EventManager {
             int previousUpgradeLevel = defenderUpgradeLevel;
             defenderUpgradeLevel = bpd.getDefenderUpgradeLevel();
             towerBuilds = bpd.getTowerBuildPlan();
-            removedTowers = bpd.getRemovedTowers();
             GameController.attackerNetworkUpdates(defenderUpgradeLevel - previousUpgradeLevel);
         }
     }
@@ -88,6 +87,7 @@ public class EventManager {
     public static void initialise(int givenTroopsTypes, int givenPathCount) {
         troopTypes = givenTroopsTypes;
         pathCount = givenPathCount;
+        towerBuilds = new ArrayList<>();
         resetEventManager();
     }
 
@@ -173,7 +173,7 @@ public class EventManager {
      */
     public static void resetEventManager() {
         unitBuildPlan = new int[troopTypes][pathCount];
-        towerBuilds = new ArrayList<>();
+        //towerBuilds = new ArrayList<>();
         removedTowers = new ArrayList<>();
         pathsUnblockedThisTurn = new ArrayList<>();
     }
