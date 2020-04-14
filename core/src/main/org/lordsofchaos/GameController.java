@@ -349,6 +349,16 @@ public class GameController {
     private static void resetAddMoneyTimer() {
     }
 
+    public static boolean endTurnButtonEnabled()
+    {
+        if (waveState == WaveState.Play)
+            return true;
+        else if (buildTimer < 3)
+            return true;
+        else
+            return false;
+    }
+
     /**
      * The three play phases are DefenderBuild, AttackerBuild, and Play Whenever the current phase
      * ends, this function is called and the game is moved on to the next phase
