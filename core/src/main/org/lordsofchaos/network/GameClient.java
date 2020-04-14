@@ -89,7 +89,6 @@ public class GameClient extends UDPSocket {
             // Get confirmation that the other client is ready
             // Need to allow server socket time to get back up
             socket.setSoTimeout(10000);
-            Thread.sleep(1000);
             packet = receive(buffer);
 
             Object message = new String(packet.getData());
