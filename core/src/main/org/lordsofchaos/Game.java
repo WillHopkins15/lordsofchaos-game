@@ -293,13 +293,6 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         buttonList.add(new UnitButton("UI/ufoButtonB.png", 30, 50, Screen.ATTACKER_SCREEN, 0));
         buttonList.add(new UnitButton("UI/ufo3ButtonB.png", 136, 50, Screen.ATTACKER_SCREEN, 1));
         buttonList.add(new UnitButton("UI/ufo2ButtonB.png", 242, 50, Screen.ATTACKER_SCREEN, 2));
-        // select attacker/defender buttons
-        buttonList.add(
-            new PlayerButton("UI/NewArtMaybe/defenderButton.png", 100, halfHeight,
-                Screen.CHOOSE_FACTION, Screen.DEFENDER_SCREEN, 0));
-        buttonList.add(
-            new PlayerButton("UI/NewArtMaybe/attackerButton.png", Gdx.graphics.getWidth() - 400,
-                halfHeight, Screen.CHOOSE_FACTION, Screen.ATTACKER_SCREEN, 1));
 
         buttonList.add(
             new EndTurnButton("UI/NewArtMaybe/endTurnButton.png", Gdx.graphics.getWidth() - 350, 50,

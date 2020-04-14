@@ -30,7 +30,7 @@ public class UnitButton extends HoverButton {
      * If the action fails an error sound is played.
      */
     public void leftButtonAction() {
-        if (GameController.canAffordTroop(troopType)) {
+        if (GameController.canAffordTroop(troopType) && !GameController.getBlockedPaths().contains(Game.getCurrentPath())) {
             unitPath = Game.getCurrentPath();
             selectSound.play(Game.getSoundEffectsVolume());
             EventManager.buildPlanChange(troopType, unitPath, 1, false);
