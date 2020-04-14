@@ -357,6 +357,7 @@ public class GameController {
         // If wave state is defender/attacker build, don't allow end turn for first three seconds
         if (waveState != WaveState.Play && buildTimer < 3)
         {
+            Game.playSound("ErrorSound");
             return;
         }
         Game.switchPlayer();
