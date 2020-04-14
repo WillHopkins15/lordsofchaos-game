@@ -13,13 +13,16 @@ public class EndTurnButton extends Button {
      * When the button is left clicked the game ends the current players turn
      */
     public void leftButtonAction() {
-        selectSound.play(Game.getSoundEffectsVolume());
-        if (Game.multiplayer) {
-            Game.getClient().changePhase();
-        } else {
-            GameController.endPhase();
+        if(GameController.endTurnButtonEnabled()) {
+            selectSound.play(Game.getSoundEffectsVolume());
+            if (Game.multiplayer) {
+                Game.getClient().changePhase();
+            } else {
+                GameController.endPhase();
+            }
+            Game.setBuildMode(false);
         }
-        Game.setBuildMode(false);
+        else Game.playSound("ErrorSound");
     }
 
     public void rightButtonAction() {

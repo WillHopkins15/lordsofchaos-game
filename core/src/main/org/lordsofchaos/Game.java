@@ -800,6 +800,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
                         button.getSprite().draw(batch);
                     }
                 } else {
+                    if(button instanceof  EndTurnButton) {
+                        if (!GameController.endTurnButtonEnabled())
+                            button.getSprite().setColor(Color.GRAY);
+                        else button.getSprite().setColor(Color.WHITE);
+                    }
                     if (!(button instanceof SliderButton)) {
                         button.getSprite().draw(batch);
                     }
@@ -842,6 +847,11 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         for (Button button : buttonList) {
             if (button.getScreenLocation() == Screen.ATTACKER_SCREEN
                 && !(button instanceof SliderButton)) {
+                if(button instanceof  EndTurnButton) {
+                    if (!GameController.endTurnButtonEnabled())
+                        button.getSprite().setColor(Color.GRAY);
+                    else button.getSprite().setColor(Color.WHITE);
+                }
                 button.getSprite().draw(batch);
                 if (button instanceof UnitUpgradeButton) {
                     ((UnitUpgradeButton) button).showCooldown(batch);
