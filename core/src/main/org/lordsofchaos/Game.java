@@ -207,7 +207,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static BitmapFont getBloxyFont() {
         return font;
     }
-
+    /**
+     * Switches between Defender and attacker when the game is played locally
+     */
     public static void switchPlayer() {
         if (!multiplayer && client == null) {
             if (player == 0) {
@@ -219,7 +221,10 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             currentScreen = Screen.DEFENDER_SCREEN;
         }
     }
-
+    /**
+     * Plays a certain sound effect
+     * @param soundName  String that tells the function which sound to play
+     */
     public static void playSound(String soundName) {
         Sound tmpSound;
         float tmpVolume = 1;
@@ -247,7 +252,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static void setBuildMode(boolean bool) {
         buildMode = bool;
     }
-
+    /**
+     * Creates buttons and adds them to their respective list
+     */
     public static void createButtons() {
         buttonList = new ArrayList<>();
         buttonList.add(
@@ -337,6 +344,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
     }
 
+    /**
+     * Initialises music and sound
+     */
     public static void createSound() {
         //Setting up soundtrack
         soundTrack = Gdx.audio
@@ -377,12 +387,21 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public static void defenderMaxLevel() {
         UpgradeButton.maxLevel = true;
     }
-
+    /**
+     * Creates a new alert and adds it to the list of alerts
+     * @param targetTime How long the alert is going to be on screen
+     * @param font Which font to use for the alert
+     * @param text Text that is going to appear on screen
+     * @param x X coordinate of the alert
+     * @param y Y coordinate of the alert
+     */
     public static void createAlert(float targetTime, BitmapFont font, String text, int x, int y,
         Screen alertScreen) {
         alertList.add(new Alert(targetTime, font, text, x, y, alertScreen));
     }
-
+    /**
+     * Goes through the list of alerts and shows them on screen
+     */
     public static void showAlert() {
         if (!alertList.isEmpty()) {
             int i = 0;
@@ -529,7 +548,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
     public BitmapFont getPixelatedFont() {
         return unitNumber;
     }
-
+    /**
+     * Resets game when the user goes to the main menu
+     */
     public void resetGame() {
         currentScreen = Screen.MAIN_MENU;
         GameController.initialise();
@@ -605,12 +626,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         renderer.getBatch().end();
     }
 
+    /**
+     * Calculates the health percentage the defender has.
+     */
     public void healthPercentage() {
         float result = GameController.defender.getHealth() / 100.0f;
         healthSprite.setBounds(healthSprite.getX(), healthSprite.getY(), hpSpriteW * result,
             healthSprite.getHeight());
     }
 
+    /**
+     * Initialises font generators and generates all the fonts
+     */
     public void generateFont() {
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("UI/boxybold.ttf"));
         fontParameterBoxy = new FreeTypeFontParameter();
@@ -629,6 +656,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         arialFont18 = fontGenerator.generateFont(fontParameterArial);
     }
 
+    /**
+     * Initialises the fonts and sets the color
+     */
     public void createFonts() {
         unitNumber = new BitmapFont();
         unitNumber.setColor(Color.WHITE);
@@ -642,6 +672,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         boxyFont18 = new BitmapFont();
     }
 
+    /**
+     * Displays the defender health bar on screen and the amount of health they have
+     */
     public void showHealth() {
         healthPercentage();
         healthBarSprite.draw(batch);
@@ -651,6 +684,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         boxyFont18.draw(batch, nr + " / 100", 205 - (nr.length() - 1) * 5, Gdx.graphics.getHeight() - 51);
     }
 
+    /**
+     * Displays the health bar of the units that have been spawned
+     */
     public void showUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
         unitsSprite = new ArrayList<>();
@@ -664,7 +700,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             }
         }
     }
-
+    /**
+     * Frees up the memory when a unit dies by disposing of its health bar
+     */
     public void disposeUnitHealthBar() {
         List<Troop> tmpUnits = GameController.getTroops();
         if (tmpUnits.size() > 0) {
@@ -674,7 +712,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
             troopSprite.dispose();
         }
     }
-
+    /**
+     * Displays the projectile of the towers
+     */
     public void showTowerAttack() {
         towerAttackPixmap = new Pixmap(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
             Pixmap.Format.RGBA8888);
@@ -706,12 +746,18 @@ public class Game extends ApplicationAdapter implements InputProcessor {
         }
         towerAttackSprite.draw(batch);
     }
-
+    /**
+     * Frees up memory by disposing of the tower attacks in between frames
+     */
     public void disposeAttacks() {
         towerAttackTexture.dispose();
         towerAttackPixmap.dispose();
     }
 
+    /**
+     * Displays the amount of coins a player has
+     * @param player Determines whose coins are displayed
+     */
     public void showCoins(Player player) {
         coinSprite.setPosition(Gdx.graphics.getWidth() - 200, Gdx.graphics.getHeight() - 72);
         String tmpCoinCounter = player.getCurrentMoney() + "";
@@ -721,7 +767,9 @@ public class Game extends ApplicationAdapter implements InputProcessor {
 
         coinSprite.draw(batch);
     }
-
+    /**
+     * Displays the multiplayer logs when connecting to a server
+     */
     public void showMultiplayerLogs(SpriteBatch batch) {
         if (client != null) {
             if (searchingForGame) {

@@ -9,7 +9,9 @@ public class EndTurnButton extends Button {
     public EndTurnButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
         super(path, buttonX1, buttonY1, screenLocation);
     }
-
+    /**
+     * When the button is left clicked the game ends the current players turn
+     */
     public void leftButtonAction() {
         selectSound.play(Game.getSoundEffectsVolume());
         if (Game.multiplayer) {

@@ -24,7 +24,11 @@ public class UpgradeButton extends HoverButton {
         infoCardSprite.setPosition(30, 150);
         this.path = path;
     }
-
+    /**
+     * When the button is left clicked try to upgrade defender to the next tier.
+     * If it fails play an error sound.
+     * If it succeeds it also updates the tooltip/infocard about the upgrade.
+     */
     @Override
     public void leftButtonAction() {
         if (maxLevel) {
@@ -48,7 +52,10 @@ public class UpgradeButton extends HoverButton {
     @Override
     public void rightButtonAction() {
     }
-
+    /**
+     * Update the tooltip/infocard to display information about the current upgrade
+     * by changing the sprite.
+     */
     public void updateTexture() {
         infoCardTexture.dispose();
         infoCardTexture = new Texture(
@@ -56,7 +63,14 @@ public class UpgradeButton extends HoverButton {
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30, 150);
     }
-
+    /**
+     * Function that is called every frame.
+     * Displays the tooltip/infocard for the upgrade.
+     * If defender has reached the last upgrade change the button and no longer display tooltip/infocard.
+     * @param x X coordinate of the mouse
+     * @param y Y coordinate of the mouse
+     * @param batch On which SpriteBatch everything is going to be displayed.
+     */
     @Override
     public void update(int x, int y, SpriteBatch batch) {
         if (checkHover(x, y) && !maxLevel) {
@@ -69,6 +83,9 @@ public class UpgradeButton extends HoverButton {
             super.sprite.setPosition(buttonX1, buttonY1);
         }
     }
+    /**
+     * Reset sprites and texture to the initial state.
+     */
     public void reset(){
         doOnce = true;
         maxLevel = false;

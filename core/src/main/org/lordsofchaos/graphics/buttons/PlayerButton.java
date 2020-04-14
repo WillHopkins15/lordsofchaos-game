@@ -15,7 +15,9 @@ public class PlayerButton extends MainMenuButton {
         super(path, buttonX1, buttonY1, screenLocation, targetScreen);
         this.playerType = playerType;
     }
-
+    /**
+     * When the button is left clicked
+     */
     @Override
     public void leftButtonAction() {
         if (!ifMultiplayer) {

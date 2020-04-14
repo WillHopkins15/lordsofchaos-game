@@ -16,6 +16,9 @@ public class BuyPathButton extends Button {
         //super.sprite.setScale(0.50f,0.50f);
     }
 
+    /**
+     * When the button is left clicked the attacker will try to buy the selected path
+     */
     @Override
     public void leftButtonAction() {
         if (GameController.canAttackerUnblockPath()) {

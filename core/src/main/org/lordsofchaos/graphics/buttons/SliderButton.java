@@ -21,7 +21,11 @@ public class SliderButton extends Button {
         sprite.setPosition(super.buttonX1, buttonY1);
         this.soundType = soundType;
     }
-
+    /**
+     * When the button is left clicked move the slider around.
+     * Also makes sure that the slider doesn't go out of bounds and sets the new volumes for
+     * music
+     */
     @Override
     public void leftButtonAction() {
         if (Game.getMenuOpen()) {
@@ -58,7 +62,9 @@ public class SliderButton extends Button {
     public void rightButtonAction() {
 
     }
-
+    /**
+     * Returns whether the slider changes the volume of music or sound effects.
+     */
     public int getSoundType() {
         return soundType;
     }

@@ -21,7 +21,12 @@ abstract public class HoverButton extends Button {
     public void rightButtonAction() {
 
     }
-
+    /**
+     * Checks whether the mouse is hovering over the button
+     * @param x X coordinate of the mouse
+     * @param y Y coordinate of the mouse
+     * @return Whether the mouse is hovering ouver the button or not
+     */
     public boolean checkHover(int x, int y) {
         return (x > buttonX1 && x < buttonX2 && y > buttonY1 && y < buttonY2);
     }

@@ -9,6 +9,9 @@ public class MenuButton extends Button {
         super(path, buttonX1, buttonY1, screenLocation);
     }
 
+    /**
+     * When the button is left clicked if the menu is open, close the menu
+     */
     @Override
     public void leftButtonAction() {
         if (Game.getMenuOpen()) {
