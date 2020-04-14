@@ -355,12 +355,31 @@ public class GameController {
      */
     public static boolean endTurnButtonEnabled()
     {
-        if (waveState == WaveState.Play)
-            return false;
-        else if (buildTimer < 3)
-            return false;
-        else
-            return true;
+        if (Game.multiplayer)
+        {
+            if (clientPlayerType.equals(attacker) && waveState == WaveState.DefenderBuild)
+            {
+                return false;
+            }
+            if (clientPlayerType.equals(defender) && waveState == WaveState.AttackerBuild)
+            {
+                return false;
+            }
+            if (waveState == WaveState.Play)
+                return false;
+            else if (buildTimer < 3)
+                return false;
+            else
+                return true;
+        }
+        else {
+            if (waveState == WaveState.Play)
+                return false;
+            else if (buildTimer < 3)
+                return false;
+            else
+                return true;
+        }
     }
 
     /**
