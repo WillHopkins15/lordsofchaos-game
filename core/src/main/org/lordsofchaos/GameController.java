@@ -231,7 +231,7 @@ public class GameController {
             EventManager.getTowerBuilds(),
             EventManager.getDefenderUpgradesThisTurn(),
             EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(),
-            GameController.defender.getHealth(), attackerUpgradeLevel);
+            attackerUpgradeLevel);
         return bpd;
     }
 
