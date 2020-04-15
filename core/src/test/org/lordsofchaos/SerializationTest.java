@@ -84,8 +84,8 @@ public class SerializationTest {
     public void testBuildPhaseDataIsSerializable() {
         int[][] units = new int[6][3];
         ArrayList<SerializableTower> tbp = new ArrayList<>();
-        BuildPhaseData bpd = new BuildPhaseData(units, tbp, new ArrayList<>(), 0, new ArrayList<>(),
-            "DefenderBuild", 100, 1);
+        BuildPhaseData bpd = new BuildPhaseData(units, tbp, 1, new ArrayList<>(),
+            "DefenderBuild", 1);
 
         //Serialize Object
         byte[] bytes = client.objectToByteArray(bpd);
