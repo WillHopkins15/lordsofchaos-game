@@ -23,9 +23,10 @@ public class TowerButton extends HoverButton {
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30, 150);
     }
+
     /**
-     * When the button is left clicked the defender tries to buy a tower.
-     * If the action fails an error sound is played.
+     * When the button is left clicked the defender tries to buy a tower. If the action fails an
+     * error sound is played.
      */
     public void leftButtonAction() {
         if (GameController.canAffordTower(towerType)) {
@@ -41,11 +42,13 @@ public class TowerButton extends HoverButton {
     public void rightButtonAction() {
         return;
     }
+
     /**
-     * Function that is called every frame.
-     * If the mouse is hovering over the button, display details about the tower.
-     * @param x X coordinate of the mouse
-     * @param y Y coordinate of the mouse
+     * Function that is called every frame. If the mouse is hovering over the button, display
+     * details about the tower.
+     *
+     * @param x     X coordinate of the mouse
+     * @param y     Y coordinate of the mouse
      * @param batch On which SpriteBatch everything is going to be displayed
      */
     @Override

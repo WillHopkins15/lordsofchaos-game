@@ -38,12 +38,14 @@ public class UnitUpgradeButton extends HoverButton {
         spriteCooldown.setPosition(buttonX1, buttonY1);
         super.sprite = spriteCooldown;
     }
+
     /**
-     * Function that is called every frame.
-     * If the mouse is hovering over the button, display details about the upgrade.
-     * It also updates the sprite based on the current upgrade, and limits the player from going over 3 upgrades.
-     * @param x X coordinate of the mouse
-     * @param y Y coordinate of the mouse
+     * Function that is called every frame. If the mouse is hovering over the button, display
+     * details about the upgrade. It also updates the sprite based on the current upgrade, and
+     * limits the player from going over 3 upgrades.
+     *
+     * @param x     X coordinate of the mouse
+     * @param y     Y coordinate of the mouse
      * @param batch On which SpriteBatch everything is going to be displayed
      */
     @Override
@@ -65,9 +67,11 @@ public class UnitUpgradeButton extends HoverButton {
             infoCardSprite.draw(batch);
         }
     }
+
     /**
-     * Frees up memory by disposing the sprite and the texture
-     * and creates a new sprite and texture.
+     * Frees up memory by disposing the sprite and the texture and creates a new sprite and
+     * texture.
+     *
      * @param path The path of the texture file.
      */
     private void createSprite(String path) {
@@ -88,11 +92,12 @@ public class UnitUpgradeButton extends HoverButton {
             infoCardSprite.setPosition(30, 150);
         }
     }
+
     /**
-     * When the button is left clicked try to upgrade all units.
-     * If it fails, because the attacker is already at max level,doesn't have enough money or
-     * hasn't spawned enough units play an error sound.
-     * If it succeeds create an alert informing the players that the troops have been upgraded.
+     * When the button is left clicked try to upgrade all units. If it fails, because the attacker
+     * is already at max level,doesn't have enough money or hasn't spawned enough units play an
+     * error sound. If it succeeds create an alert informing the players that the troops have been
+     * upgraded.
      */
     @Override
     public void leftButtonAction() {
@@ -105,8 +110,10 @@ public class UnitUpgradeButton extends HoverButton {
             Game.playSound("ErrorSound");
         }
     }
+
     /**
      * Displays how many units the attacker has to spawn before earning a new upgrade.
+     *
      * @param batch On which batch everything is going to be displayed.
      */
     public void showCooldown(SpriteBatch batch) {

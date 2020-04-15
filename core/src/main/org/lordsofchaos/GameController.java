@@ -309,7 +309,7 @@ public class GameController {
      */
     private static void attackerRemoveTowers() {
         //for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
-         //   removeTower(EventManager.getRemovedTowers().get(i));
+        //   removeTower(EventManager.getRemovedTowers().get(i));
         //}
     }
 
@@ -321,16 +321,18 @@ public class GameController {
         // loop through the currently placed towers and convert to SerializableTower list
         // any new towers which aren't in this list need to be created and added to the game
         // and any towers which have been removed, need to be taken out of the game
-        for (Tower t : towers)
-        {
+        for (Tower t : towers) {
             if (t instanceof TowerType1) {
-                SerializableTower st = new SerializableTower(TowerType.type1, t.getRealWorldCoordinates());
+                SerializableTower st = new SerializableTower(TowerType.type1,
+                    t.getRealWorldCoordinates());
                 currentTowers.add(st);
             } else if (t instanceof TowerType2) {
-                SerializableTower st = new SerializableTower(TowerType.type2, t.getRealWorldCoordinates());
+                SerializableTower st = new SerializableTower(TowerType.type2,
+                    t.getRealWorldCoordinates());
                 currentTowers.add(st);
             } else if (t instanceof TowerType3) {
-                SerializableTower st = new SerializableTower(TowerType.type3, t.getRealWorldCoordinates());
+                SerializableTower st = new SerializableTower(TowerType.type3,
+                    t.getRealWorldCoordinates());
                 currentTowers.add(st);
             }
         }
@@ -366,7 +368,7 @@ public class GameController {
         // create new towers
         for (int i = 0; i < newTowers.size(); i++) {
             MatrixCoordinates mc = new MatrixCoordinates(
-                    newTowers.get(i).getRealWorldCoordinates());
+                newTowers.get(i).getRealWorldCoordinates());
 
             if (((Tile) (getMatrixObject(mc.getY(), mc.getX()))).getTower() == null) {
                 createTower(newTowers.get(i));
@@ -403,32 +405,29 @@ public class GameController {
      * Returns false if the end turn button should be greyed out (i.e. the game is in the play phase
      * or the build timer is less than three seconds in)
      */
-    public static boolean endTurnButtonEnabled()
-    {
-        if (Game.multiplayer)
-        {
-            if (clientPlayerType.equals(attacker) && waveState == WaveState.DefenderBuild)
-            {
+    public static boolean endTurnButtonEnabled() {
+        if (Game.multiplayer) {
+            if (clientPlayerType.equals(attacker) && waveState == WaveState.DefenderBuild) {
                 return false;
             }
-            if (clientPlayerType.equals(defender) && waveState == WaveState.AttackerBuild)
-            {
+            if (clientPlayerType.equals(defender) && waveState == WaveState.AttackerBuild) {
                 return false;
             }
-            if (waveState == WaveState.Play)
+            if (waveState == WaveState.Play) {
                 return false;
-            else if (buildTimer < 3)
+            } else if (buildTimer < 3) {
                 return false;
-            else
+            } else {
                 return true;
-        }
-        else {
-            if (waveState == WaveState.Play)
+            }
+        } else {
+            if (waveState == WaveState.Play) {
                 return false;
-            else if (buildTimer < 3)
+            } else if (buildTimer < 3) {
                 return false;
-            else
+            } else {
                 return true;
+            }
         }
     }
 
@@ -438,8 +437,7 @@ public class GameController {
      */
     public static void endPhase() {
         // If wave state is defender/attacker build, don't allow end turn for first three seconds
-        if (waveState != WaveState.Play && buildTimer < 3)
-        {
+        if (waveState != WaveState.Play && buildTimer < 3) {
             Game.playSound("ErrorSound");
             return;
         }
@@ -1076,6 +1074,7 @@ public class GameController {
             return false;
         }
     }
+
     public static boolean canDefenderUpgrade() {
         if (defenderUpgradeLevel == defenderMaxUpgradeLevel) {
             return false;
@@ -1089,6 +1088,7 @@ public class GameController {
             return false;
         }
     }
+
     /**
      * Upgrade the defender based off which level they are at
      */

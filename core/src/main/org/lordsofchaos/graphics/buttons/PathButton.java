@@ -32,6 +32,7 @@ public class PathButton extends HoverButton {
         selected[0] = true;
 
     }
+
     /**
      * When the button is left clicked it highlights the chosen path and deselects the other paths.
      * It also makes the path that was clicked the selected path.
@@ -54,6 +55,7 @@ public class PathButton extends HoverButton {
 
     /**
      * Checks whether the button was clicked
+     *
      * @param x X coordinate of the mouse
      * @param y Y coordinate of the mouse
      */
@@ -64,14 +66,15 @@ public class PathButton extends HoverButton {
         }
         return false;
     }
+
     /**
-     * Function that is called every frame.
-     * Displays the highlighting on both the current selected path and if the mouse hovers over another path.
-     * Creates the button that the attacker uses to buy a new path.
-     * If the button was pressed and the attacker was successful in buying the path
+     * Function that is called every frame. Displays the highlighting on both the current selected
+     * path and if the mouse hovers over another path. Creates the button that the attacker uses to
+     * buy a new path. If the button was pressed and the attacker was successful in buying the path
      * it frees up memory by disposing of the buy path button.
-     * @param x X coordinate of the mouse
-     * @param y Y coordinate of the mouse
+     *
+     * @param x     X coordinate of the mouse
+     * @param y     Y coordinate of the mouse
      * @param batch On which SpriteBatch everything is going to be displayed
      */
     public void update(int x, int y, SpriteBatch batch) {

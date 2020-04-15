@@ -16,6 +16,7 @@ public class UpgradeButton extends HoverButton {
     private Texture infoCardTexture;
     private Sprite infoCardSprite;
     private String path;
+
     public UpgradeButton(String path, float buttonX1, float buttonY1, Screen screenLocation) {
         super(path, buttonX1, buttonY1, screenLocation);
         infoCardTexture = new Texture(
@@ -24,10 +25,10 @@ public class UpgradeButton extends HoverButton {
         infoCardSprite.setPosition(30, 150);
         this.path = path;
     }
+
     /**
-     * When the button is left clicked try to upgrade defender to the next tier.
-     * If it fails play an error sound.
-     * If it succeeds it also updates the tooltip/infocard about the upgrade.
+     * When the button is left clicked try to upgrade defender to the next tier. If it fails play an
+     * error sound. If it succeeds it also updates the tooltip/infocard about the upgrade.
      */
     @Override
     public void leftButtonAction() {
@@ -35,7 +36,7 @@ public class UpgradeButton extends HoverButton {
             Game.playSound("ErrorSound");
             return;
         }
-        if (!GameController.canDefenderUpgrade()){
+        if (!GameController.canDefenderUpgrade()) {
             Game.playSound("ErrorSound");
             return;
         }
@@ -52,9 +53,10 @@ public class UpgradeButton extends HoverButton {
     @Override
     public void rightButtonAction() {
     }
+
     /**
-     * Update the tooltip/infocard to display information about the current upgrade
-     * by changing the sprite.
+     * Update the tooltip/infocard to display information about the current upgrade by changing the
+     * sprite.
      */
     public void updateTexture() {
         infoCardTexture.dispose();
@@ -63,12 +65,14 @@ public class UpgradeButton extends HoverButton {
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30, 150);
     }
+
     /**
-     * Function that is called every frame.
-     * Displays the tooltip/infocard for the upgrade.
-     * If defender has reached the last upgrade change the button and no longer display tooltip/infocard.
-     * @param x X coordinate of the mouse
-     * @param y Y coordinate of the mouse
+     * Function that is called every frame. Displays the tooltip/infocard for the upgrade. If
+     * defender has reached the last upgrade change the button and no longer display
+     * tooltip/infocard.
+     *
+     * @param x     X coordinate of the mouse
+     * @param y     Y coordinate of the mouse
      * @param batch On which SpriteBatch everything is going to be displayed.
      */
     @Override
@@ -83,19 +87,20 @@ public class UpgradeButton extends HoverButton {
             super.sprite.setPosition(buttonX1, buttonY1);
         }
     }
+
     /**
      * Reset sprites and texture to the initial state.
      */
-    public void reset(){
+    public void reset() {
         doOnce = true;
         maxLevel = false;
         super.texture.dispose();
         super.texture = new Texture(Gdx.files.internal(path));
         super.sprite = new Sprite(super.texture);
-        super.sprite.setPosition(buttonX1,buttonY1);
+        super.sprite.setPosition(buttonX1, buttonY1);
         infoCardTexture.dispose();
         infoCardTexture = new Texture(
-                "UI/InfoCards/infoPanelTier" + (GameController.getDefenderUpgrade() + 1) + ".png");
+            "UI/InfoCards/infoPanelTier" + (GameController.getDefenderUpgrade() + 1) + ".png");
         infoCardSprite = new Sprite(infoCardTexture);
         infoCardSprite.setPosition(30, 150);
     }

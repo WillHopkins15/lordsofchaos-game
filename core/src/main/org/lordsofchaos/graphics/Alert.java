@@ -24,11 +24,13 @@ public class Alert {
         this.currentScreen = currentScreen;
         readyToDelete = false;
     }
+
     /**
      * Displays the alert on the screen for a certain amount of time.
+     *
      * @param deltaTime Delta time between the current and the last frame
-     * @param batch On which Sprite Batch everything is going to be displayed on.
-     * @param screen On which screen the alert should be displayed.
+     * @param batch     On which Sprite Batch everything is going to be displayed on.
+     * @param screen    On which screen the alert should be displayed.
      */
     public void update(float deltaTime, SpriteBatch batch, Screen screen) {
         currentTime += deltaTime;

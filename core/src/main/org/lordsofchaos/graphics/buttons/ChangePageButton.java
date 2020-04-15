@@ -14,7 +14,8 @@ public class ChangePageButton extends Button {
     }
 
     /**
-     * On left click this button should play a sound effect and then change the page of the level select screen
+     * On left click this button should play a sound effect and then change the page of the level
+     * select screen
      */
     @Override
     public void leftButtonAction() {

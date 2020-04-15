@@ -9,9 +9,10 @@ public class QuitMenuButton extends MainMenuButton {
         Screen screenTarget) {
         super(path, buttonX1, buttonY1, screenLocation, screenTarget);
     }
+
     /**
-     * When the button is left clicked reset the game to its initial state.
-     * This happens when the quit button is clicked that sends the player to the main menu.
+     * When the button is left clicked reset the game to its initial state. This happens when the
+     * quit button is clicked that sends the player to the main menu.
      */
     @Override
     public void leftButtonAction() {

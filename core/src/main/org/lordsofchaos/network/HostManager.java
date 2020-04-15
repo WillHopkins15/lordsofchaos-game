@@ -23,6 +23,7 @@ public class HostManager {
 
     /**
      * Returns a list of known hostnames
+     *
      * @throws IOException If an I/O error occurs opening the source file
      */
     public static ArrayList<String> getHosts() throws IOException {

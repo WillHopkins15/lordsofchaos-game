@@ -12,6 +12,7 @@ public class MainMenuButton extends Button {
         super(path, buttonX1, buttonY1, screenLocation);
         this.targetScreen = targetScreen;
     }
+
     /**
      * When the button is left clicked if the game is not searching for a server it moves the game
      * to its targetScreen

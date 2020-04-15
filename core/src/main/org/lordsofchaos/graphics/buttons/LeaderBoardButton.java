@@ -12,8 +12,8 @@ public class LeaderBoardButton extends MainMenuButton {
     }
 
     /**
-     * On left click this button should play a sound effect and then load the leaderboard page, and display the top five
-     * scores from the database
+     * On left click this button should play a sound effect and then load the leaderboard page, and
+     * display the top five scores from the database
      */
     @Override
     public void leftButtonAction() {

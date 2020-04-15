@@ -91,9 +91,7 @@ public class GameClient extends UDPSocket {
             socket.setSoTimeout(10000);
             packet = receive(buffer);
 
-            Object message = new String(packet.getData());
-            System.out.println(message);
-            if (message.equals("mismatched maps")) {
+            if (new String(packet.getData()).equals("mismatched maps")) {
                 failureMsg = "Client maps are mismatched.";
                 break;
             }
