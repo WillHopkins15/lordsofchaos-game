@@ -225,7 +225,7 @@ public class DatabaseCommunication {
         Map map = getMap(3);
     }
 
-    public static void main(String args[]) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         printOutTable();
     }
 }

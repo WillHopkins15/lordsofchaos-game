@@ -225,14 +225,12 @@ public class GameController {
      * Collects all the information about what has changed since the last packet was sent
      */
     public static BuildPhaseData getGameState() {
-        //System.out.println("Towers giving " + EventManager.getTowerBuilds() + " is attacker " + clientPlayerType.equals(attacker));
         // send towerBuilds and unitBuildPlan over network
-        BuildPhaseData bpd = new BuildPhaseData(EventManager.getUnitBuildPlan(),
+        return new BuildPhaseData(EventManager.getUnitBuildPlan(),
             EventManager.getTowerBuilds(),
             EventManager.getDefenderUpgradesThisTurn(),
             EventManager.getPathsUnblockedThisTurn(), GameController.getWaveState().toString(),
             attackerUpgradeLevel);
-        return bpd;
     }
 
     /**
@@ -242,7 +240,6 @@ public class GameController {
      * @param bpd the object that contains all the required information about what has changed
      */
     public static void setGameState(BuildPhaseData bpd) {
-        //System.out.println("Towers got " + bpd.getTowerBuildPlan().size() + " is attacker " + clientPlayerType.equals(attacker));
         EventManager.recieveBuildPhaseData(bpd, clientPlayerType);
         EventManager.resetEventManager();
     }
@@ -299,7 +296,6 @@ public class GameController {
      */
     public static void attackerNetworkUpdates(int defenderUpgrades) {
         attackerPlaceTowers();
-        attackerRemoveTowers();
         attackerUpdgradeDefender(defenderUpgrades);
     }
 
@@ -308,9 +304,9 @@ public class GameController {
      * attacker's game
      */
     private static void attackerRemoveTowers() {
-        //for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
-        //   removeTower(EventManager.getRemovedTowers().get(i));
-        //}
+        for (int i = 0; i < EventManager.getRemovedTowers().size(); i++) {
+           removeTower(EventManager.getRemovedTowers().get(i));
+        }
     }
 
     /**
@@ -366,17 +362,17 @@ public class GameController {
             }
         }
         // create new towers
-        for (int i = 0; i < newTowers.size(); i++) {
+        for (SerializableTower newTower : newTowers) {
             MatrixCoordinates mc = new MatrixCoordinates(
-                newTowers.get(i).getRealWorldCoordinates());
+                newTower.getRealWorldCoordinates());
 
             if (((Tile) (getMatrixObject(mc.getY(), mc.getX()))).getTower() == null) {
-                createTower(newTowers.get(i));
+                createTower(newTower);
             }
         }
         // remove towers
-        for (int i = 0; i < toRemove.size(); i++) {
-            removeTower(toRemove.get(i));
+        for (SerializableTower serializableTower : toRemove) {
+            removeTower(serializableTower);
         }
     }
 
@@ -415,19 +411,13 @@ public class GameController {
             }
             if (waveState == WaveState.Play) {
                 return false;
-            } else if (buildTimer < 3) {
-                return false;
-            } else {
-                return true;
-            }
+            } else
+                return !(buildTimer < 3);
         } else {
             if (waveState == WaveState.Play) {
                 return false;
-            } else if (buildTimer < 3) {
-                return false;
-            } else {
-                return true;
-            }
+            } else
+                return !(buildTimer < 3);
         }
     }
 
